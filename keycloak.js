@@ -3,7 +3,7 @@ import Keycloak from 'keycloak-js'
 const keycloak = new Keycloak({
   url: 'https://identity.cognaisure.com',
   realm: 'lc360',
-  clientId: 'lc360-web-client'
+  clientId: 'reinsurance-web-client'
 })
 
 export default keycloak
