@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $KUBERNETES_DEPLOYMENT
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: $KUBERNETES_DEPLOYMENT
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: $KUBERNETES_DEPLOYMENT
+    spec:
+      containers:
+        - image: ${IMAGE_URI}
+          name: $KUBERNETES_DEPLOYMENT
+          ports:
+            - containerPort: 80
+          env:
+          - name: AUTH_SECRET
+            value: $AUTH_SECRET
+          - name: AUTH_KEYCLOAK_ID
+            value: $AUTH_KEYCLOAK_ID
+          - name: AUTH_KEYCLOAK_SECRET
+            value: $AUTH_KEYCLOAK_SECRET
+          - name: AUTH_KEYCLOAK_ISSUER
+            value: $AUTH_KEYCLOAK_ISSUER
+          - name: NEXTAUTH_URL
+            value: $NEXTAUTH_URL
+          - name: REMOTE_API
+            value: $REMOTE_API
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: $KUBERNETES_SERVICE
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: $HOST_NAME
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: $SSL_CERT
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+  labels:
+    app: v1-core-lb-service
+spec:
+  selector:
+    app: $KUBERNETES_SERVICE
+  ports:
+    - name: https
+      port: 443
+      targetPort: 80
+  type: LoadBalancer

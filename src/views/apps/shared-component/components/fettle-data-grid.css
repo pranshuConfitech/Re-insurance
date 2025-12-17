@@ -1,0 +1,85 @@
+.fettle-data-table .p-paginator .p-paginator-current {
+    margin-left: auto;
+}
+
+.fettle-data-table .p-progressbar {
+    height: .5rem;
+    background-color: #D8DADC;
+}
+
+.fettle-data-table .p-progressbar .p-progressbar-value {
+    background-color: #607D8B;
+}
+
+.fettle-data-table .table-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.fettle-data-table .p-datepicker {
+    min-width: 25rem;
+}
+
+.fettle-data-table .p-datepicker td {
+    font-weight: 400;
+}
+
+.fettle-data-table .p-datatable.p-datatable-customers .p-datatable-header {
+    padding: 1rem;
+    text-align: left;
+    font-size: 1.5rem;
+}
+
+.fettle-data-table .p-datatable.p-datatable-customers .p-paginator {
+    padding: 1rem;
+}
+
+.fettle-data-table .p-datatable.p-datatable-customers .p-datatable-thead > tr > th {
+    text-align: left;
+}
+
+.fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td {
+    cursor: auto;
+}
+
+.fettle-data-table .p-datatable.p-datatable-customers .p-dropdown-label:not(.p-placeholder) {
+    text-transform: uppercase;
+}
+
+.fettle-data-table .p-datatable-customers .p-datatable-tbody > tr > td .p-column-title {
+    display: none;
+}
+
+@media screen and (max-width: 960px) {
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-thead > tr > th,
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tfoot > tr > td {
+        display: none !important;
+    }
+
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tbody > tr {
+        border-bottom: 1px solid var(--layer-2);
+    }
+
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td {
+        text-align: left;
+        display: block;
+        border: 0 none !important;
+        width: 100% !important;
+        float: left;
+        clear: left;
+        border: 0 none;
+    }
+
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td .p-column-title {
+        padding: .4rem;
+        min-width: 30%;
+        display: inline-block;
+        margin: -.4rem 1rem -.4rem -.4rem;
+        font-weight: bold;
+    }
+
+    .fettle-data-table .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td .p-progressbar {
+        margin-top: .5rem;
+    }
+}
+
