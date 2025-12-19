@@ -74,20 +74,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <SubMenu label="Master Data" icon={<i className="ri-database-2-line" />}>
           <MenuItem href="/masters/insurance-config/basic-details">Insurance Details</MenuItem>
           <MenuItem href="/masters/insurance-config/address-config">Address Config</MenuItem>
-          <MenuItem href="/branch">Region, Branch & Unit</MenuItem>
-          <MenuItem href="/underwriting/guidelines">Underwriting Guidelines</MenuItem>
-          <MenuItem href="/questionnaire">Underwriting Questionnaire</MenuItem>
-          <MenuItem href="/member-upload">Member Upload Config</MenuItem>
-          <MenuItem href="/taxes">Tax Config</MenuItem>
-          <MenuItem href="/bank-management/banks">Bank Config</MenuItem>
-          <MenuItem href="/bank-management/cards">Card Config</MenuItem>
-          <MenuItem href="/masters/provider-config">Provider Config</MenuItem>
-          <MenuItem href="/claims/letter">Letter Config</MenuItem>
-          <MenuItem href="/masters/sector">Sectors</MenuItem>
-          <MenuItem href="/masters/industries">Industies</MenuItem>
-          <MenuItem href="/masters/doc-source">Document Source</MenuItem>
-          <MenuItem href="/masters/claim-matrix">Claim Matrix</MenuItem>
-          <MenuItem href="/masters/template-config">Template Config</MenuItem>
+        </SubMenu>
+        <SubMenu label="Users" icon={<i className="ri-shield-user-line" />}>
+          <MenuItem href="/user-management/access-rights">Access Rights</MenuItem>
+          <MenuItem href="/user-management/users">Users</MenuItem>
         </SubMenu>
         <SubMenu label="Re-insurance" icon={<i className="ri-shield-check-line" />}>
           <MenuItem href="/reinsurance/register-reinsurer">Register Re-insurer</MenuItem>
