@@ -6,7 +6,7 @@ const style = {
   height: 100,
   width: '100%',
   marginRight: '1.5rem',
-  color: 'blue',
+  color: '#D80E51',
   padding: '1rem',
   fontSize: '1rem',
   lineHeight: 'normal',
@@ -17,8 +17,8 @@ const style = {
   fontWeight: 600,
 };
 
-const Dustbin = memo(function Dustbin({ onDrop, children }:{ onDrop:any, children:any }) {
-  const [{ canDrop, isOver }, drop]:any[] = useDrop(() => ({
+const Dustbin = memo(function Dustbin({ onDrop, children }: { onDrop: any, children: any }) {
+  const [{ canDrop, isOver }, drop]: any[] = useDrop(() => ({
     accept: 'box',
     drop: (_item, monitor) => {
       onDrop(_item);
@@ -39,19 +39,19 @@ const Dustbin = memo(function Dustbin({ onDrop, children }:{ onDrop:any, childre
     background = 'linear-gradient(135deg, rgb(66 177 219 / 20%) 0%, rgb(46 158 201 / 26%) 100%)';
   }
 
-  
-return (
+
+  return (
     <td ref={drop} role={'Dustbin'} style={{ ...style, background }}>
       {isActive ? 'Release to drop' : 'Drag a box here'}
     </td>
   );
 });
 
-export const StatefulTargetBox = (props:any) => {
-  const handleDrop = useCallback((data:any) => {
+export const StatefulTargetBox = (props: any) => {
+  const handleDrop = useCallback((data: any) => {
     props.onDrop(data);
   }, [props]);
 
-  
-return <Dustbin {...props} onDrop={handleDrop} />;
+
+  return <Dustbin {...props} onDrop={handleDrop} />;
 };
