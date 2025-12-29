@@ -9,6 +9,7 @@ import { TreatyConfigHeader } from './components/TreatyConfigHeader';
 import { TopFormSection } from './components/TopFormSection';
 import { TreatyFormFields } from './components/TreatyFormFields';
 import { RiskLimitsSection } from './components/RiskLimitsSection';
+import { NonProportionalSection } from './components/NonProportionalSection';
 import { getBlockColor } from './utils/blockColors';
 
 interface Reinsurer {
@@ -59,6 +60,61 @@ interface Treaty {
 
 interface Block { id: string; blockNumber: number; treaties: Treaty[]; }
 
+interface LayerLine {
+    id: string;
+    productLOB: string;
+    productCode: string;
+    accountingLOB: string;
+    riskCategory: string;
+    riskGrade: string;
+    lossOccurDeductibility: string;
+    lossLimit: string;
+    shareOfOccurrenceDeduction: string;
+    availableReinstatedSI: string;
+    annualAggLimit: string;
+    annualAggAmount: string;
+    aggClaimAmount: string;
+    localNativeLayer: string;
+    transactionLimitCcy: string;
+    reinsurers: Reinsurer[];
+    brokers: Broker[];
+}
+
+interface NonProportionalTreaty {
+    id: string;
+    treatyCode: string;
+    priority: string;
+    treatyType: string;
+    treatyName: string;
+    businessTreatyReferenceNumber: string;
+    xolType: string;
+    formerTreatyCode: string;
+    treatyCategory: string;
+    treatyStatus: string;
+    treatyCurrency: string;
+    discussion: string;
+    annualAggregateLimit: string;
+    annualAggDeductible: string;
+    totalNumberOfRI: string;
+    capacity: string;
+    xolBasisForShare: string;
+    xolReinstmtForPremio: string;
+    xolReinstmtForPremioYes: string;
+    proRataOfAmount: string;
+    proRataOfTime: string;
+    sumInsuredRate: string;
+    sumInsuredOccurRate: string;
+    premiumOccurRate: string;
+    perXlSumInsuredPerRiskLimit: string;
+    processingPortfolioMethod: string;
+    premReserveRetainedRate: string;
+    premReserveInterestRate: string;
+    showLayers: boolean;
+    layerLines: LayerLine[];
+}
+
+interface NonProportionalBlock { id: string; blockNumber: number; treaties: NonProportionalTreaty[]; }
+
 const TreatyConfig4CreateComponent = () => {
     const [selectMode, setSelectMode] = useState('Treaty (Proportional)');
     const [portfolio, setPortfolio] = useState('');
@@ -69,6 +125,7 @@ const TreatyConfig4CreateComponent = () => {
     const [treatyEndDate, setTreatyEndDate] = useState<Date | null>(null);
     const [currency, setCurrency] = useState('USD');
     const [blocks, setBlocks] = useState<Block[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }]);
+    const [nonProportionalBlocks, setNonProportionalBlocks] = useState<NonProportionalBlock[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyNonProportionalTreaty('1-1')] }]);
 
     function createEmptyTreaty(id: string): Treaty {
         return {
@@ -90,7 +147,7 @@ const TreatyConfig4CreateComponent = () => {
             retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
             perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
             lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
-            reinsurers: [createEmptyReinsurer('1')],
+            reinsurers: [],
             brokers: []
         };
     }
@@ -100,7 +157,34 @@ const TreatyConfig4CreateComponent = () => {
     }
 
     function createEmptyBroker(id: string): Broker {
-        return { id, broker: '', share: '', reinsurers: [createEmptyReinsurer('1')] };
+        return { id, broker: '', share: '', reinsurers: [] };
+    }
+
+    function createEmptyNonProportionalTreaty(id: string): NonProportionalTreaty {
+        return {
+            id, treatyCode: '', priority: '', treatyType: 'XOL', treatyName: '',
+            businessTreatyReferenceNumber: '', xolType: '', formerTreatyCode: '',
+            treatyCategory: '', treatyStatus: '', treatyCurrency: '', discussion: '',
+            annualAggregateLimit: '', annualAggDeductible: '', totalNumberOfRI: '',
+            capacity: '', xolBasisForShare: '', xolReinstmtForPremio: '',
+            xolReinstmtForPremioYes: '', proRataOfAmount: '', proRataOfTime: '',
+            sumInsuredRate: '', sumInsuredOccurRate: '', premiumOccurRate: '',
+            perXlSumInsuredPerRiskLimit: '', processingPortfolioMethod: 'Clean Cut',
+            premReserveRetainedRate: '', premReserveInterestRate: '', showLayers: false,
+            layerLines: [createEmptyLayerLine('1')]
+        };
+    }
+
+    function createEmptyLayerLine(id: string): LayerLine {
+        return {
+            id, productLOB: '', productCode: '', accountingLOB: '', riskCategory: '',
+            riskGrade: '', lossOccurDeductibility: '', lossLimit: '',
+            shareOfOccurrenceDeduction: '', availableReinstatedSI: '', annualAggLimit: '',
+            annualAggAmount: '', aggClaimAmount: '', localNativeLayer: '',
+            transactionLimitCcy: '',
+            reinsurers: [],
+            brokers: []
+        };
     }
 
     const handleAddOperatingUIN = () => {
@@ -253,7 +337,7 @@ const TreatyConfig4CreateComponent = () => {
                             return {
                                 ...treaty,
                                 riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId && line.reinsurers.length > 1) {
+                                    if (line.id === lineId) {
                                         return { ...line, reinsurers: line.reinsurers.filter(r => r.id !== reinsurerId) };
                                     }
                                     return line;
@@ -429,7 +513,7 @@ const TreatyConfig4CreateComponent = () => {
                                         return {
                                             ...line,
                                             brokers: line.brokers.map(b => {
-                                                if (b.id === brokerId && b.reinsurers.length > 1) {
+                                                if (b.id === brokerId) {
                                                     return { ...b, reinsurers: b.reinsurers.filter(r => r.id !== reinsurerId) };
                                                 }
                                                 return b;
@@ -475,6 +559,379 @@ const TreatyConfig4CreateComponent = () => {
                                         };
                                     }
                                     return line;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    // Non-Proportional handlers
+    const handleAddNonProportionalBlock = () => {
+        const newBlockNumber = nonProportionalBlocks.length + 1;
+        setNonProportionalBlocks([...nonProportionalBlocks, { id: String(newBlockNumber), blockNumber: newBlockNumber, treaties: [createEmptyNonProportionalTreaty(`${newBlockNumber}-1`)] }]);
+    };
+
+    const handleDeleteNonProportionalBlock = (blockId: string) => {
+        if (nonProportionalBlocks.length > 1) setNonProportionalBlocks(nonProportionalBlocks.filter(block => block.id !== blockId));
+    };
+
+    const handleAddNonProportionalTreaty = (blockId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId && block.treaties.length < 9) {
+                return { ...block, treaties: [...block.treaties, createEmptyNonProportionalTreaty(`${blockId}-${block.treaties.length + 1}`)] };
+            }
+            return block;
+        }));
+    };
+
+    const handleDeleteNonProportionalTreaty = (blockId: string, treatyId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId && block.treaties.length > 1) {
+                return { ...block, treaties: block.treaties.filter(treaty => treaty.id !== treatyId) };
+            }
+            return block;
+        }));
+    };
+
+    const handleNonProportionalTreatyChange = (blockId: string, treatyId: string, field: string, value: string | boolean) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return { ...block, treaties: block.treaties.map(treaty => treaty.id === treatyId ? { ...treaty, [field]: value } : treaty) };
+            }
+            return block;
+        }));
+    };
+
+    const toggleLayers = (blockId: string, treatyId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return { ...block, treaties: block.treaties.map(treaty => treaty.id === treatyId ? { ...treaty, showLayers: !treaty.showLayers } : treaty) };
+            }
+            return block;
+        }));
+    };
+
+    const handleAddLayer = (blockId: string, treatyId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            const newLayerId = String(treaty.layerLines.length + 1);
+                            return { ...treaty, layerLines: [...treaty.layerLines, createEmptyLayerLine(newLayerId)] };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleDeleteLayer = (blockId: string, treatyId: string, layerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId && treaty.layerLines.length > 1) {
+                            return { ...treaty, layerLines: treaty.layerLines.filter(layer => layer.id !== layerId) };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleLayerChange = (blockId: string, treatyId: string, layerId: string, field: string, value: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer =>
+                                    layer.id === layerId ? { ...layer, [field]: value } : layer
+                                )
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    // Non-Proportional Reinsurer handlers
+    const handleAddNPReinsurer = (blockId: string, treatyId: string, layerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        const newReinsurerId = String(layer.reinsurers.length + 1);
+                                        return { ...layer, reinsurers: [...layer.reinsurers, createEmptyReinsurer(newReinsurerId)] };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleDeleteNPReinsurer = (blockId: string, treatyId: string, layerId: string, reinsurerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return { ...layer, reinsurers: layer.reinsurers.filter(r => r.id !== reinsurerId) };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleNPReinsurerChange = (blockId: string, treatyId: string, layerId: string, reinsurerId: string, field: string, value: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return {
+                                            ...layer,
+                                            reinsurers: layer.reinsurers.map(r =>
+                                                r.id === reinsurerId ? { ...r, [field]: value } : r
+                                            )
+                                        };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    // Non-Proportional Broker handlers
+    const handleAddNPBroker = (blockId: string, treatyId: string, layerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        const newBrokerId = String(layer.brokers.length + 1);
+                                        return { ...layer, brokers: [...layer.brokers, createEmptyBroker(newBrokerId)] };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleDeleteNPBroker = (blockId: string, treatyId: string, layerId: string, brokerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return { ...layer, brokers: layer.brokers.filter(b => b.id !== brokerId) };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleNPBrokerChange = (blockId: string, treatyId: string, layerId: string, brokerId: string, field: string, value: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return {
+                                            ...layer,
+                                            brokers: layer.brokers.map(b =>
+                                                b.id === brokerId ? { ...b, [field]: value } : b
+                                            )
+                                        };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    // Non-Proportional Broker's Reinsurer handlers
+    const handleAddNPBrokerReinsurer = (blockId: string, treatyId: string, layerId: string, brokerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return {
+                                            ...layer,
+                                            brokers: layer.brokers.map(b => {
+                                                if (b.id === brokerId) {
+                                                    const newReinsurerId = String(b.reinsurers.length + 1);
+                                                    return { ...b, reinsurers: [...b.reinsurers, createEmptyReinsurer(newReinsurerId)] };
+                                                }
+                                                return b;
+                                            })
+                                        };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleDeleteNPBrokerReinsurer = (blockId: string, treatyId: string, layerId: string, brokerId: string, reinsurerId: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return {
+                                            ...layer,
+                                            brokers: layer.brokers.map(b => {
+                                                if (b.id === brokerId) {
+                                                    return { ...b, reinsurers: b.reinsurers.filter(r => r.id !== reinsurerId) };
+                                                }
+                                                return b;
+                                            })
+                                        };
+                                    }
+                                    return layer;
+                                })
+                            };
+                        }
+                        return treaty;
+                    })
+                };
+            }
+            return block;
+        }));
+    };
+
+    const handleNPBrokerReinsurerChange = (blockId: string, treatyId: string, layerId: string, brokerId: string, reinsurerId: string, field: string, value: string) => {
+        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+            if (block.id === blockId) {
+                return {
+                    ...block,
+                    treaties: block.treaties.map(treaty => {
+                        if (treaty.id === treatyId) {
+                            return {
+                                ...treaty,
+                                layerLines: treaty.layerLines.map(layer => {
+                                    if (layer.id === layerId) {
+                                        return {
+                                            ...layer,
+                                            brokers: layer.brokers.map(b => {
+                                                if (b.id === brokerId) {
+                                                    return {
+                                                        ...b,
+                                                        reinsurers: b.reinsurers.map(r =>
+                                                            r.id === reinsurerId ? { ...r, [field]: value } : r
+                                                        )
+                                                    };
+                                                }
+                                                return b;
+                                            })
+                                        };
+                                    }
+                                    return layer;
                                 })
                             };
                         }
@@ -652,10 +1109,27 @@ const TreatyConfig4CreateComponent = () => {
                 )}
 
                 {selectMode === 'Treaty (Non Proportional)' && (
-                    <Card sx={{ p: 4, textAlign: 'center' }}>
-                        <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>Treaty (Non Proportional)</Typography>
-                        <Typography variant="body1" sx={{ color: '#6c757d' }}>Non Proportional section will be implemented next.</Typography>
-                    </Card>
+                    <NonProportionalSection
+                        blocks={nonProportionalBlocks}
+                        onAddBlock={handleAddNonProportionalBlock}
+                        onDeleteBlock={handleDeleteNonProportionalBlock}
+                        onAddTreaty={handleAddNonProportionalTreaty}
+                        onDeleteTreaty={handleDeleteNonProportionalTreaty}
+                        onTreatyChange={handleNonProportionalTreatyChange}
+                        onToggleLayers={toggleLayers}
+                        onAddLayer={handleAddLayer}
+                        onDeleteLayer={handleDeleteLayer}
+                        onLayerChange={handleLayerChange}
+                        onAddReinsurer={handleAddNPReinsurer}
+                        onDeleteReinsurer={handleDeleteNPReinsurer}
+                        onReinsurerChange={handleNPReinsurerChange}
+                        onAddBroker={handleAddNPBroker}
+                        onDeleteBroker={handleDeleteNPBroker}
+                        onBrokerChange={handleNPBrokerChange}
+                        onAddBrokerReinsurer={handleAddNPBrokerReinsurer}
+                        onDeleteBrokerReinsurer={handleDeleteNPBrokerReinsurer}
+                        onBrokerReinsurerChange={handleNPBrokerReinsurerChange}
+                    />
                 )}
             </Box>
         </LocalizationProvider>

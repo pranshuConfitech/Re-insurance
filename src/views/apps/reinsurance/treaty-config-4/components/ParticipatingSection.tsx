@@ -113,15 +113,13 @@ export const ParticipatingSection = ({
                                 />
                             </Grid>
                         </Grid>
-                        {reinsurers.length > 1 && (
-                            <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => onDeleteReinsurer(blockId, treatyId, lineId, reinsurer.id)}
-                            >
-                                <DeleteIcon fontSize="small" />
-                            </IconButton>
-                        )}
+                        <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => onDeleteReinsurer(blockId, treatyId, lineId, reinsurer.id)}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
                     </Box>
                 </Card>
             ))}
@@ -172,15 +170,13 @@ export const ParticipatingSection = ({
                                 />
                             </Grid>
                         </Grid>
-                        {brokers.length > 1 && (
-                            <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => onDeleteBroker(blockId, treatyId, lineId, broker.id)}
-                            >
-                                <DeleteIcon fontSize="small" />
-                            </IconButton>
-                        )}
+                        <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => onDeleteBroker(blockId, treatyId, lineId, broker.id)}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
                     </Box>
 
                     {/* Broker's Reinsurers */}
@@ -229,15 +225,13 @@ export const ParticipatingSection = ({
                                         />
                                     </Grid>
                                 </Grid>
-                                {broker.reinsurers.length > 1 && (
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() => onDeleteBrokerReinsurer(blockId, treatyId, lineId, broker.id, reinsurer.id)}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                )}
+                                <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => onDeleteBrokerReinsurer(blockId, treatyId, lineId, broker.id, reinsurer.id)}
+                                >
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
                             </Box>
                         ))}
                     </Box>
