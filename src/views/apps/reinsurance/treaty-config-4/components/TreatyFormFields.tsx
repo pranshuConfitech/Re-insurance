@@ -1,0 +1,137 @@
+import { Grid, TextField, FormControl, Select, MenuItem } from '@mui/material';
+import { FieldLabel } from './FieldLabel';
+
+interface Treaty {
+    treatyCode: string;
+    priority: string;
+    treatyType: string;
+    treatyName: string;
+    businessTreatyReferenceNumber: string;
+    riGradedRet: string;
+    formerTreatyCode: string;
+    treatyCategory: string;
+    installment: string;
+    processingPortfolioMethod: string;
+    premReserveRetainedRate: string;
+    premReserveInterestRate: string;
+    portfolioPremiumEntryRate: string;
+    portfolioClaimEntryRate: string;
+    portfolioPremWithdRate: string;
+    portfolioClaimWithdRate: string;
+    managementExpenses: string;
+    taxesAndOtherExpenses: string;
+}
+
+interface TreatyFormFieldsProps {
+    treaty: Treaty;
+    blockId: string;
+    treatyId: string;
+    onTreatyChange: (blockId: string, treatyId: string, field: string, value: string) => void;
+}
+
+export const TreatyFormFields = ({ treaty, blockId, treatyId, onTreatyChange }: TreatyFormFieldsProps) => {
+    const handleChange = (field: string, value: string) => {
+        onTreatyChange(blockId, treatyId, field, value);
+    };
+
+    return (
+        <Grid container spacing={2.5}>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Treaty Code</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.treatyCode} onChange={(e) => handleChange('treatyCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={1.5}>
+                <FieldLabel>Priority</FieldLabel>
+                <TextField fullWidth size="small" type="number" value={treaty.priority} onChange={(e) => handleChange('priority', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Treaty Type</FieldLabel>
+                <FormControl fullWidth size="small">
+                    <Select value={treaty.treatyType} onChange={(e) => handleChange('treatyType', e.target.value)} sx={{ backgroundColor: 'white' }}>
+                        <MenuItem value="Quota Share">Quota Share</MenuItem>
+                        <MenuItem value="Surplus">Surplus</MenuItem>
+                        <MenuItem value="Facultative">Facultative</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={6} sm={4} md={2.5}>
+                <FieldLabel>Treaty Name</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.treatyName} onChange={(e) => handleChange('treatyName', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Business Treaty Ref. Number</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.businessTreatyReferenceNumber} onChange={(e) => handleChange('businessTreatyReferenceNumber', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>RI Graded Ret</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.riGradedRet} onChange={(e) => handleChange('riGradedRet', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Former Treaty Code</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.formerTreatyCode} onChange={(e) => handleChange('formerTreatyCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={1.5}>
+                <FieldLabel>Treaty Category</FieldLabel>
+                <FormControl fullWidth size="small">
+                    <Select value={treaty.treatyCategory} onChange={(e) => handleChange('treatyCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                        <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="M">M</MenuItem>
+                        <MenuItem value="F">F</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={6} sm={4} md={1.5}>
+                <FieldLabel>Installment</FieldLabel>
+                <FormControl fullWidth size="small">
+                    <Select value={treaty.installment} onChange={(e) => handleChange('installment', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                        <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="Monthly">Monthly</MenuItem>
+                        <MenuItem value="Quarterly">Quarterly</MenuItem>
+                        <MenuItem value="Annually">Annually</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Processing Portfolio Method</FieldLabel>
+                <FormControl fullWidth size="small">
+                    <Select value={treaty.processingPortfolioMethod} onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)} sx={{ backgroundColor: 'white' }}>
+                        <MenuItem value="Clean Cut">Clean Cut</MenuItem>
+                        <MenuItem value="Run Off">Run Off</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Prem Reserve Retained Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.premReserveRetainedRate} onChange={(e) => handleChange('premReserveRetainedRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Prem Reserve Interest Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.premReserveInterestRate} onChange={(e) => handleChange('premReserveInterestRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Portfolio Premium Entry Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.portfolioPremiumEntryRate} onChange={(e) => handleChange('portfolioPremiumEntryRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Portfolio Claim Entry Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.portfolioClaimEntryRate} onChange={(e) => handleChange('portfolioClaimEntryRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Portfolio Prem Withd. Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.portfolioPremWithdRate} onChange={(e) => handleChange('portfolioPremWithdRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Portfolio Claim Withd. Rate(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.portfolioClaimWithdRate} onChange={(e) => handleChange('portfolioClaimWithdRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Management Expenses(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.managementExpenses} onChange={(e) => handleChange('managementExpenses', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+            <Grid item xs={6} sm={4} md={2}>
+                <FieldLabel>Taxes And Other Expenses(%)</FieldLabel>
+                <TextField fullWidth size="small" value={treaty.taxesAndOtherExpenses} onChange={(e) => handleChange('taxesAndOtherExpenses', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+            </Grid>
+        </Grid>
+    );
+};
