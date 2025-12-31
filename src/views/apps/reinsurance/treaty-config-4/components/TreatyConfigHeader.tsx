@@ -1,4 +1,4 @@
-import { Box, Typography, FormControl, Select, MenuItem } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 
 interface TreatyConfigHeaderProps {
     selectMode: string;
@@ -10,20 +10,51 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
             Reinsurance Configuration
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                Select Mode:
-            </Typography>
-            <FormControl size="small" sx={{ minWidth: 200 }}>
-                <Select
-                    value={selectMode}
-                    onChange={(e) => onSelectModeChange(e.target.value)}
-                    sx={{ backgroundColor: 'white' }}
-                >
-                    <MenuItem value="Treaty (Proportional)">Treaty (Proportional)</MenuItem>
-                    <MenuItem value="Treaty (Non Proportional)">Treaty (Non Proportional)</MenuItem>
-                </Select>
-            </FormControl>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Button
+                variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
+                onClick={() => onSelectModeChange('Treaty (Proportional)')}
+                sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '6px',
+                    ...(selectMode === 'Treaty (Proportional)' ? {
+                        backgroundColor: '#007bff',
+                        '&:hover': { backgroundColor: '#0056b3' },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    } : {
+                        borderColor: '#007bff',
+                        color: '#007bff',
+                        '&:hover': { borderColor: '#0056b3', backgroundColor: 'rgba(0, 123, 255, 0.05)' }
+                    })
+                }}
+            >
+                Treaty Proportional
+            </Button>
+            <Button
+                variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
+                onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
+                sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '6px',
+                    ...(selectMode === 'Treaty (Non Proportional)' ? {
+                        backgroundColor: '#007bff',
+                        '&:hover': { backgroundColor: '#0056b3' },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    } : {
+                        borderColor: '#007bff',
+                        color: '#007bff',
+                        '&:hover': { borderColor: '#0056b3', backgroundColor: 'rgba(0, 123, 255, 0.05)' }
+                    })
+                }}
+            >
+                Treaty Non Proportional
+            </Button>
         </Box>
     </Box>
 );

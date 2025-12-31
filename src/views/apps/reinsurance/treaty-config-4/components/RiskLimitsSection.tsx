@@ -76,12 +76,12 @@ export const RiskLimitsSection = ({
                     startIcon={<AddIcon />}
                     onClick={() => onAddLine(blockId, treatyId)}
                     sx={{
-                        background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                        '&:hover': { background: 'linear-gradient(135deg, #0e8074 0%, #2dd46a 100%)' },
+                        backgroundColor: '#28a745',
+                        '&:hover': { backgroundColor: '#218838' },
                         textTransform: 'none',
                         fontSize: '11px',
                         fontWeight: 600,
-                        boxShadow: '0 2px 8px rgba(17, 153, 142, 0.4)'
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                     }}
                 >
                     Add Line
@@ -105,8 +105,9 @@ export const RiskLimitsSection = ({
                         Risk & Limit Line {index + 1}
                     </Typography>
 
-                    <Grid container spacing={2.5}>
-                        <Grid item xs={6} sm={4} md={2}>
+                    <Grid container spacing={3}>
+                        {/* Row 1 - 4 fields */}
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Product LOB</FieldLabel>
                             <FormControl fullWidth size="small">
                                 <Select value={line.productLOB} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -117,11 +118,11 @@ export const RiskLimitsSection = ({
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Product Code</FieldLabel>
                             <TextField fullWidth size="small" value={line.productCode} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Accounting LOB</FieldLabel>
                             <FormControl fullWidth size="small">
                                 <Select value={line.accountingLOB} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -131,7 +132,7 @@ export const RiskLimitsSection = ({
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Risk Category</FieldLabel>
                             <FormControl fullWidth size="small">
                                 <Select value={line.riskCategory} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -141,27 +142,31 @@ export const RiskLimitsSection = ({
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6} sm={4} md={1.5}>
+
+                        {/* Row 2 - 4 fields */}
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Risk Grade</FieldLabel>
                             <TextField fullWidth size="small" value={line.riskGrade} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={1.5}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Cession Rate %</FieldLabel>
                             <TextField fullWidth size="small" value={line.cessionRate} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cessionRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Quota Cession Max Capacity</FieldLabel>
                             <TextField fullWidth size="small" value={line.quotaCessionMaxCapacity} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'quotaCessionMaxCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Retention (Gross/Net)</FieldLabel>
                             <TextField fullWidth size="small" value={line.retentionGrossNet} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'retentionGrossNet', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+
+                        {/* Row 3 - 4 fields */}
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Surplus Capacity</FieldLabel>
                             <TextField fullWidth size="small" value={line.surplusCapacity} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'surplusCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Capacity(Calculate In XL)</FieldLabel>
                             <FormControl fullWidth size="small">
                                 <Select value={line.capacityCalculateInXL} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'capacityCalculateInXL', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -171,27 +176,29 @@ export const RiskLimitsSection = ({
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Per Risk Recovery Limit</FieldLabel>
                             <TextField fullWidth size="small" value={line.perRiskRecoveryLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'perRiskRecoveryLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Event Limit</FieldLabel>
                             <TextField fullWidth size="small" value={line.eventLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'eventLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+
+                        {/* Row 4 - 3 fields */}
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Cash Call Limit</FieldLabel>
                             <TextField fullWidth size="small" value={line.cashCallLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cashCallLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Loss Advice Limit</FieldLabel>
                             <TextField fullWidth size="small" value={line.lossAdviceLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'lossAdviceLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Premium Payment Warranty</FieldLabel>
                             <TextField fullWidth size="small" value={line.premiumPaymentWarranty} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'premiumPaymentWarranty', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>
-                        <Grid item xs={6} sm={4} md={2}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <FieldLabel>Alert Days</FieldLabel>
                             <TextField fullWidth size="small" value={line.alertDays} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'alertDays', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                         </Grid>

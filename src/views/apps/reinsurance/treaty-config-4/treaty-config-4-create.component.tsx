@@ -972,10 +972,10 @@ const TreatyConfig4CreateComponent = () => {
                             <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Treaty (Proportional)</Typography>
                             <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddBlock}
                                 sx={{
-                                    background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                                    '&:hover': { background: 'linear-gradient(135deg, #0e8074 0%, #2dd46a 100%)' },
+                                    backgroundColor: '#28a745',
+                                    '&:hover': { backgroundColor: '#218838' },
                                     textTransform: 'none',
-                                    boxShadow: '0 4px 15px rgba(17, 153, 142, 0.4)',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                     fontWeight: 600,
                                     px: 3
                                 }}>
@@ -988,33 +988,33 @@ const TreatyConfig4CreateComponent = () => {
                             return (
                                 <Card key={block.id} sx={{
                                     mb: 3,
-                                    backgroundColor: blockColor.bg,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    borderRadius: '12px',
+                                    backgroundColor: 'white',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    borderRadius: '8px',
                                     overflow: 'hidden',
-                                    border: `2px solid ${blockColor.accent}20`
+                                    border: '1px solid #dee2e6'
                                 }}>
                                     <Box sx={{
                                         p: 2.5,
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
-                                        background: `linear-gradient(135deg, ${blockColor.header} 0%, ${blockColor.accent}30 100%)`,
-                                        borderBottom: `3px solid ${blockColor.accent}`
+                                        backgroundColor: '#f8f9fa',
+                                        borderBottom: '2px solid #dee2e6'
                                     }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <Box sx={{
                                                 width: 40,
                                                 height: 40,
-                                                borderRadius: '10px',
-                                                backgroundColor: blockColor.accent,
+                                                borderRadius: '8px',
+                                                backgroundColor: '#6c757d',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 color: 'white',
                                                 fontWeight: 700,
                                                 fontSize: '18px',
-                                                boxShadow: `0 4px 10px ${blockColor.accent}40`
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                             }}>
                                                 {block.blockNumber}
                                             </Box>
@@ -1037,12 +1037,12 @@ const TreatyConfig4CreateComponent = () => {
                                                 backgroundColor: 'white',
                                                 mb: 2,
                                                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                                borderRadius: '10px',
-                                                border: `2px solid ${blockColor.accent}15`
+                                                borderRadius: '8px',
+                                                border: '1px solid #dee2e6'
                                             }}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                                     <Typography variant="subtitle2" sx={{
-                                                        color: blockColor.accent,
+                                                        color: '#495057',
                                                         fontWeight: 600,
                                                         fontSize: '12px',
                                                         letterSpacing: '0.5px',
@@ -1067,7 +1067,7 @@ const TreatyConfig4CreateComponent = () => {
 
                                             <Box sx={{ textAlign: 'center', mb: 2 }}>
                                                 <Button variant="text" size="small" onClick={() => toggleRiskLimits(block.id, treaty.id)}
-                                                    sx={{ color: blockColor.accent, textTransform: 'none', fontSize: '13px', fontWeight: 600 }}>
+                                                    sx={{ color: '#007bff', textTransform: 'none', fontSize: '13px', fontWeight: 600 }}>
                                                     {treaty.showRiskLimits ? 'Hide' : 'Show'} / Hide Risk & Limits Details
                                                 </Button>
                                             </Box>
@@ -1097,7 +1097,7 @@ const TreatyConfig4CreateComponent = () => {
                                     {block.treaties.length < 9 && (
                                         <Box sx={{ textAlign: 'center', p: 2 }}>
                                             <Button variant="text" startIcon={<AddIcon />} onClick={() => handleAddTreaty(block.id)}
-                                                sx={{ color: blockColor.accent, textTransform: 'none', fontWeight: 600 }}>
+                                                sx={{ color: '#007bff', textTransform: 'none', fontWeight: 600 }}>
                                                 Add Treaty to this Block
                                             </Button>
                                         </Box>

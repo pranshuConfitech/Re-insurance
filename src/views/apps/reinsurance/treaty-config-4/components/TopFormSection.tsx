@@ -30,7 +30,7 @@ export const TopFormSection = ({
 }: TopFormSectionProps) => (
     <Card sx={{ p: 3, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
         <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Portfolio</FieldLabel>
                 <TextField
                     fullWidth
@@ -40,7 +40,7 @@ export const TopFormSection = ({
                     sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
                 />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Company UIN</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select
@@ -56,7 +56,7 @@ export const TopFormSection = ({
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.5}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Operating Unit UIN</FieldLabel>
                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                     <FormControl fullWidth size="small">
@@ -85,7 +85,7 @@ export const TopFormSection = ({
                     )}
                 </Box>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Treaty Start Date</FieldLabel>
                 <DatePicker
                     label=""
@@ -96,7 +96,7 @@ export const TopFormSection = ({
                     )}
                 />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Treaty End Date</FieldLabel>
                 <DatePicker
                     label=""
@@ -107,7 +107,9 @@ export const TopFormSection = ({
                     )}
                 />
             </Grid>
-            <Grid item xs={12} sm={6} md={1.5}>
+        </Grid>
+        <Grid container spacing={3} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Currency</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={currency} onChange={(e) => onCurrencyChange(e.target.value)} sx={{ backgroundColor: 'white' }}>
