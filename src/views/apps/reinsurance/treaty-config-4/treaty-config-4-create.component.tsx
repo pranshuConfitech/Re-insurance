@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Box, Card, Typography, Button, IconButton, Collapse } from '@mui/material';
+import { Box, Card, Typography, Button, IconButton, Collapse, Stepper, Step, StepLabel } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AddIcon from '@mui/icons-material/Add';
@@ -116,6 +116,7 @@ interface NonProportionalTreaty {
 interface NonProportionalBlock { id: string; blockNumber: number; treaties: NonProportionalTreaty[]; }
 
 const TreatyConfig4CreateComponent = () => {
+    const [activeStep, setActiveStep] = useState(0);
     const [selectMode, setSelectMode] = useState('Treaty (Proportional)');
     const [portfolio, setPortfolio] = useState('');
     const [companyUIN, setCompanyUIN] = useState('');
@@ -126,6 +127,8 @@ const TreatyConfig4CreateComponent = () => {
     const [currency, setCurrency] = useState('USD');
     const [blocks, setBlocks] = useState<Block[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }]);
     const [nonProportionalBlocks, setNonProportionalBlocks] = useState<NonProportionalBlock[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyNonProportionalTreaty('1-1')] }]);
+
+    const steps = ['Basic Configuration', 'Treaty Details'];
 
     function createEmptyTreaty(id: string): Treaty {
         return {
@@ -943,193 +946,279 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
+    const handleNext = () => {
+        setActiveStep((prevStep) => prevStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevStep) => prevStep - 1);
+    };
+
+    const validateStep1 = () => {
+        return portfolio && companyUIN && treatyStartDate && treatyEndDate && currency;
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ p: 4, backgroundColor: '#fafafa', minHeight: '100vh' }}>
-                <TreatyConfigHeader selectMode={selectMode} onSelectModeChange={setSelectMode} />
+                <Typography variant="h4" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
+                    Reinsurance Configuration
+                </Typography>
 
-                <TopFormSection
-                    portfolio={portfolio}
-                    companyUIN={companyUIN}
-                    currentOperatingUIN={currentOperatingUIN}
-                    operatingUnitUINs={operatingUnitUINs}
-                    treatyStartDate={treatyStartDate}
-                    treatyEndDate={treatyEndDate}
-                    currency={currency}
-                    onPortfolioChange={setPortfolio}
-                    onCompanyUINChange={setCompanyUIN}
-                    onCurrentOperatingUINChange={setCurrentOperatingUIN}
-                    onAddOperatingUIN={handleAddOperatingUIN}
-                    onRemoveOperatingUIN={handleRemoveOperatingUIN}
-                    onTreatyStartDateChange={setTreatyStartDate}
-                    onTreatyEndDateChange={setTreatyEndDate}
-                    onCurrencyChange={setCurrency}
-                />
+                {/* Stepper */}
+                <Card sx={{ p: 3, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                    <Stepper activeStep={activeStep} alternativeLabel>
+                        {steps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                </Card>
 
-                {selectMode === 'Treaty (Proportional)' && (
+                {/* Step 1: Basic Configuration */}
+                {activeStep === 0 && (
                     <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Treaty (Proportional)</Typography>
-                            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddBlock}
+                        <TopFormSection
+                            portfolio={portfolio}
+                            companyUIN={companyUIN}
+                            currentOperatingUIN={currentOperatingUIN}
+                            operatingUnitUINs={operatingUnitUINs}
+                            treatyStartDate={treatyStartDate}
+                            treatyEndDate={treatyEndDate}
+                            currency={currency}
+                            onPortfolioChange={setPortfolio}
+                            onCompanyUINChange={setCompanyUIN}
+                            onCurrentOperatingUINChange={setCurrentOperatingUIN}
+                            onAddOperatingUIN={handleAddOperatingUIN}
+                            onRemoveOperatingUIN={handleRemoveOperatingUIN}
+                            onTreatyStartDateChange={setTreatyStartDate}
+                            onTreatyEndDateChange={setTreatyEndDate}
+                            onCurrencyChange={setCurrency}
+                        />
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                            <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                disabled={!validateStep1()}
+                                sx={{
+                                    backgroundColor: '#007bff',
+                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Next
+                            </Button>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Step 2: Treaty Details */}
+                {activeStep === 1 && (
+                    <Box>
+                        <TreatyConfigHeader selectMode={selectMode} onSelectModeChange={setSelectMode} />
+                        {selectMode === 'Treaty (Proportional)' && (
+                            <Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Treaty (Proportional)</Typography>
+                                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddBlock}
+                                        sx={{
+                                            backgroundColor: '#28a745',
+                                            '&:hover': { backgroundColor: '#218838' },
+                                            textTransform: 'none',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                            fontWeight: 600,
+                                            px: 3
+                                        }}>
+                                        New Block
+                                    </Button>
+                                </Box>
+
+                                {blocks.map((block) => {
+                                    const blockColor = getBlockColor(block.blockNumber);
+                                    return (
+                                        <Card key={block.id} sx={{
+                                            mb: 3,
+                                            backgroundColor: 'white',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                            borderRadius: '8px',
+                                            overflow: 'hidden',
+                                            border: '1px solid #dee2e6'
+                                        }}>
+                                            <Box sx={{
+                                                p: 2.5,
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                backgroundColor: '#f8f9fa',
+                                                borderBottom: '2px solid #dee2e6'
+                                            }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white',
+                                                        fontWeight: 700,
+                                                        fontSize: '18px',
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    }}>
+                                                        {block.blockNumber}
+                                                    </Box>
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#212529', fontSize: '16px' }}>
+                                                        BLOCK {block.blockNumber} (PROPORTIONAL)
+                                                    </Typography>
+                                                </Box>
+                                                {blocks.length > 1 && (
+                                                    <Button variant="outlined" color="error" size="small" onClick={() => handleDeleteBlock(block.id)}
+                                                        sx={{ textTransform: 'none', fontWeight: 600 }}>
+                                                        Delete Block
+                                                    </Button>
+                                                )}
+                                            </Box>
+
+                                            {block.treaties.map((treaty) => (
+                                                <Box key={treaty.id} sx={{ p: 3 }}>
+                                                    <Card sx={{
+                                                        p: 3,
+                                                        backgroundColor: 'white',
+                                                        mb: 2,
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                                        borderRadius: '8px',
+                                                        border: '1px solid #dee2e6'
+                                                    }}>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                                            <Typography variant="subtitle2" sx={{
+                                                                color: '#495057',
+                                                                fontWeight: 600,
+                                                                fontSize: '12px',
+                                                                letterSpacing: '0.5px',
+                                                                textTransform: 'uppercase'
+                                                            }}>
+                                                                MANDATORY TREATY INFORMATION
+                                                            </Typography>
+                                                            {block.treaties.length > 1 && (
+                                                                <IconButton size="small" color="error" onClick={() => handleDeleteTreaty(block.id, treaty.id)}>
+                                                                    <DeleteIcon fontSize="small" />
+                                                                </IconButton>
+                                                            )}
+                                                        </Box>
+
+                                                        <TreatyFormFields
+                                                            treaty={treaty}
+                                                            blockId={block.id}
+                                                            treatyId={treaty.id}
+                                                            onTreatyChange={handleTreatyChange}
+                                                        />
+                                                    </Card>
+
+                                                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                                                        <Button variant="text" size="small" onClick={() => toggleRiskLimits(block.id, treaty.id)}
+                                                            sx={{ color: '#007bff', textTransform: 'none', fontSize: '13px', fontWeight: 600 }}>
+                                                            {treaty.showRiskLimits ? 'Hide' : 'Show'} / Hide Risk & Limits Details
+                                                        </Button>
+                                                    </Box>
+
+                                                    <Collapse in={treaty.showRiskLimits}>
+                                                        <RiskLimitsSection
+                                                            riskLimitLines={treaty.riskLimitLines}
+                                                            blockId={block.id}
+                                                            treatyId={treaty.id}
+                                                            onAddLine={handleAddRiskLimitLine}
+                                                            onDeleteLine={handleDeleteRiskLimitLine}
+                                                            onLineChange={handleRiskLimitLineChange}
+                                                            onAddReinsurer={handleAddReinsurer}
+                                                            onDeleteReinsurer={handleDeleteReinsurer}
+                                                            onReinsurerChange={handleReinsurerChange}
+                                                            onAddBroker={handleAddBroker}
+                                                            onDeleteBroker={handleDeleteBroker}
+                                                            onBrokerChange={handleBrokerChange}
+                                                            onAddBrokerReinsurer={handleAddBrokerReinsurer}
+                                                            onDeleteBrokerReinsurer={handleDeleteBrokerReinsurer}
+                                                            onBrokerReinsurerChange={handleBrokerReinsurerChange}
+                                                        />
+                                                    </Collapse>
+                                                </Box>
+                                            ))}
+
+                                            {block.treaties.length < 9 && (
+                                                <Box sx={{ textAlign: 'center', p: 2 }}>
+                                                    <Button variant="text" startIcon={<AddIcon />} onClick={() => handleAddTreaty(block.id)}
+                                                        sx={{ color: '#007bff', textTransform: 'none', fontWeight: 600 }}>
+                                                        Add Treaty to this Block
+                                                    </Button>
+                                                </Box>
+                                            )}
+                                        </Card>
+                                    );
+                                })}
+                            </Box>
+                        )}
+
+                        {selectMode === 'Treaty (Non Proportional)' && (
+                            <NonProportionalSection
+                                blocks={nonProportionalBlocks}
+                                onAddBlock={handleAddNonProportionalBlock}
+                                onDeleteBlock={handleDeleteNonProportionalBlock}
+                                onAddTreaty={handleAddNonProportionalTreaty}
+                                onDeleteTreaty={handleDeleteNonProportionalTreaty}
+                                onTreatyChange={handleNonProportionalTreatyChange}
+                                onToggleLayers={toggleLayers}
+                                onAddLayer={handleAddLayer}
+                                onDeleteLayer={handleDeleteLayer}
+                                onLayerChange={handleLayerChange}
+                                onAddReinsurer={handleAddNPReinsurer}
+                                onDeleteReinsurer={handleDeleteNPReinsurer}
+                                onReinsurerChange={handleNPReinsurerChange}
+                                onAddBroker={handleAddNPBroker}
+                                onDeleteBroker={handleDeleteNPBroker}
+                                onBrokerChange={handleNPBrokerChange}
+                                onAddBrokerReinsurer={handleAddNPBrokerReinsurer}
+                                onDeleteBrokerReinsurer={handleDeleteNPBrokerReinsurer}
+                                onBrokerReinsurerChange={handleNPBrokerReinsurerChange}
+                            />
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleBack}
+                                sx={{
+                                    borderColor: '#6c757d',
+                                    color: '#6c757d',
+                                    '&:hover': { borderColor: '#5a6268', backgroundColor: 'rgba(108, 117, 125, 0.05)' },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                variant="contained"
                                 sx={{
                                     backgroundColor: '#28a745',
                                     '&:hover': { backgroundColor: '#218838' },
                                     textTransform: 'none',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                     fontWeight: 600,
-                                    px: 3
-                                }}>
-                                New Block
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Submit
                             </Button>
                         </Box>
-
-                        {blocks.map((block) => {
-                            const blockColor = getBlockColor(block.blockNumber);
-                            return (
-                                <Card key={block.id} sx={{
-                                    mb: 3,
-                                    backgroundColor: 'white',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    border: '1px solid #dee2e6'
-                                }}>
-                                    <Box sx={{
-                                        p: 2.5,
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        backgroundColor: '#f8f9fa',
-                                        borderBottom: '2px solid #dee2e6'
-                                    }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Box sx={{
-                                                width: 40,
-                                                height: 40,
-                                                borderRadius: '8px',
-                                                backgroundColor: '#6c757d',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: 'white',
-                                                fontWeight: 700,
-                                                fontSize: '18px',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                            }}>
-                                                {block.blockNumber}
-                                            </Box>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#212529', fontSize: '16px' }}>
-                                                BLOCK {block.blockNumber} (PROPORTIONAL)
-                                            </Typography>
-                                        </Box>
-                                        {blocks.length > 1 && (
-                                            <Button variant="outlined" color="error" size="small" onClick={() => handleDeleteBlock(block.id)}
-                                                sx={{ textTransform: 'none', fontWeight: 600 }}>
-                                                Delete Block
-                                            </Button>
-                                        )}
-                                    </Box>
-
-                                    {block.treaties.map((treaty) => (
-                                        <Box key={treaty.id} sx={{ p: 3 }}>
-                                            <Card sx={{
-                                                p: 3,
-                                                backgroundColor: 'white',
-                                                mb: 2,
-                                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                                borderRadius: '8px',
-                                                border: '1px solid #dee2e6'
-                                            }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                                    <Typography variant="subtitle2" sx={{
-                                                        color: '#495057',
-                                                        fontWeight: 600,
-                                                        fontSize: '12px',
-                                                        letterSpacing: '0.5px',
-                                                        textTransform: 'uppercase'
-                                                    }}>
-                                                        MANDATORY TREATY INFORMATION
-                                                    </Typography>
-                                                    {block.treaties.length > 1 && (
-                                                        <IconButton size="small" color="error" onClick={() => handleDeleteTreaty(block.id, treaty.id)}>
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    )}
-                                                </Box>
-
-                                                <TreatyFormFields
-                                                    treaty={treaty}
-                                                    blockId={block.id}
-                                                    treatyId={treaty.id}
-                                                    onTreatyChange={handleTreatyChange}
-                                                />
-                                            </Card>
-
-                                            <Box sx={{ textAlign: 'center', mb: 2 }}>
-                                                <Button variant="text" size="small" onClick={() => toggleRiskLimits(block.id, treaty.id)}
-                                                    sx={{ color: '#007bff', textTransform: 'none', fontSize: '13px', fontWeight: 600 }}>
-                                                    {treaty.showRiskLimits ? 'Hide' : 'Show'} / Hide Risk & Limits Details
-                                                </Button>
-                                            </Box>
-
-                                            <Collapse in={treaty.showRiskLimits}>
-                                                <RiskLimitsSection
-                                                    riskLimitLines={treaty.riskLimitLines}
-                                                    blockId={block.id}
-                                                    treatyId={treaty.id}
-                                                    onAddLine={handleAddRiskLimitLine}
-                                                    onDeleteLine={handleDeleteRiskLimitLine}
-                                                    onLineChange={handleRiskLimitLineChange}
-                                                    onAddReinsurer={handleAddReinsurer}
-                                                    onDeleteReinsurer={handleDeleteReinsurer}
-                                                    onReinsurerChange={handleReinsurerChange}
-                                                    onAddBroker={handleAddBroker}
-                                                    onDeleteBroker={handleDeleteBroker}
-                                                    onBrokerChange={handleBrokerChange}
-                                                    onAddBrokerReinsurer={handleAddBrokerReinsurer}
-                                                    onDeleteBrokerReinsurer={handleDeleteBrokerReinsurer}
-                                                    onBrokerReinsurerChange={handleBrokerReinsurerChange}
-                                                />
-                                            </Collapse>
-                                        </Box>
-                                    ))}
-
-                                    {block.treaties.length < 9 && (
-                                        <Box sx={{ textAlign: 'center', p: 2 }}>
-                                            <Button variant="text" startIcon={<AddIcon />} onClick={() => handleAddTreaty(block.id)}
-                                                sx={{ color: '#007bff', textTransform: 'none', fontWeight: 600 }}>
-                                                Add Treaty to this Block
-                                            </Button>
-                                        </Box>
-                                    )}
-                                </Card>
-                            );
-                        })}
                     </Box>
-                )}
-
-                {selectMode === 'Treaty (Non Proportional)' && (
-                    <NonProportionalSection
-                        blocks={nonProportionalBlocks}
-                        onAddBlock={handleAddNonProportionalBlock}
-                        onDeleteBlock={handleDeleteNonProportionalBlock}
-                        onAddTreaty={handleAddNonProportionalTreaty}
-                        onDeleteTreaty={handleDeleteNonProportionalTreaty}
-                        onTreatyChange={handleNonProportionalTreatyChange}
-                        onToggleLayers={toggleLayers}
-                        onAddLayer={handleAddLayer}
-                        onDeleteLayer={handleDeleteLayer}
-                        onLayerChange={handleLayerChange}
-                        onAddReinsurer={handleAddNPReinsurer}
-                        onDeleteReinsurer={handleDeleteNPReinsurer}
-                        onReinsurerChange={handleNPReinsurerChange}
-                        onAddBroker={handleAddNPBroker}
-                        onDeleteBroker={handleDeleteNPBroker}
-                        onBrokerChange={handleNPBrokerChange}
-                        onAddBrokerReinsurer={handleAddNPBrokerReinsurer}
-                        onDeleteBrokerReinsurer={handleDeleteNPBrokerReinsurer}
-                        onBrokerReinsurerChange={handleNPBrokerReinsurerChange}
-                    />
                 )}
             </Box>
         </LocalizationProvider>

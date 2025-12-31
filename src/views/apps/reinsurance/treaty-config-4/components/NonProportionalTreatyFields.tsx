@@ -44,17 +44,17 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
     };
 
     return (
-        <Grid container spacing={2.5}>
-            {/* Row 1: Treaty Code, Priority, Treaty Type, Treaty Name, Business Treaty Reference Number, XOL Type */}
-            <Grid item xs={12} sm={6} md={1.5}>
+        <Grid container spacing={3}>
+            {/* Row 1 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Code</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.treatyCode} onChange={(e) => handleChange('treatyCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={1.5}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Priority</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.priority} onChange={(e) => handleChange('priority', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={1.5}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Type</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.treatyType} onChange={(e) => handleChange('treatyType', e.target.value)} sx={{ backgroundColor: 'white' }}>
@@ -64,15 +64,17 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.5}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Name</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.treatyName} onChange={(e) => handleChange('treatyName', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2.5}>
+
+            {/* Row 2 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Business Treaty Reference Number</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.businessTreatyReferenceNumber} onChange={(e) => handleChange('businessTreatyReferenceNumber', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2.5}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>XOL Type</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.xolType} onChange={(e) => handleChange('xolType', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -82,13 +84,11 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-
-            {/* Row 2: Former Treaty Code, Treaty Category, Treaty Status, Treaty Currency, Processing, Annual Aggregate Limit */}
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Former Treaty Code</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.formerTreatyCode} onChange={(e) => handleChange('formerTreatyCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Category</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.treatyCategory} onChange={(e) => handleChange('treatyCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -98,7 +98,9 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+
+            {/* Row 3 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Status</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.treatyStatus} onChange={(e) => handleChange('treatyStatus', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -109,7 +111,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Currency</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.treatyCurrency} onChange={(e) => handleChange('treatyCurrency', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -121,7 +123,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Processing</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.processing} onChange={(e) => handleChange('processing', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -131,39 +133,39 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Annual Aggregate Limit</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.annualAggregateLimit} onChange={(e) => handleChange('annualAggregateLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
 
-            {/* Row 3: Annual Agg Deductible, Total Reinstated SI, Capacity, Flat Rate XOL Prem, Min Deposit XOL Prem, No. Reinstatements */}
-            <Grid item xs={12} sm={6} md={2}>
+            {/* Row 4 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Annual Agg Deductible</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.annualAggDeductible} onChange={(e) => handleChange('annualAggDeductible', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Total Reinstated SI</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.totalReinstatedSI} onChange={(e) => handleChange('totalReinstatedSI', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Capacity</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.capacity} onChange={(e) => handleChange('capacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Flat Rate XOL Prem</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.flatRateXOLPrem} onChange={(e) => handleChange('flatRateXOLPrem', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+
+            {/* Row 5 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Min Deposit XOL Prem</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.minDepositXOLPrem} onChange={(e) => handleChange('minDepositXOLPrem', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>No. Reinstatements</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.noReinstatements} onChange={(e) => handleChange('noReinstatements', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-
-            {/* Row 4: Pro Rate to Amount, Pro Rate to Time, Reserve Type Involved, Burning Cost Rate, Prem Payment Warranty, Alert Days */}
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Pro Rate to Amount</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.proRateToAmount} onChange={(e) => handleChange('proRateToAmount', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -173,7 +175,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Pro Rate to Time</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.proRateToTime} onChange={(e) => handleChange('proRateToTime', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -183,29 +185,31 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+
+            {/* Row 6 - 4 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Reserve Type Involved</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.reserveTypeInvolved} onChange={(e) => handleChange('reserveTypeInvolved', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Burning Cost Rate</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.burningCostRate} onChange={(e) => handleChange('burningCostRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Prem Payment Warranty</FieldLabel>
                 <TextField fullWidth size="small" value={treaty.premPaymentWarranty} onChange={(e) => handleChange('premPaymentWarranty', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Alert Days</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.alertDays} onChange={(e) => handleChange('alertDays', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
 
-            {/* Row 5: Per Claim Recoverable Limit, Processing Portfolio Method, Basis of Attachment */}
-            <Grid item xs={12} sm={6} md={2}>
+            {/* Row 7 - 3 fields */}
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Per Claim Recoverable Limit</FieldLabel>
                 <TextField fullWidth size="small" type="number" value={treaty.perClaimRecoverableLimit} onChange={(e) => handleChange('perClaimRecoverableLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
             </Grid>
-            <Grid item xs={12} sm={6} md={2}>
+            <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Processing Portfolio Method</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.processingPortfolioMethod} onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
@@ -215,7 +219,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreat
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={6}>
                 <FieldLabel>Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss</FieldLabel>
                 <FormControl fullWidth size="small">
                     <Select value={treaty.basisOfAttachment} onChange={(e) => handleChange('basisOfAttachment', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
