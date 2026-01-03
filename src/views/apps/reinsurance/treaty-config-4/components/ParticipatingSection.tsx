@@ -40,9 +40,22 @@ export const ParticipatingSection = ({
     onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
 }: ParticipatingSectionProps) => {
     return (
-        <Card sx={{ p: 2.5, mt: 2, backgroundColor: '#fff8e1', border: '2px solid #ffa726' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ color: '#e65100', fontWeight: 600, fontSize: '12px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+        <Card sx={{
+            p: 2.5,
+            mt: 3,
+            backgroundColor: '#fef9f3',
+            border: '1px solid #ffe0b2',
+            borderRadius: '10px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+                <Typography variant="subtitle2" sx={{
+                    color: '#e65100',
+                    fontWeight: 600,
+                    fontSize: '12px',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase'
+                }}>
                     Participating Reinsurers / Brokers
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -51,7 +64,18 @@ export const ParticipatingSection = ({
                         size="small"
                         startIcon={<AddIcon />}
                         onClick={() => onAddReinsurer(blockId, treatyId, lineId)}
-                        sx={{ textTransform: 'none', fontSize: '11px', fontWeight: 600, borderColor: '#1976d2', color: '#1976d2' }}
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            borderColor: '#1976d2',
+                            color: '#1976d2',
+                            borderRadius: '6px',
+                            '&:hover': {
+                                borderColor: '#1976d2',
+                                backgroundColor: '#e9ecef'
+                            }
+                        }}
                     >
                         Add Reinsurer
                     </Button>
@@ -60,7 +84,18 @@ export const ParticipatingSection = ({
                         size="small"
                         startIcon={<AddIcon />}
                         onClick={() => onAddBroker(blockId, treatyId, lineId)}
-                        sx={{ textTransform: 'none', fontSize: '11px', fontWeight: 600, borderColor: '#f57c00', color: '#f57c00' }}
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            borderColor: '#f57c00',
+                            color: '#f57c00',
+                            borderRadius: '6px',
+                            '&:hover': {
+                                borderColor: '#f57c00',
+                                backgroundColor: '#e9ecef'
+                            }
+                        }}
                     >
                         Add Broker
                     </Button>
@@ -69,11 +104,19 @@ export const ParticipatingSection = ({
 
             {/* Reinsurers */}
             {reinsurers.map((reinsurer, index) => (
-                <Card key={reinsurer.id} sx={{ p: 2, mb: 1.5, backgroundColor: '#e3f2fd', border: '1px solid #1976d2', position: 'relative' }}>
+                <Card key={reinsurer.id} sx={{
+                    p: 2,
+                    mb: 1.5,
+                    backgroundColor: 'white',
+                    border: '1px solid #e3f2fd',
+                    borderRadius: '8px',
+                    position: 'relative',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box sx={{
-                            width: 32,
-                            height: 32,
+                            width: 28,
+                            height: 28,
                             borderRadius: '6px',
                             backgroundColor: '#1976d2',
                             display: 'flex',
@@ -190,7 +233,16 @@ export const ParticipatingSection = ({
                                 size="small"
                                 startIcon={<AddIcon />}
                                 onClick={() => onAddBrokerReinsurer(blockId, treatyId, lineId, broker.id)}
-                                sx={{ textTransform: 'none', fontSize: '10px', color: '#d32f2f', fontWeight: 600 }}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontSize: '10px',
+                                    color: '#d32f2f',
+                                    fontWeight: 600,
+                                    '&:hover': {
+                                        backgroundColor: '#e9ecef',
+                                        color: '#d32f2f'
+                                    }
+                                }}
                             >
                                 Add Reinsurer
                             </Button>

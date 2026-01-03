@@ -14,6 +14,8 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
             <Button
                 variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
                 onClick={() => onSelectModeChange('Treaty (Proportional)')}
+                disableRipple
+                disableElevation
                 sx={{
                     textTransform: 'none',
                     fontWeight: 600,
@@ -21,13 +23,21 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
                     py: 1,
                     borderRadius: '6px',
                     ...(selectMode === 'Treaty (Proportional)' ? {
-                        backgroundColor: '#007bff',
-                        '&:hover': { backgroundColor: '#0056b3' },
+                        backgroundColor: '#007bff !important',
+                        color: 'white !important',
+                        '&:hover': {
+                            backgroundColor: '#0056b3 !important'
+                        },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     } : {
-                        borderColor: '#007bff',
-                        color: '#007bff',
-                        '&:hover': { borderColor: '#0056b3', backgroundColor: 'rgba(0, 123, 255, 0.05)' }
+                        borderColor: '#007bff !important',
+                        color: '#007bff !important',
+                        backgroundColor: 'transparent !important',
+                        '&:hover': {
+                            borderColor: '#007bff !important',
+                            backgroundColor: '#e9ecef !important',
+                            color: '#007bff !important'
+                        }
                     })
                 }}
             >
@@ -36,6 +46,8 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
             <Button
                 variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
                 onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
+                disableRipple
+                disableElevation
                 sx={{
                     textTransform: 'none',
                     fontWeight: 600,
@@ -43,13 +55,21 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
                     py: 1,
                     borderRadius: '6px',
                     ...(selectMode === 'Treaty (Non Proportional)' ? {
-                        backgroundColor: '#007bff',
-                        '&:hover': { backgroundColor: '#0056b3' },
+                        backgroundColor: '#007bff !important',
+                        color: 'white !important',
+                        '&:hover': {
+                            backgroundColor: '#0056b3 !important'
+                        },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     } : {
-                        borderColor: '#007bff',
-                        color: '#007bff',
-                        '&:hover': { borderColor: '#0056b3', backgroundColor: 'rgba(0, 123, 255, 0.05)' }
+                        borderColor: '#007bff !important',
+                        color: '#007bff !important',
+                        backgroundColor: 'transparent !important',
+                        '&:hover': {
+                            borderColor: '#007bff !important',
+                            backgroundColor: '#e9ecef !important',
+                            color: '#007bff !important'
+                        }
                     })
                 }}
             >
