@@ -25,13 +25,12 @@ interface Treaty {
 interface TreatyFormFieldsProps {
     treaty: Treaty;
     blockId: string;
-    treatyId: string;
-    onTreatyChange: (blockId: string, treatyId: string, field: string, value: string) => void;
+    onTreatyChange: (blockId: string, field: string, value: string) => void;
 }
 
-export const TreatyFormFields = ({ treaty, blockId, treatyId, onTreatyChange }: TreatyFormFieldsProps) => {
+export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyFormFieldsProps) => {
     const handleChange = (field: string, value: string) => {
-        onTreatyChange(blockId, treatyId, field, value);
+        onTreatyChange(blockId, field, value);
     };
 
     return (

@@ -1,4 +1,4 @@
-import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid } from '@mui/material';
+import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import AddIcon from '@mui/icons-material/Add';
 import { FieldLabel } from './FieldLabel';
@@ -11,6 +11,7 @@ interface TopFormSectionProps {
     treatyStartDate: Date | null;
     treatyEndDate: Date | null;
     currency: string;
+    selectMode: string;
     onPortfolioChange: (value: string) => void;
     onCompanyUINChange: (value: string) => void;
     onCurrentOperatingUINChange: (value: string) => void;
@@ -19,16 +20,90 @@ interface TopFormSectionProps {
     onTreatyStartDateChange: (date: Date | null) => void;
     onTreatyEndDateChange: (date: Date | null) => void;
     onCurrencyChange: (value: string) => void;
+    onSelectModeChange: (mode: string) => void;
 }
 
 export const TopFormSection = ({
     portfolio, companyUIN, currentOperatingUIN, operatingUnitUINs,
-    treatyStartDate, treatyEndDate, currency,
+    treatyStartDate, treatyEndDate, currency, selectMode,
     onPortfolioChange, onCompanyUINChange, onCurrentOperatingUINChange,
     onAddOperatingUIN, onRemoveOperatingUIN,
-    onTreatyStartDateChange, onTreatyEndDateChange, onCurrencyChange
+    onTreatyStartDateChange, onTreatyEndDateChange, onCurrencyChange, onSelectModeChange
 }: TopFormSectionProps) => (
     <Card sx={{ p: 3, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
+        {/* Treaty Type Selection */}
+        <Box sx={{ mb: 3, pb: 2, borderBottom: '1px solid #e0e0e0' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
+                Treaty Type
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Button
+                    variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
+                    onClick={() => onSelectModeChange('Treaty (Proportional)')}
+                    disableRipple
+                    disableElevation
+                    sx={{
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 3,
+                        py: 1,
+                        borderRadius: '6px',
+                        ...(selectMode === 'Treaty (Proportional)' ? {
+                            backgroundColor: '#007bff !important',
+                            color: 'white !important',
+                            '&:hover': {
+                                backgroundColor: '#0056b3 !important'
+                            },
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        } : {
+                            borderColor: '#007bff !important',
+                            color: '#007bff !important',
+                            backgroundColor: 'transparent !important',
+                            '&:hover': {
+                                borderColor: '#007bff !important',
+                                backgroundColor: '#e9ecef !important',
+                                color: '#007bff !important'
+                            }
+                        })
+                    }}
+                >
+                    Treaty Proportional
+                </Button>
+                <Button
+                    variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
+                    onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
+                    disableRipple
+                    disableElevation
+                    sx={{
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 3,
+                        py: 1,
+                        borderRadius: '6px',
+                        ...(selectMode === 'Treaty (Non Proportional)' ? {
+                            backgroundColor: '#007bff !important',
+                            color: 'white !important',
+                            '&:hover': {
+                                backgroundColor: '#0056b3 !important'
+                            },
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        } : {
+                            borderColor: '#007bff !important',
+                            color: '#007bff !important',
+                            backgroundColor: 'transparent !important',
+                            '&:hover': {
+                                borderColor: '#007bff !important',
+                                backgroundColor: '#e9ecef !important',
+                                color: '#007bff !important'
+                            }
+                        })
+                    }}
+                >
+                    Treaty Non Proportional
+                </Button>
+            </Box>
+        </Box>
+
         <Grid container spacing={3}>
             <Grid item xs={12} sm={6} md={2.4}>
                 <FieldLabel>Portfolio</FieldLabel>

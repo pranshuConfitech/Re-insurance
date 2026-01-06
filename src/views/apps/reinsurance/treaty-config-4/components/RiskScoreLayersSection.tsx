@@ -2,7 +2,6 @@ import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { FieldLabel } from './FieldLabel';
-import { ParticipatingSection } from './ParticipatingSection';
 
 interface Reinsurer {
     id: string;
@@ -40,27 +39,14 @@ interface LayerLine {
 interface RiskScoreLayersSectionProps {
     layerLines: LayerLine[];
     blockId: string;
-    treatyId: string;
-    onAddLayer: (blockId: string, treatyId: string) => void;
-    onDeleteLayer: (blockId: string, treatyId: string, layerId: string) => void;
-    onLayerChange: (blockId: string, treatyId: string, layerId: string, field: string, value: string) => void;
-    onAddReinsurer: (blockId: string, treatyId: string, layerId: string) => void;
-    onDeleteReinsurer: (blockId: string, treatyId: string, layerId: string, reinsurerId: string) => void;
-    onReinsurerChange: (blockId: string, treatyId: string, layerId: string, reinsurerId: string, field: string, value: string) => void;
-    onAddBroker: (blockId: string, treatyId: string, layerId: string) => void;
-    onDeleteBroker: (blockId: string, treatyId: string, layerId: string, brokerId: string) => void;
-    onBrokerChange: (blockId: string, treatyId: string, layerId: string, brokerId: string, field: string, value: string) => void;
-    onAddBrokerReinsurer: (blockId: string, treatyId: string, layerId: string, brokerId: string) => void;
-    onDeleteBrokerReinsurer: (blockId: string, treatyId: string, layerId: string, brokerId: string, reinsurerId: string) => void;
-    onBrokerReinsurerChange: (blockId: string, treatyId: string, layerId: string, brokerId: string, reinsurerId: string, field: string, value: string) => void;
+    onAddLayer: (blockId: string) => void;
+    onDeleteLayer: (blockId: string, layerId: string) => void;
+    onLayerChange: (blockId: string, layerId: string, field: string, value: string) => void;
 }
 
 export const RiskScoreLayersSection = ({
-    layerLines, blockId, treatyId,
-    onAddLayer, onDeleteLayer, onLayerChange,
-    onAddReinsurer, onDeleteReinsurer, onReinsurerChange,
-    onAddBroker, onDeleteBroker, onBrokerChange,
-    onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
+    layerLines, blockId,
+    onAddLayer, onDeleteLayer, onLayerChange
 }: RiskScoreLayersSectionProps) => {
     return (
         <Card sx={{
@@ -93,7 +79,7 @@ export const RiskScoreLayersSection = ({
                     variant="contained"
                     size="small"
                     startIcon={<AddIcon />}
-                    onClick={() => onAddLayer(blockId, treatyId)}
+                    onClick={() => onAddLayer(blockId)}
                     sx={{
                         backgroundColor: '#28a745',
                         '&:hover': { backgroundColor: '#218838' },
@@ -123,7 +109,7 @@ export const RiskScoreLayersSection = ({
                             <IconButton
                                 size="small"
                                 color="error"
-                                onClick={() => onDeleteLayer(blockId, treatyId, layer.id)}
+                                onClick={() => onDeleteLayer(blockId, layer.id)}
                                 sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}
                             >
                                 <DeleteIcon fontSize="small" />
@@ -139,7 +125,7 @@ export const RiskScoreLayersSection = ({
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Product LOB</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={layer.productLOB} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={layer.productLOB} onChange={(e) => onLayerChange(blockId, layer.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
@@ -224,23 +210,6 @@ export const RiskScoreLayersSection = ({
                                 <TextField fullWidth size="small" value={layer.transactionLimitCcy} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'transactionLimitCcy', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                         </Grid>
-
-                        <ParticipatingSection
-                            reinsurers={layer.reinsurers}
-                            brokers={layer.brokers}
-                            blockId={blockId}
-                            treatyId={treatyId}
-                            lineId={layer.id}
-                            onAddReinsurer={onAddReinsurer}
-                            onDeleteReinsurer={onDeleteReinsurer}
-                            onReinsurerChange={onReinsurerChange}
-                            onAddBroker={onAddBroker}
-                            onDeleteBroker={onDeleteBroker}
-                            onBrokerChange={onBrokerChange}
-                            onAddBrokerReinsurer={onAddBrokerReinsurer}
-                            onDeleteBrokerReinsurer={onDeleteBrokerReinsurer}
-                            onBrokerReinsurerChange={onBrokerReinsurerChange}
-                        />
                     </Card>
                 ))}
             </Box>

@@ -2,7 +2,6 @@ import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { FieldLabel } from './FieldLabel';
-import { ParticipatingSection } from './ParticipatingSection';
 
 interface Reinsurer {
     id: string;
@@ -42,27 +41,14 @@ interface RiskLimitLine {
 interface RiskLimitsSectionProps {
     riskLimitLines: RiskLimitLine[];
     blockId: string;
-    treatyId: string;
-    onAddLine: (blockId: string, treatyId: string) => void;
-    onDeleteLine: (blockId: string, treatyId: string, lineId: string) => void;
-    onLineChange: (blockId: string, treatyId: string, lineId: string, field: string, value: string) => void;
-    onAddReinsurer: (blockId: string, treatyId: string, lineId: string) => void;
-    onDeleteReinsurer: (blockId: string, treatyId: string, lineId: string, reinsurerId: string) => void;
-    onReinsurerChange: (blockId: string, treatyId: string, lineId: string, reinsurerId: string, field: string, value: string) => void;
-    onAddBroker: (blockId: string, treatyId: string, lineId: string) => void;
-    onDeleteBroker: (blockId: string, treatyId: string, lineId: string, brokerId: string) => void;
-    onBrokerChange: (blockId: string, treatyId: string, lineId: string, brokerId: string, field: string, value: string) => void;
-    onAddBrokerReinsurer: (blockId: string, treatyId: string, lineId: string, brokerId: string) => void;
-    onDeleteBrokerReinsurer: (blockId: string, treatyId: string, lineId: string, brokerId: string, reinsurerId: string) => void;
-    onBrokerReinsurerChange: (blockId: string, treatyId: string, lineId: string, brokerId: string, reinsurerId: string, field: string, value: string) => void;
+    onAddLine: (blockId: string) => void;
+    onDeleteLine: (blockId: string, lineId: string) => void;
+    onLineChange: (blockId: string, lineId: string, field: string, value: string) => void;
 }
 
 export const RiskLimitsSection = ({
-    riskLimitLines, blockId, treatyId,
-    onAddLine, onDeleteLine, onLineChange,
-    onAddReinsurer, onDeleteReinsurer, onReinsurerChange,
-    onAddBroker, onDeleteBroker, onBrokerChange,
-    onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
+    riskLimitLines, blockId,
+    onAddLine, onDeleteLine, onLineChange
 }: RiskLimitsSectionProps) => {
     return (
         <Card sx={{
@@ -95,7 +81,7 @@ export const RiskLimitsSection = ({
                     variant="contained"
                     size="small"
                     startIcon={<AddIcon />}
-                    onClick={() => onAddLine(blockId, treatyId)}
+                    onClick={() => onAddLine(blockId)}
                     sx={{
                         backgroundColor: '#28a745',
                         '&:hover': { backgroundColor: '#218838' },
@@ -117,7 +103,7 @@ export const RiskLimitsSection = ({
                             <IconButton
                                 size="small"
                                 color="error"
-                                onClick={() => onDeleteLine(blockId, treatyId, line.id)}
+                                onClick={() => onDeleteLine(blockId, line.id)}
                                 sx={{ position: 'absolute', top: 8, right: 8 }}
                             >
                                 <DeleteIcon fontSize="small" />
@@ -133,7 +119,7 @@ export const RiskLimitsSection = ({
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Product LOB</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={line.productLOB} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={line.productLOB} onChange={(e) => onLineChange(blockId, line.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
@@ -143,12 +129,12 @@ export const RiskLimitsSection = ({
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Product Code</FieldLabel>
-                                <TextField fullWidth size="small" value={line.productCode} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.productCode} onChange={(e) => onLineChange(blockId, line.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Accounting LOB</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={line.accountingLOB} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={line.accountingLOB} onChange={(e) => onLineChange(blockId, line.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
@@ -158,7 +144,7 @@ export const RiskLimitsSection = ({
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Risk Category</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={line.riskCategory} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={line.riskCategory} onChange={(e) => onLineChange(blockId, line.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Comm">Comm</MenuItem>
                                         <MenuItem value="Residential">Residential</MenuItem>
@@ -169,30 +155,30 @@ export const RiskLimitsSection = ({
                             {/* Row 2 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Risk Grade</FieldLabel>
-                                <TextField fullWidth size="small" value={line.riskGrade} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.riskGrade} onChange={(e) => onLineChange(blockId, line.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Cession Rate %</FieldLabel>
-                                <TextField fullWidth size="small" value={line.cessionRate} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cessionRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.cessionRate} onChange={(e) => onLineChange(blockId, line.id, 'cessionRate', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Quota Cession Max Capacity</FieldLabel>
-                                <TextField fullWidth size="small" value={line.quotaCessionMaxCapacity} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'quotaCessionMaxCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.quotaCessionMaxCapacity} onChange={(e) => onLineChange(blockId, line.id, 'quotaCessionMaxCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Retention (Gross/Net)</FieldLabel>
-                                <TextField fullWidth size="small" value={line.retentionGrossNet} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'retentionGrossNet', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.retentionGrossNet} onChange={(e) => onLineChange(blockId, line.id, 'retentionGrossNet', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
 
                             {/* Row 3 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Surplus Capacity</FieldLabel>
-                                <TextField fullWidth size="small" value={line.surplusCapacity} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'surplusCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.surplusCapacity} onChange={(e) => onLineChange(blockId, line.id, 'surplusCapacity', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Capacity(Calculate In XL)</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={line.capacityCalculateInXL} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'capacityCalculateInXL', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={line.capacityCalculateInXL} onChange={(e) => onLineChange(blockId, line.id, 'capacityCalculateInXL', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Yes">Yes</MenuItem>
                                         <MenuItem value="No">No</MenuItem>
@@ -201,48 +187,31 @@ export const RiskLimitsSection = ({
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Per Risk Recovery Limit</FieldLabel>
-                                <TextField fullWidth size="small" value={line.perRiskRecoveryLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'perRiskRecoveryLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.perRiskRecoveryLimit} onChange={(e) => onLineChange(blockId, line.id, 'perRiskRecoveryLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Event Limit</FieldLabel>
-                                <TextField fullWidth size="small" value={line.eventLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'eventLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.eventLimit} onChange={(e) => onLineChange(blockId, line.id, 'eventLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
 
                             {/* Row 4 - 3 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Cash Call Limit</FieldLabel>
-                                <TextField fullWidth size="small" value={line.cashCallLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cashCallLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.cashCallLimit} onChange={(e) => onLineChange(blockId, line.id, 'cashCallLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Loss Advice Limit</FieldLabel>
-                                <TextField fullWidth size="small" value={line.lossAdviceLimit} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'lossAdviceLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.lossAdviceLimit} onChange={(e) => onLineChange(blockId, line.id, 'lossAdviceLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Premium Payment Warranty</FieldLabel>
-                                <TextField fullWidth size="small" value={line.premiumPaymentWarranty} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'premiumPaymentWarranty', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.premiumPaymentWarranty} onChange={(e) => onLineChange(blockId, line.id, 'premiumPaymentWarranty', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Alert Days</FieldLabel>
-                                <TextField fullWidth size="small" value={line.alertDays} onChange={(e) => onLineChange(blockId, treatyId, line.id, 'alertDays', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={line.alertDays} onChange={(e) => onLineChange(blockId, line.id, 'alertDays', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                         </Grid>
-
-                        <ParticipatingSection
-                            reinsurers={line.reinsurers}
-                            brokers={line.brokers}
-                            blockId={blockId}
-                            treatyId={treatyId}
-                            lineId={line.id}
-                            onAddReinsurer={onAddReinsurer}
-                            onDeleteReinsurer={onDeleteReinsurer}
-                            onReinsurerChange={onReinsurerChange}
-                            onAddBroker={onAddBroker}
-                            onDeleteBroker={onDeleteBroker}
-                            onBrokerChange={onBrokerChange}
-                            onAddBrokerReinsurer={onAddBrokerReinsurer}
-                            onDeleteBrokerReinsurer={onDeleteBrokerReinsurer}
-                            onBrokerReinsurerChange={onBrokerReinsurerChange}
-                        />
                     </Card>
                 ))}
             </Box>

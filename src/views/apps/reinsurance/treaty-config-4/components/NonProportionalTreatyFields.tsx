@@ -34,13 +34,12 @@ interface NonProportionalTreaty {
 interface NonProportionalTreatyFieldsProps {
     treaty: NonProportionalTreaty;
     blockId: string;
-    treatyId: string;
-    onTreatyChange: (blockId: string, treatyId: string, field: string, value: string) => void;
+    onTreatyChange: (blockId: string, field: string, value: string) => void;
 }
 
-export const NonProportionalTreatyFields = ({ treaty, blockId, treatyId, onTreatyChange }: NonProportionalTreatyFieldsProps) => {
+export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }: NonProportionalTreatyFieldsProps) => {
     const handleChange = (field: string, value: string) => {
-        onTreatyChange(blockId, treatyId, field, value);
+        onTreatyChange(blockId, field, value);
     };
 
     return (
