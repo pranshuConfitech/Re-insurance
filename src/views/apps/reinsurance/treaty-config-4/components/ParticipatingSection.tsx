@@ -20,20 +20,20 @@ interface ParticipatingSectionProps {
     reinsurers: Reinsurer[];
     brokers: Broker[];
     blockId: string;
-    lineId: string;
-    onAddReinsurer: (blockId: string, lineId: string) => void;
-    onDeleteReinsurer: (blockId: string, lineId: string, reinsurerId: string) => void;
-    onReinsurerChange: (blockId: string, lineId: string, reinsurerId: string, field: string, value: string) => void;
-    onAddBroker: (blockId: string, lineId: string) => void;
-    onDeleteBroker: (blockId: string, lineId: string, brokerId: string) => void;
-    onBrokerChange: (blockId: string, lineId: string, brokerId: string, field: string, value: string) => void;
-    onAddBrokerReinsurer: (blockId: string, lineId: string, brokerId: string) => void;
-    onDeleteBrokerReinsurer: (blockId: string, lineId: string, brokerId: string, reinsurerId: string) => void;
-    onBrokerReinsurerChange: (blockId: string, lineId: string, brokerId: string, reinsurerId: string, field: string, value: string) => void;
+    treatyId?: string;
+    onAddReinsurer: (blockId: string, treatyId: string | undefined) => void;
+    onDeleteReinsurer: (blockId: string, treatyId: string | undefined, reinsurerId: string) => void;
+    onReinsurerChange: (blockId: string, treatyId: string | undefined, reinsurerId: string, field: string, value: string) => void;
+    onAddBroker: (blockId: string, treatyId: string | undefined) => void;
+    onDeleteBroker: (blockId: string, treatyId: string | undefined, brokerId: string) => void;
+    onBrokerChange: (blockId: string, treatyId: string | undefined, brokerId: string, field: string, value: string) => void;
+    onAddBrokerReinsurer: (blockId: string, treatyId: string | undefined, brokerId: string) => void;
+    onDeleteBrokerReinsurer: (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string) => void;
+    onBrokerReinsurerChange: (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => void;
 }
 
 export const ParticipatingSection = ({
-    reinsurers, brokers, blockId, lineId,
+    reinsurers, brokers, blockId, treatyId,
     onAddReinsurer, onDeleteReinsurer, onReinsurerChange,
     onAddBroker, onDeleteBroker, onBrokerChange,
     onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
@@ -62,7 +62,7 @@ export const ParticipatingSection = ({
                         variant="outlined"
                         size="small"
                         startIcon={<AddIcon />}
-                        onClick={() => onAddReinsurer(blockId, lineId)}
+                        onClick={() => onAddReinsurer(blockId, treatyId)}
                         sx={{
                             textTransform: 'none',
                             fontSize: '11px',
@@ -82,7 +82,7 @@ export const ParticipatingSection = ({
                         variant="outlined"
                         size="small"
                         startIcon={<AddIcon />}
-                        onClick={() => onAddBroker(blockId, lineId)}
+                        onClick={() => onAddBroker(blockId, treatyId)}
                         sx={{
                             textTransform: 'none',
                             fontSize: '11px',
@@ -133,7 +133,7 @@ export const ParticipatingSection = ({
                                 <FormControl fullWidth size="small">
                                     <Select
                                         value={reinsurer.reinsurer}
-                                        onChange={(e) => onReinsurerChange(blockId, lineId, reinsurer.id, 'reinsurer', e.target.value)}
+                                        onChange={(e) => onReinsurerChange(blockId, treatyId, reinsurer.id, 'reinsurer', e.target.value)}
                                         displayEmpty
                                         sx={{ backgroundColor: 'white' }}
                                     >
@@ -150,7 +150,7 @@ export const ParticipatingSection = ({
                                     fullWidth
                                     size="small"
                                     value={reinsurer.share}
-                                    onChange={(e) => onReinsurerChange(blockId, lineId, reinsurer.id, 'share', e.target.value)}
+                                    onChange={(e) => onReinsurerChange(blockId, treatyId, reinsurer.id, 'share', e.target.value)}
                                     sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
                                 />
                             </Grid>
@@ -158,7 +158,7 @@ export const ParticipatingSection = ({
                         <IconButton
                             size="small"
                             color="error"
-                            onClick={() => onDeleteReinsurer(blockId, lineId, reinsurer.id)}
+                            onClick={() => onDeleteReinsurer(blockId, treatyId, reinsurer.id)}
                         >
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -190,7 +190,7 @@ export const ParticipatingSection = ({
                                 <FormControl fullWidth size="small">
                                     <Select
                                         value={broker.broker}
-                                        onChange={(e) => onBrokerChange(blockId, lineId, broker.id, 'broker', e.target.value)}
+                                        onChange={(e) => onBrokerChange(blockId, treatyId, broker.id, 'broker', e.target.value)}
                                         displayEmpty
                                         sx={{ backgroundColor: 'white' }}
                                     >
@@ -207,7 +207,7 @@ export const ParticipatingSection = ({
                                     fullWidth
                                     size="small"
                                     value={broker.share}
-                                    onChange={(e) => onBrokerChange(blockId, lineId, broker.id, 'share', e.target.value)}
+                                    onChange={(e) => onBrokerChange(blockId, treatyId, broker.id, 'share', e.target.value)}
                                     sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
                                 />
                             </Grid>
@@ -215,7 +215,7 @@ export const ParticipatingSection = ({
                         <IconButton
                             size="small"
                             color="error"
-                            onClick={() => onDeleteBroker(blockId, lineId, broker.id)}
+                            onClick={() => onDeleteBroker(blockId, treatyId, broker.id)}
                         >
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -231,7 +231,7 @@ export const ParticipatingSection = ({
                                 variant="text"
                                 size="small"
                                 startIcon={<AddIcon />}
-                                onClick={() => onAddBrokerReinsurer(blockId, lineId, broker.id)}
+                                onClick={() => onAddBrokerReinsurer(blockId, treatyId, broker.id)}
                                 sx={{
                                     textTransform: 'none',
                                     fontSize: '10px',
@@ -254,7 +254,7 @@ export const ParticipatingSection = ({
                                         <FormControl fullWidth size="small">
                                             <Select
                                                 value={reinsurer.reinsurer}
-                                                onChange={(e) => onBrokerReinsurerChange(blockId, lineId, broker.id, reinsurer.id, 'reinsurer', e.target.value)}
+                                                onChange={(e) => onBrokerReinsurerChange(blockId, treatyId, broker.id, reinsurer.id, 'reinsurer', e.target.value)}
                                                 displayEmpty
                                                 sx={{ backgroundColor: 'white' }}
                                             >
@@ -271,7 +271,7 @@ export const ParticipatingSection = ({
                                             size="small"
                                             placeholder="%"
                                             value={reinsurer.share}
-                                            onChange={(e) => onBrokerReinsurerChange(blockId, lineId, broker.id, reinsurer.id, 'share', e.target.value)}
+                                            onChange={(e) => onBrokerReinsurerChange(blockId, treatyId, broker.id, reinsurer.id, 'share', e.target.value)}
                                             sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
                                         />
                                     </Grid>
@@ -279,7 +279,7 @@ export const ParticipatingSection = ({
                                 <IconButton
                                     size="small"
                                     color="error"
-                                    onClick={() => onDeleteBrokerReinsurer(blockId, lineId, broker.id, reinsurer.id)}
+                                    onClick={() => onDeleteBrokerReinsurer(blockId, treatyId, broker.id, reinsurer.id)}
                                 >
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>

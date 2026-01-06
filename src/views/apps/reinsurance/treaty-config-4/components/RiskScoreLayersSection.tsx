@@ -135,12 +135,12 @@ export const RiskScoreLayersSection = ({
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Product Code</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.productCode} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.productCode} onChange={(e) => onLayerChange(blockId, layer.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Accounting LOB</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={layer.accountingLOB} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={layer.accountingLOB} onChange={(e) => onLayerChange(blockId, layer.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
@@ -150,7 +150,7 @@ export const RiskScoreLayersSection = ({
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Risk Category</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={layer.riskCategory} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={layer.riskCategory} onChange={(e) => onLayerChange(blockId, layer.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Comm">Comm</MenuItem>
                                         <MenuItem value="Residential">Residential</MenuItem>
@@ -161,12 +161,12 @@ export const RiskScoreLayersSection = ({
                             {/* Row 2 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Risk Grade</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.riskGrade} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.riskGrade} onChange={(e) => onLayerChange(blockId, layer.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Loss Occur Deductibility</FieldLabel>
                                 <FormControl fullWidth size="small">
-                                    <Select value={layer.lossOccurDeductibility} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'lossOccurDeductibility', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
+                                    <Select value={layer.lossOccurDeductibility} onChange={(e) => onLayerChange(blockId, layer.id, 'lossOccurDeductibility', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Deductible">Deductible</MenuItem>
                                         <MenuItem value="Non-Deductible">Non-Deductible</MenuItem>
@@ -175,39 +175,39 @@ export const RiskScoreLayersSection = ({
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Loss Limit</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.lossLimit} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'lossLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.lossLimit} onChange={(e) => onLayerChange(blockId, layer.id, 'lossLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Share Of Occurrence Deduction</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.shareOfOccurrenceDeduction} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'shareOfOccurrenceDeduction', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.shareOfOccurrenceDeduction} onChange={(e) => onLayerChange(blockId, layer.id, 'shareOfOccurrenceDeduction', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
 
                             {/* Row 3 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Available Reinstated SI</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.availableReinstatedSI} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'availableReinstatedSI', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.availableReinstatedSI} onChange={(e) => onLayerChange(blockId, layer.id, 'availableReinstatedSI', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Annual Agg Limit (Zone)</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.annualAggLimit} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'annualAggLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.annualAggLimit} onChange={(e) => onLayerChange(blockId, layer.id, 'annualAggLimit', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Shared Agg Limit (Zone)</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.annualAggAmount} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'annualAggAmount', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.annualAggAmount} onChange={(e) => onLayerChange(blockId, layer.id, 'annualAggAmount', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Agg Claim Amount</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.aggClaimAmount} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'aggClaimAmount', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.aggClaimAmount} onChange={(e) => onLayerChange(blockId, layer.id, 'aggClaimAmount', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
 
                             {/* Row 4 - 2 fields */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Local Native Layer</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.localNativeLayer} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'localNativeLayer', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.localNativeLayer} onChange={(e) => onLayerChange(blockId, layer.id, 'localNativeLayer', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Transaction Limit Ccy</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.transactionLimitCcy} onChange={(e) => onLayerChange(blockId, treatyId, layer.id, 'transactionLimitCcy', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField fullWidth size="small" value={layer.transactionLimitCcy} onChange={(e) => onLayerChange(blockId, layer.id, 'transactionLimitCcy', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                         </Grid>
                     </Card>

@@ -45,8 +45,6 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
-    reinsurers: Reinsurer[];
-    brokers: Broker[];
 }
 
 interface Treaty {
@@ -58,6 +56,8 @@ interface Treaty {
     portfolioPremWithdRate: string; portfolioClaimWithdRate: string;
     managementExpenses: string; taxesAndOtherExpenses: string;
     riskLimitLines: RiskLimitLine[];
+    reinsurers: Reinsurer[];
+    brokers: Broker[];
 }
 
 interface Block {
@@ -98,23 +98,24 @@ interface NonProportionalTreaty {
     treatyCategory: string;
     treatyStatus: string;
     treatyCurrency: string;
-    discussion: string;
+    processing: string;
     annualAggregateLimit: string;
     annualAggDeductible: string;
-    totalNumberOfRI: string;
+    totalReinstatedSI: string;
     capacity: string;
-    xolBasisForShare: string;
-    xolReinstmtForPremio: string;
-    xolReinstmtForPremioYes: string;
-    proRataOfAmount: string;
-    proRataOfTime: string;
-    sumInsuredRate: string;
-    sumInsuredOccurRate: string;
-    premiumOccurRate: string;
-    perXlSumInsuredPerRiskLimit: string;
+    flatRateXOLPrem: string;
+    minDepositXOLPrem: string;
+    noReinstatements: string;
+    proRateToAmount: string;
+    proRateToTime: string;
+    reserveTypeInvolved: string;
+    burningCostRate: string;
+    premPaymentWarranty: string;
+    alertDays: string;
+    perClaimRecoverableLimit: string;
     processingPortfolioMethod: string;
-    premReserveRetainedRate: string;
-    premReserveInterestRate: string;
+    basisOfAttachment: string;
+    showLayers: boolean;
     layerLines: LayerLine[];
 }
 
@@ -134,10 +135,10 @@ const TreatyConfig4CreateComponent = () => {
     const [treatyStartDate, setTreatyStartDate] = useState<Date | null>(null);
     const [treatyEndDate, setTreatyEndDate] = useState<Date | null>(null);
     const [currency, setCurrency] = useState('USD');
-    const [blocks, setBlocks] = useState<Block[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1')] }]);
+    const [blocks, setBlocks] = useState<Block[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }]);
     const [nonProportionalBlocks, setNonProportionalBlocks] = useState<NonProportionalBlock[]>([{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }]);
 
-    const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers'];
+    const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers', 'Additional Configuration'];
 
     function createEmptyTreaty(id: string): Treaty {
         return {
@@ -148,7 +149,9 @@ const TreatyConfig4CreateComponent = () => {
             portfolioPremiumEntryRate: '', portfolioClaimEntryRate: '',
             portfolioPremWithdRate: '', portfolioClaimWithdRate: '',
             managementExpenses: '', taxesAndOtherExpenses: '',
-            riskLimitLines: [createEmptyRiskLimitLine('1')]
+            riskLimitLines: [createEmptyRiskLimitLine('1')],
+            reinsurers: [],
+            brokers: []
         };
     }
 
@@ -158,9 +161,7 @@ const TreatyConfig4CreateComponent = () => {
             riskGrade: '', cessionRate: '', quotaCessionMaxCapacity: '',
             retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
             perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
-            lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
-            reinsurers: [],
-            brokers: []
+            lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: ''
         };
     }
 
@@ -176,13 +177,13 @@ const TreatyConfig4CreateComponent = () => {
         return {
             id, treatyCode: '', priority: '', treatyType: 'XOL', treatyName: '',
             businessTreatyReferenceNumber: '', xolType: '', formerTreatyCode: '',
-            treatyCategory: '', treatyStatus: '', treatyCurrency: '', discussion: '',
-            annualAggregateLimit: '', annualAggDeductible: '', totalNumberOfRI: '',
-            capacity: '', xolBasisForShare: '', xolReinstmtForPremio: '',
-            xolReinstmtForPremioYes: '', proRataOfAmount: '', proRataOfTime: '',
-            sumInsuredRate: '', sumInsuredOccurRate: '', premiumOccurRate: '',
-            perXlSumInsuredPerRiskLimit: '', processingPortfolioMethod: 'Clean Cut',
-            premReserveRetainedRate: '', premReserveInterestRate: '',
+            treatyCategory: '', treatyStatus: '', treatyCurrency: '', processing: '',
+            annualAggregateLimit: '', annualAggDeductible: '', totalReinstatedSI: '',
+            capacity: '', flatRateXOLPrem: '', minDepositXOLPrem: '',
+            noReinstatements: '', proRateToAmount: '', proRateToTime: '',
+            reserveTypeInvolved: '', burningCostRate: '', premPaymentWarranty: '',
+            alertDays: '', perClaimRecoverableLimit: '', processingPortfolioMethod: 'Clean Cut',
+            basisOfAttachment: '', showLayers: false,
             layerLines: [createEmptyLayerLine('1')]
         };
     }
@@ -212,7 +213,8 @@ const TreatyConfig4CreateComponent = () => {
 
     const handleAddBlock = () => {
         const newBlockNumber = blocks.length + 1;
-        setBlocks([...blocks, { id: String(newBlockNumber), blockNumber: newBlockNumber, treaties: [createEmptyTreaty(String(newBlockNumber))] }]);
+        const newBlockId = String(newBlockNumber);
+        setBlocks([...blocks, { id: newBlockId, blockNumber: newBlockNumber, treaties: [createEmptyTreaty(`${newBlockId}-1`)] }]);
     };
 
     const handleDeleteBlock = (blockId: string) => {
@@ -222,7 +224,8 @@ const TreatyConfig4CreateComponent = () => {
     const handleAddTreaty = (blockId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
-                const newTreatyId = String(block.treaties.length + 1);
+                // Create globally unique treaty ID using block ID and treaty count
+                const newTreatyId = `${blockId}-${block.treaties.length + 1}`;
                 return {
                     ...block,
                     treaties: [...block.treaties, createEmptyTreaty(newTreatyId)]
@@ -258,13 +261,13 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleAddRiskLimitLine = (blockId: string) => {
+    const handleAddRiskLimitLine = (blockId: string, treatyId?: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Add to first treaty for now
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             const newLineId = String(treaty.riskLimitLines.length + 1);
                             return {
                                 ...treaty,
@@ -279,13 +282,13 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleDeleteRiskLimitLine = (blockId: string, lineId: string) => {
+    const handleDeleteRiskLimitLine = (blockId: string, treatyId: string | undefined, lineId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0 && treaty.riskLimitLines.length > 1) { // Delete from first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if ((!treatyId || treaty.id === treatyId) && treaty.riskLimitLines.length > 1) {
                             return {
                                 ...treaty,
                                 riskLimitLines: treaty.riskLimitLines.filter(line => line.id !== lineId)
@@ -299,13 +302,13 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleRiskLimitLineChange = (blockId: string, lineId: string, field: string, value: string) => {
+    const handleRiskLimitLineChange = (blockId: string, treatyId: string | undefined, lineId: string, field: string, value: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
                                 riskLimitLines: treaty.riskLimitLines.map(line =>
@@ -322,23 +325,15 @@ const TreatyConfig4CreateComponent = () => {
     };
 
     // Reinsurer handlers
-    const handleAddReinsurer = (blockId: string, lineId: string) => {
+    const handleAddReinsurer = (blockId: string, treatyId: string | undefined) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
-                            return {
-                                ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        const newReinsurerId = String(line.reinsurers.length + 1);
-                                        return { ...line, reinsurers: [...line.reinsurers, createEmptyReinsurer(newReinsurerId)] };
-                                    }
-                                    return line;
-                                })
-                            };
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
+                            const newReinsurerId = String(treaty.reinsurers.length + 1);
+                            return { ...treaty, reinsurers: [...treaty.reinsurers, createEmptyReinsurer(newReinsurerId)] };
                         }
                         return treaty;
                     })
@@ -348,22 +343,14 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleDeleteReinsurer = (blockId: string, lineId: string, reinsurerId: string) => {
+    const handleDeleteReinsurer = (blockId: string, treatyId: string | undefined, reinsurerId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
-                            return {
-                                ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return { ...line, reinsurers: line.reinsurers.filter(r => r.id !== reinsurerId) };
-                                    }
-                                    return line;
-                                })
-                            };
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
+                            return { ...treaty, reinsurers: treaty.reinsurers.filter(r => r.id !== reinsurerId) };
                         }
                         return treaty;
                     })
@@ -373,26 +360,18 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleReinsurerChange = (blockId: string, lineId: string, reinsurerId: string, field: string, value: string) => {
+    const handleReinsurerChange = (blockId: string, treatyId: string | undefined, reinsurerId: string, field: string, value: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return {
-                                            ...line,
-                                            reinsurers: line.reinsurers.map(r =>
-                                                r.id === reinsurerId ? { ...r, [field]: value } : r
-                                            )
-                                        };
-                                    }
-                                    return line;
-                                })
+                                reinsurers: treaty.reinsurers.map(r =>
+                                    r.id === reinsurerId ? { ...r, [field]: value } : r
+                                )
                             };
                         }
                         return treaty;
@@ -404,23 +383,15 @@ const TreatyConfig4CreateComponent = () => {
     };
 
     // Broker handlers
-    const handleAddBroker = (blockId: string, lineId: string) => {
+    const handleAddBroker = (blockId: string, treatyId: string | undefined) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
-                            return {
-                                ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        const newBrokerId = String(line.brokers.length + 1);
-                                        return { ...line, brokers: [...line.brokers, createEmptyBroker(newBrokerId)] };
-                                    }
-                                    return line;
-                                })
-                            };
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
+                            const newBrokerId = String(treaty.brokers.length + 1);
+                            return { ...treaty, brokers: [...treaty.brokers, createEmptyBroker(newBrokerId)] };
                         }
                         return treaty;
                     })
@@ -430,22 +401,14 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleDeleteBroker = (blockId: string, lineId: string, brokerId: string) => {
+    const handleDeleteBroker = (blockId: string, treatyId: string | undefined, brokerId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
-                            return {
-                                ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return { ...line, brokers: line.brokers.filter(b => b.id !== brokerId) };
-                                    }
-                                    return line;
-                                })
-                            };
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
+                            return { ...treaty, brokers: treaty.brokers.filter(b => b.id !== brokerId) };
                         }
                         return treaty;
                     })
@@ -455,26 +418,18 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleBrokerChange = (blockId: string, lineId: string, brokerId: string, field: string, value: string) => {
+    const handleBrokerChange = (blockId: string, treatyId: string | undefined, brokerId: string, field: string, value: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return {
-                                            ...line,
-                                            brokers: line.brokers.map(b =>
-                                                b.id === brokerId ? { ...b, [field]: value } : b
-                                            )
-                                        };
-                                    }
-                                    return line;
-                                })
+                                brokers: treaty.brokers.map(b =>
+                                    b.id === brokerId ? { ...b, [field]: value } : b
+                                )
                             };
                         }
                         return treaty;
@@ -486,29 +441,21 @@ const TreatyConfig4CreateComponent = () => {
     };
 
     // Broker's Reinsurer handlers
-    const handleAddBrokerReinsurer = (blockId: string, lineId: string, brokerId: string) => {
+    const handleAddBrokerReinsurer = (blockId: string, treatyId: string | undefined, brokerId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return {
-                                            ...line,
-                                            brokers: line.brokers.map(b => {
-                                                if (b.id === brokerId) {
-                                                    const newReinsurerId = String(b.reinsurers.length + 1);
-                                                    return { ...b, reinsurers: [...b.reinsurers, createEmptyReinsurer(newReinsurerId)] };
-                                                }
-                                                return b;
-                                            })
-                                        };
+                                brokers: treaty.brokers.map(b => {
+                                    if (b.id === brokerId) {
+                                        const newReinsurerId = String(b.reinsurers.length + 1);
+                                        return { ...b, reinsurers: [...b.reinsurers, createEmptyReinsurer(newReinsurerId)] };
                                     }
-                                    return line;
+                                    return b;
                                 })
                             };
                         }
@@ -520,28 +467,20 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleDeleteBrokerReinsurer = (blockId: string, lineId: string, brokerId: string, reinsurerId: string) => {
+    const handleDeleteBrokerReinsurer = (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
-                                        return {
-                                            ...line,
-                                            brokers: line.brokers.map(b => {
-                                                if (b.id === brokerId) {
-                                                    return { ...b, reinsurers: b.reinsurers.filter(r => r.id !== reinsurerId) };
-                                                }
-                                                return b;
-                                            })
-                                        };
+                                brokers: treaty.brokers.map(b => {
+                                    if (b.id === brokerId) {
+                                        return { ...b, reinsurers: b.reinsurers.filter(r => r.id !== reinsurerId) };
                                     }
-                                    return line;
+                                    return b;
                                 })
                             };
                         }
@@ -553,33 +492,25 @@ const TreatyConfig4CreateComponent = () => {
         }));
     };
 
-    const handleBrokerReinsurerChange = (blockId: string, lineId: string, brokerId: string, reinsurerId: string, field: string, value: string) => {
+    const handleBrokerReinsurerChange = (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => {
         setBlocks(blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
-                    treaties: block.treaties.map((treaty, index) => {
-                        if (index === 0) { // Update first treaty
+                    treaties: block.treaties.map(treaty => {
+                        if (!treatyId || treaty.id === treatyId) {
                             return {
                                 ...treaty,
-                                riskLimitLines: treaty.riskLimitLines.map(line => {
-                                    if (line.id === lineId) {
+                                brokers: treaty.brokers.map(b => {
+                                    if (b.id === brokerId) {
                                         return {
-                                            ...line,
-                                            brokers: line.brokers.map(b => {
-                                                if (b.id === brokerId) {
-                                                    return {
-                                                        ...b,
-                                                        reinsurers: b.reinsurers.map(r =>
-                                                            r.id === reinsurerId ? { ...r, [field]: value } : r
-                                                        )
-                                                    };
-                                                }
-                                                return b;
-                                            })
+                                            ...b,
+                                            reinsurers: b.reinsurers.map(r =>
+                                                r.id === reinsurerId ? { ...r, [field]: value } : r
+                                            )
                                         };
                                     }
-                                    return line;
+                                    return b;
                                 })
                             };
                         }
@@ -1078,16 +1009,21 @@ const TreatyConfig4CreateComponent = () => {
                                             </Box>
 
                                             <Box sx={{ p: 3 }}>
-                                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
-                                                    {block.treaties[0]?.treatyName || `Block ${block.blockNumber} Treaty`}
-                                                </Typography>
-                                                <RiskLimitsSection
-                                                    riskLimitLines={block.treaties[0]?.riskLimitLines || []}
-                                                    blockId={block.id}
-                                                    onAddLine={handleAddRiskLimitLine}
-                                                    onDeleteLine={handleDeleteRiskLimitLine}
-                                                    onLineChange={handleRiskLimitLineChange}
-                                                />
+                                                {block.treaties.map((treaty, treatyIndex) => (
+                                                    <Card key={treaty.id} sx={{ mb: 2, p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
+                                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
+                                                            Treaty {block.blockNumber}{treatyIndex + 1}: {treaty.treatyName || `Block ${block.blockNumber} Treaty ${treatyIndex + 1}`}
+                                                        </Typography>
+                                                        <RiskLimitsSection
+                                                            riskLimitLines={treaty.riskLimitLines || []}
+                                                            blockId={block.id}
+                                                            treatyId={treaty.id}
+                                                            onAddLine={(blockId, treatyId) => handleAddRiskLimitLine(blockId, treatyId)}
+                                                            onDeleteLine={(blockId, treatyId, lineId) => handleDeleteRiskLimitLine(blockId, treatyId, lineId)}
+                                                            onLineChange={(blockId, treatyId, lineId, field, value) => handleRiskLimitLineChange(blockId, treatyId, lineId, field, value)}
+                                                        />
+                                                    </Card>
+                                                ))}
                                             </Box>
                                         </Card>
                                     );
@@ -1234,29 +1170,26 @@ const TreatyConfig4CreateComponent = () => {
                                             </Box>
 
                                             <Box sx={{ p: 3 }}>
-                                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
-                                                    {block.treaties[0]?.treatyName || `Block ${block.blockNumber} Treaty`}
-                                                </Typography>
-
-                                                {(block.treaties[0]?.riskLimitLines || []).map((line, lineIndex) => (
-                                                    <Card key={line.id} sx={{ mb: 2, p: 2, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
-                                                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
-                                                            Risk & Limit Line {lineIndex + 1}
+                                                {block.treaties.map((treaty, treatyIndex) => (
+                                                    <Card key={treaty.id} sx={{ mb: 3, p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
+                                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
+                                                            Treaty {block.blockNumber}{treatyIndex + 1}: {treaty.treatyName || `Block ${block.blockNumber} Treaty ${treatyIndex + 1}`}
                                                         </Typography>
+
                                                         <ParticipatingSection
-                                                            reinsurers={line.reinsurers}
-                                                            brokers={line.brokers}
+                                                            reinsurers={treaty.reinsurers}
+                                                            brokers={treaty.brokers}
                                                             blockId={block.id}
-                                                            lineId={line.id}
-                                                            onAddReinsurer={handleAddReinsurer}
-                                                            onDeleteReinsurer={handleDeleteReinsurer}
-                                                            onReinsurerChange={handleReinsurerChange}
-                                                            onAddBroker={handleAddBroker}
-                                                            onDeleteBroker={handleDeleteBroker}
-                                                            onBrokerChange={handleBrokerChange}
-                                                            onAddBrokerReinsurer={handleAddBrokerReinsurer}
-                                                            onDeleteBrokerReinsurer={handleDeleteBrokerReinsurer}
-                                                            onBrokerReinsurerChange={handleBrokerReinsurerChange}
+                                                            treatyId={treaty.id}
+                                                            onAddReinsurer={(blockId, treatyId) => handleAddReinsurer(blockId, treatyId)}
+                                                            onDeleteReinsurer={(blockId, treatyId, reinsurerId) => handleDeleteReinsurer(blockId, treatyId, reinsurerId)}
+                                                            onReinsurerChange={(blockId, treatyId, reinsurerId, field, value) => handleReinsurerChange(blockId, treatyId, reinsurerId, field, value)}
+                                                            onAddBroker={(blockId, treatyId) => handleAddBroker(blockId, treatyId)}
+                                                            onDeleteBroker={(blockId, treatyId, brokerId) => handleDeleteBroker(blockId, treatyId, brokerId)}
+                                                            onBrokerChange={(blockId, treatyId, brokerId, field, value) => handleBrokerChange(blockId, treatyId, brokerId, field, value)}
+                                                            onAddBrokerReinsurer={(blockId, treatyId, brokerId) => handleAddBrokerReinsurer(blockId, treatyId, brokerId)}
+                                                            onDeleteBrokerReinsurer={(blockId, treatyId, brokerId, reinsurerId) => handleDeleteBrokerReinsurer(blockId, treatyId, brokerId, reinsurerId)}
+                                                            onBrokerReinsurerChange={(blockId, treatyId, brokerId, reinsurerId, field, value) => handleBrokerReinsurerChange(blockId, treatyId, brokerId, reinsurerId, field, value)}
                                                         />
                                                     </Card>
                                                 ))}
@@ -1330,6 +1263,180 @@ const TreatyConfig4CreateComponent = () => {
                                                         />
                                                     </Card>
                                                 ))}
+                                            </Box>
+                                        </Card>
+                                    );
+                                })}
+                            </Box>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleBack}
+                                disableRipple
+                                sx={{
+                                    borderColor: '#6c757d !important',
+                                    color: '#6c757d !important',
+                                    backgroundColor: 'transparent !important',
+                                    '&:hover': {
+                                        borderColor: '#6c757d !important',
+                                        backgroundColor: '#e9ecef !important',
+                                        color: '#6c757d !important'
+                                    },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                sx={{
+                                    backgroundColor: '#007bff',
+                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Next
+                            </Button>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Step 5: Additional Configuration */}
+                {activeStep === 4 && (
+                    <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
+                            Additional Configuration
+                        </Typography>
+
+                        {selectMode === 'Treaty (Proportional)' && (
+                            <Box>
+                                {blocks.map((block) => {
+                                    const blockColor = getBlockColor(block.blockNumber);
+                                    return (
+                                        <Card key={block.id} sx={{
+                                            mb: 3,
+                                            backgroundColor: blockColor.bg,
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            border: `2px solid ${blockColor.border}`,
+                                            borderLeft: `5px solid ${blockColor.accent}`
+                                        }}>
+                                            <Box sx={{
+                                                p: 2.5,
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                backgroundColor: blockColor.border,
+                                                borderBottom: `1px solid ${blockColor.light}40`
+                                            }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: blockColor.accent,
+                                                        boxShadow: `0 0 0 4px ${blockColor.light}60`
+                                                    }} />
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
+                                                        BLOCK {block.blockNumber} - ADDITIONAL CONFIGURATION
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+
+                                            <Box sx={{ p: 3 }}>
+                                                {block.treaties.map((treaty, treatyIndex) => (
+                                                    <Card key={treaty.id} sx={{ mb: 2, p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
+                                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
+                                                            Treaty {block.blockNumber}{treatyIndex + 1}: {treaty.treatyName || `Block ${block.blockNumber} Treaty ${treatyIndex + 1}`}
+                                                        </Typography>
+
+                                                        <Card sx={{ p: 3, backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
+                                                                Additional Configuration Settings
+                                                            </Typography>
+                                                            <Typography variant="body2" sx={{ color: '#6c757d', fontStyle: 'italic' }}>
+                                                                Additional configuration options will be implemented here.
+                                                                This section can include settings like:
+                                                                <br />• Commission structures
+                                                                <br />• Special terms and conditions
+                                                                <br />• Reporting requirements
+                                                                <br />• Settlement procedures
+                                                            </Typography>
+                                                        </Card>
+                                                    </Card>
+                                                ))}
+                                            </Box>
+                                        </Card>
+                                    );
+                                })}
+                            </Box>
+                        )}
+
+                        {selectMode === 'Treaty (Non Proportional)' && (
+                            <Box>
+                                {nonProportionalBlocks.map((block) => {
+                                    const blockColor = getBlockColor(block.blockNumber);
+                                    return (
+                                        <Card key={block.id} sx={{
+                                            mb: 3,
+                                            backgroundColor: blockColor.bg,
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            border: `2px solid ${blockColor.border}`,
+                                            borderLeft: `5px solid ${blockColor.accent}`
+                                        }}>
+                                            <Box sx={{
+                                                p: 2.5,
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                backgroundColor: blockColor.border,
+                                                borderBottom: `1px solid ${blockColor.light}40`
+                                            }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: blockColor.accent,
+                                                        boxShadow: `0 0 0 4px ${blockColor.light}60`
+                                                    }} />
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
+                                                        BLOCK {block.blockNumber} - ADDITIONAL CONFIGURATION
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+
+                                            <Box sx={{ p: 3 }}>
+                                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
+                                                    {block.treaty.treatyName || `Block ${block.blockNumber} Treaty`}
+                                                </Typography>
+
+                                                <Card sx={{ p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
+                                                        Additional Configuration Settings
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ color: '#6c757d', fontStyle: 'italic' }}>
+                                                        Additional configuration options will be implemented here.
+                                                        This section can include settings like:
+                                                        <br />• Commission structures
+                                                        <br />• Special terms and conditions
+                                                        <br />• Reporting requirements
+                                                        <br />• Settlement procedures
+                                                    </Typography>
+                                                </Card>
                                             </Box>
                                         </Card>
                                     );

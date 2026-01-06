@@ -1,6 +1,28 @@
 import { Grid, TextField, FormControl, Select, MenuItem } from '@mui/material';
 import { FieldLabel } from './FieldLabel';
 
+interface RiskLimitLine {
+    id: string;
+    productLOB: string;
+    productCode: string;
+    accountingLOB: string;
+    riskCategory: string;
+    riskGrade: string;
+    cessionRate: string;
+    quotaCessionMaxCapacity: string;
+    retentionGrossNet: string;
+    surplusCapacity: string;
+    capacityCalculateInXL: string;
+    perRiskRecoveryLimit: string;
+    eventLimit: string;
+    cashCallLimit: string;
+    lossAdviceLimit: string;
+    premiumPaymentWarranty: string;
+    alertDays: string;
+    reinsurers: any[];
+    brokers: any[];
+}
+
 interface Treaty {
     treatyCode: string;
     priority: string;
@@ -20,6 +42,7 @@ interface Treaty {
     portfolioClaimWithdRate: string;
     managementExpenses: string;
     taxesAndOtherExpenses: string;
+    riskLimitLines: RiskLimitLine[];
 }
 
 interface TreatyFormFieldsProps {

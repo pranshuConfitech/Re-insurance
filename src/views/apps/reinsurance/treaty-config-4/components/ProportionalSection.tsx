@@ -70,7 +70,7 @@ export const ProportionalSection = ({
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
-                <Typography variant="h6" sx={{ tWeight: 600, color: '#1a1a1a' }}>Treaty (Proportional)</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Treaty (Proportional)</Typography>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={onAddBlock}
                     sx={{
                         backgroundColor: '#28a745',
