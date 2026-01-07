@@ -33,7 +33,6 @@ interface PortfolioTreatyData {
     startDate: string;
     endDate: string;
     currency: string;
-    status?: string;
     operatingUnits: { id: number; portfolioId: string; ouCode: string }[];
 }
 
@@ -485,13 +484,12 @@ const TreatyConfig4Component = () => {
                                         <TableCell sx={{ fontWeight: 700, fontSize: '12px', backgroundColor: '#f8f9fa', color: '#6c757d', textTransform: 'uppercase', py: 2, borderBottom: '2px solid #dee2e6' }}>Start Date</TableCell>
                                         <TableCell sx={{ fontWeight: 700, fontSize: '12px', backgroundColor: '#f8f9fa', color: '#6c757d', textTransform: 'uppercase', py: 2, borderBottom: '2px solid #dee2e6' }}>End Date</TableCell>
                                         <TableCell sx={{ fontWeight: 700, fontSize: '12px', backgroundColor: '#f8f9fa', color: '#6c757d', textTransform: 'uppercase', py: 2, borderBottom: '2px solid #dee2e6' }}>Currency</TableCell>
-                                        <TableCell sx={{ fontWeight: 700, fontSize: '12px', backgroundColor: '#f8f9fa', color: '#6c757d', textTransform: 'uppercase', py: 2, borderBottom: '2px solid #dee2e6' }}>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {data.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4, color: '#6c757d' }}>
+                                            <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4, color: '#6c757d' }}>
                                                 No data available
                                             </TableCell>
                                         </TableRow>
@@ -516,24 +514,9 @@ const TreatyConfig4Component = () => {
                                                     <TableCell sx={{ fontSize: '14px', py: 2 }}>{formatDate(row.startDate)}</TableCell>
                                                     <TableCell sx={{ fontSize: '14px', py: 2 }}>{formatDate(row.endDate)}</TableCell>
                                                     <TableCell sx={{ fontSize: '14px', py: 2 }}>{row.currency || '-'}</TableCell>
-                                                    <TableCell sx={{ fontSize: '14px', py: 2 }}>
-                                                        <Box
-                                                            component="span"
-                                                            sx={{
-                                                                px: 2,
-                                                                py: 0.5,
-                                                                borderRadius: '12px',
-                                                                fontSize: '12px',
-                                                                fontWeight: 600,
-                                                                ...getStatusColor(row.status || '')
-                                                            }}
-                                                        >
-                                                            {row.status || 'N/A'}
-                                                        </Box>
-                                                    </TableCell>
                                                 </TableRow>
                                                 <TableRow key={`collapse-${row.id || index}`}>
-                                                    <TableCell colSpan={8} sx={{ py: 0, borderBottom: expandedRow === row.id ? '1px solid #dee2e6' : 'none' }}>
+                                                    <TableCell colSpan={7} sx={{ py: 0, borderBottom: expandedRow === row.id ? '1px solid #dee2e6' : 'none' }}>
                                                         <Collapse in={expandedRow === row.id} timeout="auto" unmountOnExit>
                                                             {renderAccordionContent(row.id)}
                                                         </Collapse>
