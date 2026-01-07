@@ -1,0 +1,80 @@
+import { Box, Typography, Button } from '@mui/material';
+
+interface TreatyConfigHeaderProps {
+    selectMode: string;
+    onSelectModeChange: (mode: string) => void;
+}
+
+export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyConfigHeaderProps) => (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+            Reinsurance Configuration
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Button
+                variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
+                onClick={() => onSelectModeChange('Treaty (Proportional)')}
+                disableRipple
+                disableElevation
+                sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '6px',
+                    ...(selectMode === 'Treaty (Proportional)' ? {
+                        backgroundColor: '#007bff !important',
+                        color: 'white !important',
+                        '&:hover': {
+                            backgroundColor: '#0056b3 !important'
+                        },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    } : {
+                        borderColor: '#007bff !important',
+                        color: '#007bff !important',
+                        backgroundColor: 'transparent !important',
+                        '&:hover': {
+                            borderColor: '#007bff !important',
+                            backgroundColor: '#e9ecef !important',
+                            color: '#007bff !important'
+                        }
+                    })
+                }}
+            >
+                Treaty Proportional
+            </Button>
+            <Button
+                variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
+                onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
+                disableRipple
+                disableElevation
+                sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '6px',
+                    ...(selectMode === 'Treaty (Non Proportional)' ? {
+                        backgroundColor: '#007bff !important',
+                        color: 'white !important',
+                        '&:hover': {
+                            backgroundColor: '#0056b3 !important'
+                        },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    } : {
+                        borderColor: '#007bff !important',
+                        color: '#007bff !important',
+                        backgroundColor: 'transparent !important',
+                        '&:hover': {
+                            borderColor: '#007bff !important',
+                            backgroundColor: '#e9ecef !important',
+                            color: '#007bff !important'
+                        }
+                    })
+                }}
+            >
+                Treaty Non Proportional
+            </Button>
+        </Box>
+    </Box>
+);

@@ -304,4 +304,23 @@ export class ReinsuranceService {
             .get<any>(`${this.QUERY_CONTEXT}/treaty-definition/${id}`)
             .pipe(map((response) => response));
     }
+
+    // Portfolio Treaty APIs (Treaty Config 4)
+    savePortfolioTreaty(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.COMMAND_CONTEXT}/portfolio-treaty`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    getAllPortfolioTreaties(pageRequest: any): Observable<any> {
+        return http
+            .get<any>(`${this.QUERY_CONTEXT}/portfolio-treaty`, { params: pageRequest })
+            .pipe(map((response) => response));
+    }
+
+    getPortfolioTreatyById(id: any): Observable<any> {
+        return http
+            .get<any>(`${this.QUERY_CONTEXT}/portfolio-treaty/${id}`)
+            .pipe(map((response) => response));
+    }
 }
