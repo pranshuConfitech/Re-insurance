@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { Box, Card, Typography, Button, IconButton, Collapse, Stepper, Step, StepLabel, TextField } from '@mui/material';
+import { Box, Card, Typography, Button, IconButton, Collapse, Stepper, Step, StepLabel, TextField, CircularProgress } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { format } from 'date-fns';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TopFormSection } from './components/TopFormSection';
@@ -13,6 +14,9 @@ import { NonProportionalSection } from './components/NonProportionalSection';
 import { ProportionalSection } from './components/ProportionalSection';
 import { ParticipatingSection } from './components/ParticipatingSection';
 import { getBlockColor } from './utils/blockColors';
+import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
+
+const reinsuranceService = new ReinsuranceService();
 
 interface Reinsurer {
     id: string;
@@ -45,6 +49,8 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
+    reinsurers: Reinsurer[];
+    brokers: Broker[];
 }
 
 interface Treaty {
@@ -161,7 +167,9 @@ const TreatyConfig4CreateComponent = () => {
             riskGrade: '', cessionRate: '', quotaCessionMaxCapacity: '',
             retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
             perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
-            lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: ''
+            lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
+            reinsurers: [],
+            brokers: []
         };
     }
 
@@ -840,6 +848,197 @@ const TreatyConfig4CreateComponent = () => {
         }
     };
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const buildPayload = () => {
+        const formatDate = (date: Date | null) => date ? format(date, 'yyyy-MM-dd') : '';
+
+        if (selectMode === 'Treaty (Proportional)') {
+            // Build Proportional payload
+            const treatyBlocks = blocks.map((block, blockIndex) => ({
+                blockType: 'PROPORTIONAL',
+                sortOrder: blockIndex + 1,
+                treaties: block.treaties.map(treaty => ({
+                    treatyCode: treaty.treatyCode,
+                    priority: treaty.priority || 'PRIMARY',
+                    treatyType: treaty.treatyType === 'Quota Share' ? 'QUOTA_SHARE' : treaty.treatyType === 'Surplus' ? 'SURPLUS' : treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
+                    treatyName: treaty.treatyName,
+                    refNumber: treaty.businessTreatyReferenceNumber,
+                    gradedRetention: treaty.riGradedRet === 'Yes',
+                    formerTreatyCode: treaty.formerTreatyCode || null,
+                    treatyCategory: treaty.treatyCategory || 'PROPERTY',
+                    status: 'ACTIVE',
+                    processingMethod: treaty.processingPortfolioMethod === 'Clean Cut' ? 'STANDARD' : treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') || 'STANDARD',
+                    propTreatyAttribute: {
+                        installmentType: treaty.installment === 'Monthly' ? 'M' : treaty.installment === 'Quarterly' ? 'Q' : treaty.installment === 'Semi-Annual' ? 'S' : treaty.installment === 'Annual' ? 'A' : treaty.installment || 'Q',
+                        premReserveRetainedRate: parseFloat(treaty.premReserveRetainedRate) || 0,
+                        premReserveInterestRate: parseFloat(treaty.premReserveInterestRate) || 0,
+                        portfolioPremEntryRate: parseFloat(treaty.portfolioPremiumEntryRate) || 100.0,
+                        portfolioClaimEntryRate: parseFloat(treaty.portfolioClaimEntryRate) || 100.0,
+                        portfolioClaimWithdRate: parseFloat(treaty.portfolioClaimWithdRate) || 0,
+                        portfolioPremWithdRate: parseFloat(treaty.portfolioPremWithdRate) || 0,
+                        mgmtExpensesPercent: parseFloat(treaty.managementExpenses) || 0,
+                        taxesPercent: parseFloat(treaty.taxesAndOtherExpenses) || 0,
+                        formerTreatyCode: treaty.formerTreatyCode || null,
+                        treatyCategory: treaty.treatyCategory || 'PROPERTY',
+                        status: 'ACTIVE',
+                        processingMethod: treaty.processingPortfolioMethod === 'Clean Cut' ? 'STANDARD' : treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') || 'STANDARD'
+                    },
+                    nonpropTreatyAttribute: null,
+                    propRiskDetails: treaty.riskLimitLines.map(line => ({
+                        treatyId: treaty.treatyCode,
+                        productLob: line.productLOB || 'PROPERTY',
+                        productCode: line.productCode,
+                        acctLob: line.accountingLOB || 'PROP',
+                        riskCategory: line.riskCategory || 'MEDIUM',
+                        riskGrade: line.riskGrade || 'B',
+                        quotaCessionMaxCapacity: parseFloat(line.quotaCessionMaxCapacity) || 0,
+                        cessionRate: parseFloat(line.cessionRate) || 0,
+                        retentionAmount: parseFloat(line.retentionGrossNet) || 0,
+                        surplusCapacity: parseFloat(line.surplusCapacity) || 0,
+                        capacityCalculated: parseFloat(line.capacityCalculateInXL) || 0,
+                        perRiskRecovery: parseFloat(line.perRiskRecoveryLimit) || 0,
+                        eventLimit: parseFloat(line.eventLimit) || 0,
+                        cashCallLimit: parseFloat(line.cashCallLimit) || 0,
+                        lossAdviceLimit: parseFloat(line.lossAdviceLimit) || 0,
+                        premiumPaymentWarranty: line.premiumPaymentWarranty || 'WITHIN_30_DAYS',
+                        alertDays: parseInt(line.alertDays) || 0
+                    })),
+                    nonpropLayers: null,
+                    portfolioTreatyAllocations: [
+                        ...treaty.reinsurers.map(r => ({
+                            participantType: 'REINSURER',
+                            participantName: r.reinsurer,
+                            sharePercent: parseFloat(r.share) || 0,
+                            brokerBreakdowns: []
+                        })),
+                        ...treaty.brokers.map(b => ({
+                            participantType: 'BROKER',
+                            participantName: b.broker,
+                            sharePercent: parseFloat(b.share) || 0,
+                            brokerBreakdowns: b.reinsurers.map(br => ({
+                                reinsurerName: br.reinsurer,
+                                sharePercent: parseFloat(br.share) || 0
+                            }))
+                        }))
+                    ]
+                }))
+            }));
+
+            return {
+                portfolioName: portfolio,
+                insurerId: companyUIN,
+                startDate: formatDate(treatyStartDate),
+                endDate: formatDate(treatyEndDate),
+                currency: currency,
+                operatingUnits: operatingUnitUINs.map(ou => ({ ouCode: ou })),
+                'treaty-blocks': treatyBlocks
+            };
+        } else {
+            // Build Non-Proportional payload
+            const treatyBlocks = nonProportionalBlocks.map((block, blockIndex) => ({
+                blockType: 'NON_PROPORTIONAL',
+                sortOrder: blockIndex + 1,
+                treaties: [{
+                    treatyCode: block.treaty.treatyCode,
+                    priority: block.treaty.priority || 'PRIMARY',
+                    treatyType: block.treaty.treatyType === 'XOL' ? 'XOL' : block.treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
+                    treatyName: block.treaty.treatyName,
+                    refNumber: block.treaty.businessTreatyReferenceNumber,
+                    xolAttachmentType: block.treaty.basisOfAttachment || 'RISK',
+                    formerTreatyCode: block.treaty.formerTreatyCode || null,
+                    treatyCategory: block.treaty.treatyCategory || 'PROPERTY',
+                    status: block.treaty.treatyStatus || 'ACTIVE',
+                    processingMethod: block.treaty.processingPortfolioMethod === 'Clean Cut' ? 'STANDARD' : block.treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') || 'STANDARD',
+                    propTreatyAttribute: null,
+                    nonpropTreatyAttribute: {
+                        xolType: block.treaty.xolType || 'PER_RISK',
+                        annualAggregateLimit: parseFloat(block.treaty.annualAggregateLimit) || 0,
+                        annualAggDeductible: parseFloat(block.treaty.annualAggDeductible) || 0,
+                        totalReinstatedSI: parseFloat(block.treaty.totalReinstatedSI) || 0,
+                        capacity: parseFloat(block.treaty.capacity) || 0,
+                        flatRateXOLPrem: parseFloat(block.treaty.flatRateXOLPrem) || 0,
+                        minDepositXOLPrem: parseFloat(block.treaty.minDepositXOLPrem) || 0,
+                        noReinstatements: parseInt(block.treaty.noReinstatements) || 0,
+                        proRateToAmount: parseFloat(block.treaty.proRateToAmount) || 0,
+                        proRateToTime: parseFloat(block.treaty.proRateToTime) || 0,
+                        reserveTypeInvolved: block.treaty.reserveTypeInvolved || null,
+                        burningCostRate: parseFloat(block.treaty.burningCostRate) || 0,
+                        premPaymentWarranty: block.treaty.premPaymentWarranty || 'WITHIN_30_DAYS',
+                        alertDays: parseInt(block.treaty.alertDays) || 0,
+                        perClaimRecoverableLimit: parseFloat(block.treaty.perClaimRecoverableLimit) || 0,
+                        treatyCurrency: block.treaty.treatyCurrency || currency
+                    },
+                    propRiskDetails: null,
+                    nonpropLayers: block.treaty.layerLines.map((layer, layerIndex) => ({
+                        layerNumber: layerIndex + 1,
+                        productLob: layer.productLOB || 'PROPERTY',
+                        productCode: layer.productCode,
+                        acctLob: layer.accountingLOB || 'PROP',
+                        riskCategory: layer.riskCategory || 'MEDIUM',
+                        riskGrade: layer.riskGrade || 'B',
+                        lossOccurDeductibility: parseFloat(layer.lossOccurDeductibility) || 0,
+                        lossLimit: parseFloat(layer.lossLimit) || 0,
+                        shareOfOccurrenceDeduction: parseFloat(layer.shareOfOccurrenceDeduction) || 0,
+                        availableReinstatedSI: parseFloat(layer.availableReinstatedSI) || 0,
+                        annualAggLimit: parseFloat(layer.annualAggLimit) || 0,
+                        annualAggAmount: parseFloat(layer.annualAggAmount) || 0,
+                        aggClaimAmount: parseFloat(layer.aggClaimAmount) || 0,
+                        localNativeLayer: layer.localNativeLayer || null,
+                        transactionLimitCcy: parseFloat(layer.transactionLimitCcy) || 0,
+                        layerAllocations: [
+                            ...layer.reinsurers.map(r => ({
+                                participantType: 'REINSURER',
+                                participantName: r.reinsurer,
+                                sharePercent: parseFloat(r.share) || 0,
+                                brokerBreakdowns: []
+                            })),
+                            ...layer.brokers.map(b => ({
+                                participantType: 'BROKER',
+                                participantName: b.broker,
+                                sharePercent: parseFloat(b.share) || 0,
+                                brokerBreakdowns: b.reinsurers.map(br => ({
+                                    reinsurerName: br.reinsurer,
+                                    sharePercent: parseFloat(br.share) || 0
+                                }))
+                            }))
+                        ]
+                    })),
+                    portfolioTreatyAllocations: []
+                }]
+            }));
+
+            return {
+                portfolioName: portfolio,
+                insurerId: companyUIN,
+                startDate: formatDate(treatyStartDate),
+                endDate: formatDate(treatyEndDate),
+                currency: currency,
+                operatingUnits: operatingUnitUINs.map(ou => ({ ouCode: ou })),
+                'treaty-blocks': treatyBlocks
+            };
+        }
+    };
+
+    const handleSubmit = () => {
+        setIsSubmitting(true);
+        const payload = buildPayload();
+        console.log('Submitting payload:', JSON.stringify(payload, null, 2));
+
+        reinsuranceService.savePortfolioTreaty(payload).subscribe({
+            next: (response) => {
+                console.log('Submit successful:', response);
+                alert('Treaty configuration saved successfully!');
+                setIsSubmitting(false);
+            },
+            error: (error) => {
+                console.error('Submit error:', error);
+                alert('Failed to save treaty configuration. Please try again.');
+                setIsSubmitting(false);
+            }
+        });
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ p: 4, backgroundColor: '#fafafa', minHeight: '100vh' }}>
@@ -1251,15 +1450,15 @@ const TreatyConfig4CreateComponent = () => {
                                                             brokers={layer.brokers}
                                                             blockId={block.id}
                                                             lineId={layer.id}
-                                                            onAddReinsurer={handleAddNPReinsurer}
-                                                            onDeleteReinsurer={handleDeleteNPReinsurer}
-                                                            onReinsurerChange={handleNPReinsurerChange}
-                                                            onAddBroker={handleAddNPBroker}
-                                                            onDeleteBroker={handleDeleteNPBroker}
-                                                            onBrokerChange={handleNPBrokerChange}
-                                                            onAddBrokerReinsurer={handleAddNPBrokerReinsurer}
-                                                            onDeleteBrokerReinsurer={handleDeleteNPBrokerReinsurer}
-                                                            onBrokerReinsurerChange={handleNPBrokerReinsurerChange}
+                                                            onAddReinsurer={(blockId, _) => handleAddNPReinsurer(blockId, layer.id)}
+                                                            onDeleteReinsurer={(blockId, _, reinsurerId) => handleDeleteNPReinsurer(blockId, layer.id, reinsurerId)}
+                                                            onReinsurerChange={(blockId, _, reinsurerId, field, value) => handleNPReinsurerChange(blockId, layer.id, reinsurerId, field, value)}
+                                                            onAddBroker={(blockId, _) => handleAddNPBroker(blockId, layer.id)}
+                                                            onDeleteBroker={(blockId, _, brokerId) => handleDeleteNPBroker(blockId, layer.id, brokerId)}
+                                                            onBrokerChange={(blockId, _, brokerId, field, value) => handleNPBrokerChange(blockId, layer.id, brokerId, field, value)}
+                                                            onAddBrokerReinsurer={(blockId, _, brokerId) => handleAddNPBrokerReinsurer(blockId, layer.id, brokerId)}
+                                                            onDeleteBrokerReinsurer={(blockId, _, brokerId, reinsurerId) => handleDeleteNPBrokerReinsurer(blockId, layer.id, brokerId, reinsurerId)}
+                                                            onBrokerReinsurerChange={(blockId, _, brokerId, reinsurerId, field, value) => handleNPBrokerReinsurerChange(blockId, layer.id, brokerId, reinsurerId, field, value)}
                                                         />
                                                     </Card>
                                                 ))}
@@ -1362,17 +1561,87 @@ const TreatyConfig4CreateComponent = () => {
                                                         </Typography>
 
                                                         <Card sx={{ p: 3, backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>
-                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
-                                                                Additional Configuration Settings
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 3, color: '#495057', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                                Additional Configurations
                                                             </Typography>
-                                                            <Typography variant="body2" sx={{ color: '#6c757d', fontStyle: 'italic' }}>
-                                                                Additional configuration options will be implemented here.
-                                                                This section can include settings like:
-                                                                <br />• Commission structures
-                                                                <br />• Special terms and conditions
-                                                                <br />• Reporting requirements
-                                                                <br />• Settlement procedures
-                                                            </Typography>
+                                                            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<Box component="span" sx={{ fontSize: '16px' }}>📊</Box>}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        borderColor: '#007bff',
+                                                                        color: '#007bff',
+                                                                        backgroundColor: 'white',
+                                                                        textTransform: 'none',
+                                                                        fontWeight: 600,
+                                                                        justifyContent: 'flex-start',
+                                                                        '&:hover': {
+                                                                            borderColor: '#0056b3',
+                                                                            backgroundColor: '#f8f9ff'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Profit Commission
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<Box component="span" sx={{ fontSize: '16px' }}>⚖️</Box>}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        borderColor: '#6c757d',
+                                                                        color: '#6c757d',
+                                                                        backgroundColor: 'white',
+                                                                        textTransform: 'none',
+                                                                        fontWeight: 600,
+                                                                        justifyContent: 'flex-start',
+                                                                        '&:hover': {
+                                                                            borderColor: '#495057',
+                                                                            backgroundColor: '#f8f9fa'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Sliding Scale Commission
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<Box component="span" sx={{ fontSize: '16px' }}>🔄</Box>}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        borderColor: '#28a745',
+                                                                        color: '#28a745',
+                                                                        backgroundColor: 'white',
+                                                                        textTransform: 'none',
+                                                                        fontWeight: 600,
+                                                                        justifyContent: 'flex-start',
+                                                                        '&:hover': {
+                                                                            borderColor: '#218838',
+                                                                            backgroundColor: '#f8fff9'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Reinstatement
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<Box component="span" sx={{ fontSize: '16px' }}>🔒</Box>}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        borderColor: '#ffc107',
+                                                                        color: '#856404',
+                                                                        backgroundColor: 'white',
+                                                                        textTransform: 'none',
+                                                                        fontWeight: 600,
+                                                                        justifyContent: 'flex-start',
+                                                                        '&:hover': {
+                                                                            borderColor: '#e0a800',
+                                                                            backgroundColor: '#fffdf5'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Special Conditions
+                                                                </Button>
+                                                            </Box>
                                                         </Card>
                                                     </Card>
                                                 ))}
@@ -1425,17 +1694,87 @@ const TreatyConfig4CreateComponent = () => {
                                                 </Typography>
 
                                                 <Card sx={{ p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
-                                                        Additional Configuration Settings
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 3, color: '#495057', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                        Additional Configurations
                                                     </Typography>
-                                                    <Typography variant="body2" sx={{ color: '#6c757d', fontStyle: 'italic' }}>
-                                                        Additional configuration options will be implemented here.
-                                                        This section can include settings like:
-                                                        <br />• Commission structures
-                                                        <br />• Special terms and conditions
-                                                        <br />• Reporting requirements
-                                                        <br />• Settlement procedures
-                                                    </Typography>
+                                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+                                                        <Button
+                                                            variant="outlined"
+                                                            startIcon={<Box component="span" sx={{ fontSize: '16px' }}>📊</Box>}
+                                                            sx={{
+                                                                p: 2,
+                                                                borderColor: '#007bff',
+                                                                color: '#007bff',
+                                                                backgroundColor: 'white',
+                                                                textTransform: 'none',
+                                                                fontWeight: 600,
+                                                                justifyContent: 'flex-start',
+                                                                '&:hover': {
+                                                                    borderColor: '#0056b3',
+                                                                    backgroundColor: '#f8f9ff'
+                                                                }
+                                                            }}
+                                                        >
+                                                            Profit Commission
+                                                        </Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            startIcon={<Box component="span" sx={{ fontSize: '16px' }}>⚖️</Box>}
+                                                            sx={{
+                                                                p: 2,
+                                                                borderColor: '#6c757d',
+                                                                color: '#6c757d',
+                                                                backgroundColor: 'white',
+                                                                textTransform: 'none',
+                                                                fontWeight: 600,
+                                                                justifyContent: 'flex-start',
+                                                                '&:hover': {
+                                                                    borderColor: '#495057',
+                                                                    backgroundColor: '#f8f9fa'
+                                                                }
+                                                            }}
+                                                        >
+                                                            Sliding Scale Commission
+                                                        </Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            startIcon={<Box component="span" sx={{ fontSize: '16px' }}>🔄</Box>}
+                                                            sx={{
+                                                                p: 2,
+                                                                borderColor: '#28a745',
+                                                                color: '#28a745',
+                                                                backgroundColor: 'white',
+                                                                textTransform: 'none',
+                                                                fontWeight: 600,
+                                                                justifyContent: 'flex-start',
+                                                                '&:hover': {
+                                                                    borderColor: '#218838',
+                                                                    backgroundColor: '#f8fff9'
+                                                                }
+                                                            }}
+                                                        >
+                                                            Reinstatement
+                                                        </Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            startIcon={<Box component="span" sx={{ fontSize: '16px' }}>🔒</Box>}
+                                                            sx={{
+                                                                p: 2,
+                                                                borderColor: '#ffc107',
+                                                                color: '#856404',
+                                                                backgroundColor: 'white',
+                                                                textTransform: 'none',
+                                                                fontWeight: 600,
+                                                                justifyContent: 'flex-start',
+                                                                '&:hover': {
+                                                                    borderColor: '#e0a800',
+                                                                    backgroundColor: '#fffdf5'
+                                                                }
+                                                            }}
+                                                        >
+                                                            Special Conditions
+                                                        </Button>
+                                                    </Box>
                                                 </Card>
                                             </Box>
                                         </Card>
@@ -1469,16 +1808,20 @@ const TreatyConfig4CreateComponent = () => {
                             </Button>
                             <Button
                                 variant="contained"
+                                onClick={handleSubmit}
+                                disabled={isSubmitting}
                                 sx={{
                                     backgroundColor: '#28a745',
                                     '&:hover': { backgroundColor: '#218838' },
+                                    '&:disabled': { backgroundColor: '#94d3a2' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,
-                                    py: 1.5
+                                    py: 1.5,
+                                    minWidth: 120
                                 }}
                             >
-                                Submit
+                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
                             </Button>
                         </Box>
                     </Box>
