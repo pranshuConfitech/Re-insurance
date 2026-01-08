@@ -159,22 +159,23 @@ const TreatyConfig4Component = () => {
         const valueStyle = { fontSize: '13px', color: '#212529', fontWeight: 500 };
 
         return (
-            <Box sx={{ p: 4, backgroundColor: '#f8f9fa', borderRadius: '8px', margin: 2 }}>
+            <Box sx={{ p: 4, backgroundColor: '#f5f5f5', borderRadius: '12px', margin: 2 }}>
                 {treatyBlocks.map((block: any, blockIndex: number) => (
                     <Card key={blockIndex} sx={{
-                        mb: 3,
-                        border: '1px solid #e9ecef',
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                        overflow: 'hidden'
+                        mb: 4,
+                        border: 'none',
+                        borderRadius: '16px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                        overflow: 'hidden',
+                        backgroundColor: '#fff'
                     }}>
                         <CardContent sx={{ p: 0 }}>
                             <Box sx={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 2,
-                                p: 3,
-                                backgroundColor: '#fff',
+                                p: 4,
+                                backgroundColor: '#f8f9fa',
                                 borderBottom: '1px solid #e9ecef'
                             }}>
                                 <Chip
@@ -184,31 +185,34 @@ const TreatyConfig4Component = () => {
                                         backgroundColor: block.blockType === 'PROPORTIONAL' ? '#e3f2fd' : '#fff3e0',
                                         color: block.blockType === 'PROPORTIONAL' ? '#1565c0' : '#e65100',
                                         fontWeight: 600,
-                                        fontSize: '13px',
-                                        px: 2
+                                        fontSize: '14px',
+                                        px: 3,
+                                        py: 1,
+                                        height: '32px'
                                     }}
                                 />
-                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#212529' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#212529', fontSize: '20px' }}>
                                     Block {block.sortOrder}
                                 </Typography>
                             </Box>
 
-                            <Box sx={{ p: 3 }}>
+                            <Box sx={{ p: 4 }}>
                                 {block.treaties && block.treaties.map((treaty: any, treatyIndex: number) => (
                                     <Box key={treatyIndex} sx={{
-                                        mb: 4,
-                                        p: 3,
-                                        backgroundColor: '#fff',
+                                        mb: treatyIndex < block.treaties.length - 1 ? 5 : 0,
+                                        p: 4,
+                                        backgroundColor: '#fafafa',
                                         borderRadius: '12px',
-                                        border: '1px solid #e9ecef',
-                                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                                        border: '1px solid #f0f0f0'
                                     }}>
                                         {/* Treaty Basic Info */}
                                         <Typography variant="h6" sx={{
                                             fontWeight: 700,
-                                            mb: 3,
+                                            mb: 4,
                                             color: '#626BDA',
-                                            fontSize: '18px'
+                                            fontSize: '20px',
+                                            borderBottom: '2px solid #e9ecef',
+                                            pb: 2
                                         }}>
                                             Treaty: {treaty.treatyName || '-'}
                                         </Typography>
@@ -348,130 +352,212 @@ const TreatyConfig4Component = () => {
 
                                         {/* Proportional Risk Details */}
                                         {treaty.propRiskDetails && treaty.propRiskDetails.length > 0 && (
-                                            <Box sx={{ mb: 3 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#7b1fa2', borderBottom: '1px solid #e9ecef', pb: 1 }}>
+                                            <Box sx={{ mb: 4 }}>
+                                                <Typography variant="subtitle2" sx={{
+                                                    fontWeight: 600,
+                                                    mb: 3,
+                                                    color: '#7b1fa2',
+                                                    fontSize: '16px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}>
                                                     Risk Details ({treaty.propRiskDetails.length})
                                                 </Typography>
-                                                <TableContainer component={Paper} elevation={0} sx={{
-                                                    border: '1px solid #e9ecef',
-                                                    borderRadius: '8px',
-                                                    overflow: 'hidden'
+                                                <Box sx={{
+                                                    backgroundColor: '#fafafa',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    border: 'none'
                                                 }}>
-                                                    <Table size="small">
+                                                    <Table size="small" sx={{
+                                                        '& .MuiTableCell-root': {
+                                                            border: 'none',
+                                                            borderBottom: '1px solid #f0f0f0'
+                                                        },
+                                                        '& .MuiTableRow-root:last-child .MuiTableCell-root': {
+                                                            borderBottom: 'none'
+                                                        }
+                                                    }}>
                                                         <TableHead>
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Product LOB</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Product Code</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Risk Category</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Risk Grade</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Cession Rate</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Retention Amt</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Surplus Capacity</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Event Limit</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Alert Days</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Product LOB</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Product Code</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Risk Category</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Risk Grade</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Cession Rate</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Retention Amt</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Surplus Capacity</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Event Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Alert Days</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {treaty.propRiskDetails.map((risk: any, riskIndex: number) => (
-                                                                <TableRow key={riskIndex}>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.productLob || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.productCode || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.riskCategory || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.riskGrade || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.cessionRate ?? '-'}%</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.retentionAmount?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.surplusCapacity?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.eventLimit?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.alertDays ?? '-'}</TableCell>
+                                                                <TableRow key={riskIndex} sx={{
+                                                                    '&:hover': { backgroundColor: '#f5f5f5' },
+                                                                    backgroundColor: riskIndex % 2 === 0 ? '#fff' : '#fafafa'
+                                                                }}>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.productLob || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.productCode || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.riskCategory || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.riskGrade || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333', fontWeight: 500 }}>{risk.cessionRate ?? '-'}%</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.retentionAmount?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.surplusCapacity?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.eventLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{risk.alertDays ?? '-'}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
                                                     </Table>
-                                                </TableContainer>
+                                                </Box>
                                             </Box>
                                         )}
 
                                         {/* Non-Proportional Layers */}
                                         {treaty.nonpropLayers && treaty.nonpropLayers.length > 0 && (
-                                            <Box sx={{ mb: 3 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#f57c00', borderBottom: '1px solid #e9ecef', pb: 1 }}>
+                                            <Box sx={{ mb: 4 }}>
+                                                <Typography variant="subtitle2" sx={{
+                                                    fontWeight: 600,
+                                                    mb: 3,
+                                                    color: '#f57c00',
+                                                    fontSize: '16px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}>
                                                     Layers ({treaty.nonpropLayers.length})
                                                 </Typography>
-                                                <TableContainer component={Paper} elevation={0} sx={{
-                                                    border: '1px solid #e9ecef',
-                                                    borderRadius: '8px',
-                                                    overflow: 'hidden'
+                                                <Box sx={{
+                                                    backgroundColor: '#fafafa',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    border: 'none'
                                                 }}>
-                                                    <Table size="small">
+                                                    <Table size="small" sx={{
+                                                        '& .MuiTableCell-root': {
+                                                            border: 'none',
+                                                            borderBottom: '1px solid #f0f0f0'
+                                                        },
+                                                        '& .MuiTableRow-root:last-child .MuiTableCell-root': {
+                                                            borderBottom: 'none'
+                                                        }
+                                                    }}>
                                                         <TableHead>
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Layer #</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Product LOB</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Product Code</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Loss Limit</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Deductibility</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Annual Agg Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Layer #</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Product LOB</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Product Code</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Loss Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Deductibility</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Annual Agg Limit</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {treaty.nonpropLayers.map((layer: any, layerIndex: number) => (
-                                                                <TableRow key={layerIndex}>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.layerNumber || layerIndex + 1}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.productLob || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.productCode || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.lossLimit?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.lossOccurDeductibility?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.annualAggLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                <TableRow key={layerIndex} sx={{
+                                                                    '&:hover': { backgroundColor: '#f5f5f5' },
+                                                                    backgroundColor: layerIndex % 2 === 0 ? '#fff' : '#fafafa'
+                                                                }}>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333', fontWeight: 500 }}>{layer.layerNumber || layerIndex + 1}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{layer.productLob || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{layer.productCode || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{layer.lossLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{layer.lossOccurDeductibility?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>{layer.annualAggLimit?.toLocaleString() ?? '-'}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
                                                     </Table>
-                                                </TableContainer>
+                                                </Box>
                                             </Box>
                                         )}
 
                                         {/* Portfolio Treaty Allocations */}
                                         {treaty.portfolioTreatyAllocations && treaty.portfolioTreatyAllocations.length > 0 && (
                                             <Box>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#0288d1', borderBottom: '1px solid #e9ecef', pb: 1 }}>
+                                                <Typography variant="subtitle2" sx={{
+                                                    fontWeight: 600,
+                                                    mb: 3,
+                                                    color: '#0288d1',
+                                                    fontSize: '16px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}>
                                                     Allocations ({treaty.portfolioTreatyAllocations.length})
                                                 </Typography>
-                                                <TableContainer component={Paper} elevation={0} sx={{
-                                                    border: '1px solid #e9ecef',
-                                                    borderRadius: '8px',
-                                                    overflow: 'hidden'
+                                                <Box sx={{
+                                                    backgroundColor: '#fafafa',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    border: 'none'
                                                 }}>
-                                                    <Table size="small">
+                                                    <Table size="small" sx={{
+                                                        '& .MuiTableCell-root': {
+                                                            border: 'none',
+                                                            borderBottom: '1px solid #f0f0f0'
+                                                        },
+                                                        '& .MuiTableRow-root:last-child .MuiTableCell-root': {
+                                                            borderBottom: 'none'
+                                                        }
+                                                    }}>
                                                         <TableHead>
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Participant Type</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Participant Name</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Share %</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057', py: 2 }}>Broker Breakdowns</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Participant Type</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Participant Name</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Share %</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px', color: '#495057', py: 2.5, px: 3 }}>Broker Breakdowns</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {treaty.portfolioTreatyAllocations.map((alloc: any, allocIndex: number) => (
-                                                                <TableRow key={allocIndex}>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>
-                                                                        <Chip label={alloc.participantType} size="small" sx={{ fontSize: '10px', height: '20px' }} />
+                                                                <TableRow key={allocIndex} sx={{
+                                                                    '&:hover': { backgroundColor: '#f5f5f5' },
+                                                                    backgroundColor: allocIndex % 2 === 0 ? '#fff' : '#fafafa'
+                                                                }}>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3 }}>
+                                                                        <Chip
+                                                                            label={alloc.participantType}
+                                                                            size="small"
+                                                                            sx={{
+                                                                                fontSize: '11px',
+                                                                                height: '24px',
+                                                                                backgroundColor: alloc.participantType === 'REINSURER' ? '#e3f2fd' : '#fff3e0',
+                                                                                color: alloc.participantType === 'REINSURER' ? '#1565c0' : '#e65100',
+                                                                                fontWeight: 500
+                                                                            }}
+                                                                        />
                                                                     </TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{alloc.participantName || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{alloc.sharePercent ?? '-'}%</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333', fontWeight: 500 }}>{alloc.participantName || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333', fontWeight: 600 }}>{alloc.sharePercent ?? '-'}%</TableCell>
+                                                                    <TableCell sx={{ fontSize: '13px', py: 2, px: 3, color: '#333' }}>
                                                                         {alloc.brokerBreakdowns && alloc.brokerBreakdowns.length > 0 ? (
-                                                                            alloc.brokerBreakdowns.map((bb: any, bbIndex: number) => (
-                                                                                <Box key={bbIndex} sx={{ fontSize: '11px' }}>
-                                                                                    {bb.reinsurerName}: {bb.sharePercent}%
-                                                                                </Box>
-                                                                            ))
-                                                                        ) : '-'}
+                                                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                                                {alloc.brokerBreakdowns.map((bb: any, bbIndex: number) => (
+                                                                                    <Chip
+                                                                                        key={bbIndex}
+                                                                                        label={`${bb.reinsurerName}: ${bb.sharePercent}%`}
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            fontSize: '10px',
+                                                                                            height: '20px',
+                                                                                            backgroundColor: '#f5f5f5',
+                                                                                            color: '#666'
+                                                                                        }}
+                                                                                    />
+                                                                                ))}
+                                                                            </Box>
+                                                                        ) : (
+                                                                            <Typography sx={{ fontSize: '12px', color: '#999' }}>-</Typography>
+                                                                        )}
                                                                     </TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
                                                     </Table>
-                                                </TableContainer>
+                                                </Box>
                                             </Box>
                                         )}
                                     </Box>

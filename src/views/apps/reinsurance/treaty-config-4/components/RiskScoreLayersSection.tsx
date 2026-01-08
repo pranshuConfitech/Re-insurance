@@ -49,31 +49,26 @@ export const RiskScoreLayersSection = ({
     onAddLayer, onDeleteLayer, onLayerChange
 }: RiskScoreLayersSectionProps) => {
     return (
-        <Card sx={{
-            p: 0,
-            backgroundColor: 'white',
-            mb: 2,
+        <Box sx={{
+            backgroundColor: '#f8f9fa',
             borderRadius: '12px',
-            border: '1px solid #e0e0e0',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            mb: 3
         }}>
             <Box sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                p: 2.5,
-                backgroundColor: '#f8f9fa',
-                borderBottom: '2px solid #e9ecef'
+                p: 3,
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #e9ecef'
             }}>
-                <Typography variant="subtitle2" sx={{
+                <Typography variant="h6" sx={{
                     color: '#495057',
                     fontWeight: 600,
-                    fontSize: '13px',
-                    letterSpacing: '0.5px',
-                    textTransform: 'uppercase'
+                    fontSize: '16px'
                 }}>
-                    RISK SCORE & LAYERS (TABLE)
+                    Risk Score & Layers
                 </Typography>
                 <Button
                     variant="contained"
@@ -84,10 +79,11 @@ export const RiskScoreLayersSection = ({
                         backgroundColor: '#28a745',
                         '&:hover': { backgroundColor: '#218838' },
                         textTransform: 'none',
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontWeight: 600,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        borderRadius: '6px'
+                        borderRadius: '8px',
+                        px: 2,
+                        py: 1
                     }}
                 >
                     Add Layer
@@ -96,27 +92,41 @@ export const RiskScoreLayersSection = ({
 
             <Box sx={{ p: 3 }}>
                 {layerLines.map((layer, index) => (
-                    <Card key={layer.id} sx={{
+                    <Box key={layer.id} sx={{
                         p: 3,
-                        mb: 2.5,
-                        backgroundColor: 'white',
-                        borderRadius: '10px',
-                        border: '1px solid #e9ecef',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-                        position: 'relative'
+                        mb: index < layerLines.length - 1 ? 3 : 0,
+                        backgroundColor: '#fff',
+                        borderRadius: '12px',
+                        position: 'relative',
+                        border: 'none',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
                     }}>
                         {layerLines.length > 1 && (
                             <IconButton
                                 size="small"
                                 color="error"
                                 onClick={() => onDeleteLayer(blockId, layer.id)}
-                                sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}
+                                sx={{
+                                    position: 'absolute',
+                                    top: 12,
+                                    right: 12,
+                                    zIndex: 1,
+                                    backgroundColor: '#fff3f3',
+                                    '&:hover': { backgroundColor: '#ffe6e6' }
+                                }}
                             >
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         )}
 
-                        <Typography variant="caption" sx={{ color: '#666', fontWeight: 600, mb: 1.5, display: 'block', fontSize: '11px' }}>
+                        <Typography variant="subtitle2" sx={{
+                            color: '#626BDA',
+                            fontWeight: 600,
+                            mb: 3,
+                            fontSize: '14px',
+                            borderBottom: '1px solid #f0f0f0',
+                            pb: 1
+                        }}>
                             Layer {index + 1}
                         </Typography>
 
@@ -210,9 +220,9 @@ export const RiskScoreLayersSection = ({
                                 <TextField fullWidth size="small" value={layer.transactionLimitCcy} onChange={(e) => onLayerChange(blockId, layer.id, 'transactionLimitCcy', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
                             </Grid>
                         </Grid>
-                    </Card>
+                    </Box>
                 ))}
             </Box>
-        </Card>
+        </Box>
     );
 };
