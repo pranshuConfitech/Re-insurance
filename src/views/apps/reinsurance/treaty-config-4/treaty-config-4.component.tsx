@@ -196,6 +196,31 @@ const TreatyConfig4Component = () => {
                             </Box>
 
                             <Box sx={{ p: 3 }}>
+                                {/* Block Summary */}
+                                <Box sx={{ mb: 3, p: 2, backgroundColor: 'white', borderRadius: '6px', border: '1px solid #dee2e6' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 1 }}>
+                                        Block Summary
+                                    </Typography>
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
+                                        <Box>
+                                            <Typography sx={labelStyle}>Block Type</Typography>
+                                            <Typography sx={valueStyle}>{block.blockType || '-'}</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={labelStyle}>Sort Order</Typography>
+                                            <Typography sx={valueStyle}>{block.sortOrder || '-'}</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={labelStyle}>Portfolio ID</Typography>
+                                            <Typography sx={valueStyle}>{block.portfolioId || '-'}</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={labelStyle}>Treaties Count</Typography>
+                                            <Typography sx={valueStyle}>{block.treaties?.length || 0}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+
                                 {block.treaties && block.treaties.map((treaty: any, treatyIndex: number) => (
                                     <Box key={treatyIndex} sx={{
                                         mb: treatyIndex < block.treaties.length - 1 ? 3 : 0,
@@ -249,6 +274,14 @@ const TreatyConfig4Component = () => {
                                                 <Typography sx={labelStyle}>Graded Retention</Typography>
                                                 <Typography sx={valueStyle}>{treaty.gradedRetention ? 'Yes' : 'No'}</Typography>
                                             </Box>
+                                            <Box>
+                                                <Typography sx={labelStyle}>XOL Attachment Type</Typography>
+                                                <Typography sx={valueStyle}>{treaty.xolAttachmentType || '-'}</Typography>
+                                            </Box>
+                                            <Box>
+                                                <Typography sx={labelStyle}>Processing Method</Typography>
+                                                <Typography sx={valueStyle}>{treaty.processingMethod || '-'}</Typography>
+                                            </Box>
                                         </Box>
 
                                         {/* Proportional Treaty Attributes */}
@@ -257,7 +290,7 @@ const TreatyConfig4Component = () => {
                                                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 1 }}>
                                                     Proportional Treaty Attributes
                                                 </Typography>
-                                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
+                                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mb: 2 }}>
                                                     <Box>
                                                         <Typography sx={labelStyle}>Installment Type</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.installmentType || '-'}</Typography>
@@ -273,6 +306,26 @@ const TreatyConfig4Component = () => {
                                                     <Box>
                                                         <Typography sx={labelStyle}>Portfolio Prem Entry Rate</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioPremEntryRate ?? '-'}%</Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography sx={labelStyle}>Portfolio Claim Entry Rate</Typography>
+                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioClaimEntryRate ?? '-'}%</Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography sx={labelStyle}>Portfolio Claim Withd Rate</Typography>
+                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioClaimWithdRate ?? '-'}%</Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography sx={labelStyle}>Portfolio Prem Withd Rate</Typography>
+                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioPremWithdRate ?? '-'}%</Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography sx={labelStyle}>Management Expenses</Typography>
+                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.mgmtExpensesPercent ?? '-'}%</Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography sx={labelStyle}>Taxes Percent</Typography>
+                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.taxesPercent ?? '-'}%</Typography>
                                                     </Box>
                                                 </Box>
                                             </Box>
@@ -322,9 +375,19 @@ const TreatyConfig4Component = () => {
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Product LOB</TableCell>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Product Code</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Acct LOB</TableCell>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Risk Category</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Cession Rate</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Risk Grade</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Cession Rate %</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Max Capacity</TableCell>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Retention Amt</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Surplus Capacity</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Per Risk Recovery</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Event Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Cash Call Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Loss Advice Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Premium Payment</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Alert Days</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -332,9 +395,55 @@ const TreatyConfig4Component = () => {
                                                                 <TableRow key={riskIndex} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
                                                                     <TableCell sx={{ fontSize: '12px' }}>{risk.productLob || '-'}</TableCell>
                                                                     <TableCell sx={{ fontSize: '12px' }}>{risk.productCode || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.acctLob || '-'}</TableCell>
                                                                     <TableCell sx={{ fontSize: '12px' }}>{risk.riskCategory || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.riskGrade || '-'}</TableCell>
                                                                     <TableCell sx={{ fontSize: '12px', fontWeight: 500 }}>{risk.cessionRate ?? '-'}%</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.quotaCessionMaxCapacity?.toLocaleString() ?? '-'}</TableCell>
                                                                     <TableCell sx={{ fontSize: '12px' }}>{risk.retentionAmount?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.surplusCapacity?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.perRiskRecovery?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.eventLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.cashCallLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.lossAdviceLimit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.premiumPaymentWarranty || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.alertDays ?? '-'}</TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </Box>
+                                        )}
+
+                                        {/* Non-Proportional Layers */}
+                                        {treaty.nonpropLayers && treaty.nonpropLayers.length > 0 && (
+                                            <Box sx={{ mb: 3 }}>
+                                                <Typography variant="subtitle2" sx={{
+                                                    fontWeight: 600,
+                                                    mb: 2,
+                                                    color: '#495057',
+                                                    fontSize: '14px'
+                                                }}>
+                                                    Non-Proportional Layers ({treaty.nonpropLayers.length})
+                                                </Typography>
+                                                <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #dee2e6' }}>
+                                                    <Table size="small">
+                                                        <TableHead>
+                                                            <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Layer</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Attachment</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Premium</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {treaty.nonpropLayers.map((layer: any, layerIndex: number) => (
+                                                                <TableRow key={layerIndex} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.layerNumber || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.attachment?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.limit?.toLocaleString() ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>{layer.premium?.toLocaleString() ?? '-'}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -361,6 +470,7 @@ const TreatyConfig4Component = () => {
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Participant Type</TableCell>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Participant Name</TableCell>
                                                                 <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Share %</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Broker Breakdowns</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -380,6 +490,19 @@ const TreatyConfig4Component = () => {
                                                                     </TableCell>
                                                                     <TableCell sx={{ fontSize: '12px', fontWeight: 500 }}>{alloc.participantName || '-'}</TableCell>
                                                                     <TableCell sx={{ fontSize: '12px', fontWeight: 600 }}>{alloc.sharePercent ?? '-'}%</TableCell>
+                                                                    <TableCell sx={{ fontSize: '12px' }}>
+                                                                        {alloc.brokerBreakdowns && alloc.brokerBreakdowns.length > 0 ? (
+                                                                            <Box>
+                                                                                {alloc.brokerBreakdowns.map((broker: any, brokerIndex: number) => (
+                                                                                    <Box key={brokerIndex} sx={{ mb: 0.5 }}>
+                                                                                        <Typography sx={{ fontSize: '11px', color: '#666' }}>
+                                                                                            {broker.reinsurerName}: {broker.sharePercent}%
+                                                                                        </Typography>
+                                                                                    </Box>
+                                                                                ))}
+                                                                            </Box>
+                                                                        ) : '-'}
+                                                                    </TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
