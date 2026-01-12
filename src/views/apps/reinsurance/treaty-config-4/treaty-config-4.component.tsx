@@ -154,8 +154,8 @@ const TreatyConfig4Component = () => {
             );
         }
 
-        const labelStyle = { fontSize: '11px', color: '#6c757d', fontWeight: 600, textTransform: 'uppercase' as const };
-        const valueStyle = { fontSize: '13px', color: '#212529', fontWeight: 500 };
+        const labelStyle = { fontSize: '10px', color: '#6c757d', fontWeight: 600, textTransform: 'uppercase' as const };
+        const valueStyle = { fontSize: '12px', color: '#212529', fontWeight: 500 };
 
         return (
             <Box sx={{ p: 3, backgroundColor: '#f8f9fa', borderRadius: '8px', margin: 2 }}>
@@ -196,52 +196,43 @@ const TreatyConfig4Component = () => {
                             </Box>
 
                             <Box sx={{ p: 3 }}>
-                                {/* Block Summary */}
-                                <Box sx={{ mb: 3, p: 2, backgroundColor: 'white', borderRadius: '6px', border: '1px solid #dee2e6' }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 1 }}>
+                                {/* Block Summary - Compact */}
+                                <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'white', borderRadius: '6px', border: '1px solid #dee2e6' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 0.5, fontSize: '12px' }}>
                                         Block Summary
                                     </Typography>
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
                                         <Box>
-                                            <Typography sx={labelStyle}>Block Type</Typography>
-                                            <Typography sx={valueStyle}>{block.blockType || '-'}</Typography>
+                                            <Typography sx={{ ...labelStyle, fontSize: '10px' }}>Block Type</Typography>
+                                            <Typography sx={{ ...valueStyle, fontSize: '11px' }}>{block.blockType || '-'}</Typography>
                                         </Box>
                                         <Box>
-                                            <Typography sx={labelStyle}>Sort Order</Typography>
-                                            <Typography sx={valueStyle}>{block.sortOrder || '-'}</Typography>
+                                            <Typography sx={{ ...labelStyle, fontSize: '10px' }}>Sort Order</Typography>
+                                            <Typography sx={{ ...valueStyle, fontSize: '11px' }}>{block.sortOrder || '-'}</Typography>
                                         </Box>
                                         <Box>
-                                            <Typography sx={labelStyle}>Portfolio ID</Typography>
-                                            <Typography sx={valueStyle}>{block.portfolioId || '-'}</Typography>
-                                        </Box>
-                                        <Box>
-                                            <Typography sx={labelStyle}>Treaties Count</Typography>
-                                            <Typography sx={valueStyle}>{block.treaties?.length || 0}</Typography>
+                                            <Typography sx={{ ...labelStyle, fontSize: '10px' }}>Treaties Count</Typography>
+                                            <Typography sx={{ ...valueStyle, fontSize: '11px' }}>{block.treaties?.length || 0}</Typography>
                                         </Box>
                                     </Box>
                                 </Box>
 
                                 {block.treaties && block.treaties.map((treaty: any, treatyIndex: number) => (
-                                    <Box key={treatyIndex} sx={{
-                                        mb: treatyIndex < block.treaties.length - 1 ? 3 : 0,
-                                        p: 3,
-                                        backgroundColor: '#fafafa',
-                                        borderRadius: '6px',
-                                        border: '1px solid #e9ecef'
-                                    }}>
-                                        {/* Treaty Basic Info */}
+                                    <Card key={treatyIndex} sx={{ mb: 1.5, p: 2, backgroundColor: 'white', border: '1px solid #dee2e6', borderRadius: '6px' }}>
+                                        {/* Treaty Header - Compact */}
                                         <Typography variant="h6" sx={{
                                             fontWeight: 600,
-                                            mb: 3,
+                                            mb: 1.5,
                                             color: '#e91e63',
-                                            fontSize: '16px',
+                                            fontSize: '14px',
                                             borderBottom: '1px solid #dee2e6',
-                                            pb: 1
+                                            pb: 0.5
                                         }}>
                                             Treaty: {treaty.treatyName || '-'}
                                         </Typography>
 
-                                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mb: 3 }}>
+                                        {/* Basic Treaty Information - Compact Grid */}
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 1.5, mb: 2 }}>
                                             <Box>
                                                 <Typography sx={labelStyle}>Treaty Code</Typography>
                                                 <Typography sx={valueStyle}>{treaty.treatyCode || '-'}</Typography>
@@ -256,76 +247,48 @@ const TreatyConfig4Component = () => {
                                             </Box>
                                             <Box>
                                                 <Typography sx={labelStyle}>Status</Typography>
-                                                <Chip label={treaty.status || 'N/A'} size="small" sx={{ ...getStatusColor(treaty.status), fontSize: '11px', height: '20px' }} />
+                                                <Chip label={treaty.status || 'N/A'} size="small" sx={{ ...getStatusColor(treaty.status), fontSize: '10px', height: '18px' }} />
                                             </Box>
                                             <Box>
-                                                <Typography sx={labelStyle}>Ref Number</Typography>
-                                                <Typography sx={valueStyle}>{treaty.refNumber || '-'}</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography sx={labelStyle}>Treaty Category</Typography>
+                                                <Typography sx={labelStyle}>Category</Typography>
                                                 <Typography sx={valueStyle}>{treaty.treatyCategory || '-'}</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography sx={labelStyle}>Former Treaty Code</Typography>
-                                                <Typography sx={valueStyle}>{treaty.formerTreatyCode || '-'}</Typography>
                                             </Box>
                                             <Box>
                                                 <Typography sx={labelStyle}>Graded Retention</Typography>
                                                 <Typography sx={valueStyle}>{treaty.gradedRetention ? 'Yes' : 'No'}</Typography>
                                             </Box>
-                                            <Box>
-                                                <Typography sx={labelStyle}>XOL Attachment Type</Typography>
-                                                <Typography sx={valueStyle}>{treaty.xolAttachmentType || '-'}</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography sx={labelStyle}>Processing Method</Typography>
-                                                <Typography sx={valueStyle}>{treaty.processingMethod || '-'}</Typography>
-                                            </Box>
                                         </Box>
 
-                                        {/* Proportional Treaty Attributes */}
+                                        {/* Proportional Treaty Attributes - Compact */}
                                         {treaty.propTreatyAttribute && (
-                                            <Box sx={{ mb: 3 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 1 }}>
+                                            <Box sx={{ mb: 2 }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#495057', borderBottom: '1px solid #e0e0e0', pb: 0.5, fontSize: '13px' }}>
                                                     Proportional Treaty Attributes
                                                 </Typography>
-                                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mb: 2 }}>
+                                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 1.5 }}>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Installment Type</Typography>
+                                                        <Typography sx={labelStyle}>Installment</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.installmentType || '-'}</Typography>
                                                     </Box>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Prem Reserve Retained Rate</Typography>
+                                                        <Typography sx={labelStyle}>Prem Reserve Retained</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.premReserveRetainedRate ?? '-'}%</Typography>
                                                     </Box>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Prem Reserve Interest Rate</Typography>
+                                                        <Typography sx={labelStyle}>Prem Reserve Interest</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.premReserveInterestRate ?? '-'}%</Typography>
                                                     </Box>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Portfolio Prem Entry Rate</Typography>
+                                                        <Typography sx={labelStyle}>Portfolio Prem Entry</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioPremEntryRate ?? '-'}%</Typography>
                                                     </Box>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Portfolio Claim Entry Rate</Typography>
+                                                        <Typography sx={labelStyle}>Portfolio Claim Entry</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioClaimEntryRate ?? '-'}%</Typography>
                                                     </Box>
                                                     <Box>
-                                                        <Typography sx={labelStyle}>Portfolio Claim Withd Rate</Typography>
-                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioClaimWithdRate ?? '-'}%</Typography>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography sx={labelStyle}>Portfolio Prem Withd Rate</Typography>
-                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.portfolioPremWithdRate ?? '-'}%</Typography>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography sx={labelStyle}>Management Expenses</Typography>
+                                                        <Typography sx={labelStyle}>Mgmt Expenses</Typography>
                                                         <Typography sx={valueStyle}>{treaty.propTreatyAttribute.mgmtExpensesPercent ?? '-'}%</Typography>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography sx={labelStyle}>Taxes Percent</Typography>
-                                                        <Typography sx={valueStyle}>{treaty.propTreatyAttribute.taxesPercent ?? '-'}%</Typography>
                                                     </Box>
                                                 </Box>
                                             </Box>
@@ -358,56 +321,59 @@ const TreatyConfig4Component = () => {
                                             </Box>
                                         )}
 
-                                        {/* Risk Details Table */}
+                                        {/* Risk Details - Compact Professional Table */}
                                         {treaty.propRiskDetails && treaty.propRiskDetails.length > 0 && (
-                                            <Box sx={{ mb: 3 }}>
+                                            <Box sx={{ mb: 2 }}>
                                                 <Typography variant="subtitle2" sx={{
                                                     fontWeight: 600,
-                                                    mb: 2,
+                                                    mb: 1.5,
                                                     color: '#495057',
-                                                    fontSize: '14px'
+                                                    fontSize: '13px'
                                                 }}>
                                                     Risk Details ({treaty.propRiskDetails.length})
                                                 </Typography>
-                                                <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #dee2e6' }}>
-                                                    <Table size="small">
+
+                                                <TableContainer
+                                                    component={Paper}
+                                                    sx={{
+                                                        boxShadow: 'none',
+                                                        border: '1px solid #dee2e6',
+                                                        borderRadius: '6px',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    <Table size="small" sx={{ '& .MuiTableCell-root': { padding: '6px 8px', fontSize: '11px' } }}>
                                                         <TableHead>
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Product LOB</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Product Code</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Acct LOB</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Risk Category</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Risk Grade</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Cession Rate %</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Max Capacity</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Retention Amt</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Surplus Capacity</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Per Risk Recovery</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Event Limit</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Cash Call Limit</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Loss Advice Limit</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Premium Payment</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Alert Days</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 80 }}>Product</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 70 }}>Code</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 70 }}>Category</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 50 }}>Grade</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 70, textAlign: 'right' }}>Cession %</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 90, textAlign: 'right' }}>Max Capacity</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 90, textAlign: 'right' }}>Retention</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 80, textAlign: 'right' }}>Surplus</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 90, textAlign: 'right' }}>Event Limit</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 80, textAlign: 'right' }}>Cash Call</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 100 }}>Payment</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 50, textAlign: 'center' }}>Days</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {treaty.propRiskDetails.map((risk: any, riskIndex: number) => (
                                                                 <TableRow key={riskIndex} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.productLob || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.productCode || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.acctLob || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.riskCategory || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.riskGrade || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 500 }}>{risk.cessionRate ?? '-'}%</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.quotaCessionMaxCapacity?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.retentionAmount?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.surplusCapacity?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.perRiskRecovery?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.eventLimit?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.cashCallLimit?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.lossAdviceLimit?.toLocaleString() ?? '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.premiumPaymentWarranty || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>{risk.alertDays ?? '-'}</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 500 }}>{risk.productLob || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 500 }}>{risk.productCode || '-'}</TableCell>
+                                                                    <TableCell>{risk.riskCategory || '-'}</TableCell>
+                                                                    <TableCell>{risk.riskGrade || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 600, color: '#e91e63', textAlign: 'right' }}>{risk.cessionRate ?? '-'}%</TableCell>
+                                                                    <TableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>{risk.quotaCessionMaxCapacity ? (risk.quotaCessionMaxCapacity / 1000).toFixed(0) + 'K' : '-'}</TableCell>
+                                                                    <TableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>{risk.retentionAmount ? (risk.retentionAmount / 1000).toFixed(0) + 'K' : '-'}</TableCell>
+                                                                    <TableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>{risk.surplusCapacity ? (risk.surplusCapacity / 1000).toFixed(0) + 'K' : '-'}</TableCell>
+                                                                    <TableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>{risk.eventLimit ? (risk.eventLimit / 1000).toFixed(0) + 'K' : '-'}</TableCell>
+                                                                    <TableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>{risk.cashCallLimit ? (risk.cashCallLimit / 1000).toFixed(0) + 'K' : '-'}</TableCell>
+                                                                    <TableCell sx={{ fontSize: '10px' }}>{risk.premiumPaymentWarranty?.replace('WITHIN_', '').replace('_DAYS', 'd') || '-'}</TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center', fontWeight: 500 }}>{risk.alertDays ?? '-'}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
@@ -452,53 +418,67 @@ const TreatyConfig4Component = () => {
                                             </Box>
                                         )}
 
-                                        {/* Allocations Table */}
+                                        {/* Allocations - Compact Table */}
                                         {treaty.portfolioTreatyAllocations && treaty.portfolioTreatyAllocations.length > 0 && (
                                             <Box>
                                                 <Typography variant="subtitle2" sx={{
                                                     fontWeight: 600,
-                                                    mb: 2,
+                                                    mb: 1.5,
                                                     color: '#495057',
-                                                    fontSize: '14px'
+                                                    fontSize: '13px'
                                                 }}>
                                                     Allocations ({treaty.portfolioTreatyAllocations.length})
                                                 </Typography>
-                                                <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #dee2e6' }}>
-                                                    <Table size="small">
+                                                <TableContainer
+                                                    component={Paper}
+                                                    sx={{
+                                                        boxShadow: 'none',
+                                                        border: '1px solid #dee2e6',
+                                                        borderRadius: '6px',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    <Table size="small" sx={{ '& .MuiTableCell-root': { padding: '6px 8px', fontSize: '11px' } }}>
                                                         <TableHead>
                                                             <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Participant Type</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Participant Name</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Share %</TableCell>
-                                                                <TableCell sx={{ fontWeight: 600, fontSize: '12px', color: '#495057' }}>Broker Breakdowns</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 100 }}>Type</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 150 }}>Participant Name</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 80, textAlign: 'right' }}>Share %</TableCell>
+                                                                <TableCell sx={{ fontWeight: 600, color: '#495057', minWidth: 200 }}>Broker Breakdowns</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {treaty.portfolioTreatyAllocations.map((alloc: any, allocIndex: number) => (
                                                                 <TableRow key={allocIndex} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>
+                                                                    <TableCell>
                                                                         <Chip
                                                                             label={alloc.participantType}
                                                                             size="small"
                                                                             sx={{
-                                                                                fontSize: '10px',
-                                                                                height: '20px',
+                                                                                fontSize: '9px',
+                                                                                height: '16px',
                                                                                 backgroundColor: alloc.participantType === 'REINSURER' ? '#e3f2fd' : '#fff3e0',
                                                                                 color: alloc.participantType === 'REINSURER' ? '#1565c0' : '#e65100'
                                                                             }}
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 500 }}>{alloc.participantName || '-'}</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600 }}>{alloc.sharePercent ?? '-'}%</TableCell>
-                                                                    <TableCell sx={{ fontSize: '12px' }}>
+                                                                    <TableCell sx={{ fontWeight: 500 }}>{alloc.participantName || '-'}</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 600, textAlign: 'right', color: '#e91e63' }}>{alloc.sharePercent ?? '-'}%</TableCell>
+                                                                    <TableCell>
                                                                         {alloc.brokerBreakdowns && alloc.brokerBreakdowns.length > 0 ? (
-                                                                            <Box>
+                                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                                                                 {alloc.brokerBreakdowns.map((broker: any, brokerIndex: number) => (
-                                                                                    <Box key={brokerIndex} sx={{ mb: 0.5 }}>
-                                                                                        <Typography sx={{ fontSize: '11px', color: '#666' }}>
-                                                                                            {broker.reinsurerName}: {broker.sharePercent}%
-                                                                                        </Typography>
-                                                                                    </Box>
+                                                                                    <Chip
+                                                                                        key={brokerIndex}
+                                                                                        label={`${broker.reinsurerName}: ${broker.sharePercent}%`}
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            fontSize: '9px',
+                                                                                            height: '16px',
+                                                                                            backgroundColor: '#f0f0f0',
+                                                                                            color: '#666'
+                                                                                        }}
+                                                                                    />
                                                                                 ))}
                                                                             </Box>
                                                                         ) : '-'}
@@ -510,7 +490,7 @@ const TreatyConfig4Component = () => {
                                                 </TableContainer>
                                             </Box>
                                         )}
-                                    </Box>
+                                    </Card>
                                 ))}
                             </Box>
                         </CardContent>
