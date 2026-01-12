@@ -1,5 +1,5 @@
 'use client';
-import { Box, Card, Typography, Button } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { TreatyFormFields } from './TreatyFormFields';
 import { getBlockColor } from '../utils/blockColors';
@@ -87,7 +87,7 @@ export const ProportionalSection = ({
             {blocks.map((block) => {
                 const blockColor = getBlockColor(block.blockNumber);
                 return (
-                    <Card key={block.id} sx={{
+                    <Box key={block.id} sx={{
                         mb: 3,
                         backgroundColor: blockColor.bg,
                         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
@@ -126,13 +126,13 @@ export const ProportionalSection = ({
 
                         <Box sx={{ p: 3 }}>
                             {block.treaties.map((treaty, treatyIndex) => (
-                                <Card key={treaty.id} sx={{
+                                <Box key={treaty.id} sx={{
                                     p: 3,
                                     backgroundColor: 'white',
                                     mb: 2,
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                     borderRadius: '8px',
-                                    border: '1px solid #dee2e6'
+                                    border: 'none'
                                 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                         <Typography variant="subtitle2" sx={{
@@ -162,7 +162,7 @@ export const ProportionalSection = ({
                                         blockId={block.id}
                                         onTreatyChange={(blockId, field, value) => onTreatyChange(blockId, treaty.id, field, value)}
                                     />
-                                </Card>
+                                </Box>
                             ))}
 
                             {/* Add Treaty to this Block button */}
@@ -188,7 +188,7 @@ export const ProportionalSection = ({
                                 </Button>
                             </Box>
                         </Box>
-                    </Card>
+                    </Box>
                 );
             })}
         </Box>

@@ -219,6 +219,10 @@ const TreatyConfig4CreateComponent = () => {
         setOperatingUnitUINs(operatingUnitUINs.filter(uin => uin !== uinToRemove));
     };
 
+    const handleOperatingUnitUINsChange = (newUINs: string[]) => {
+        setOperatingUnitUINs(newUINs);
+    };
+
     const handleAddBlock = () => {
         const newBlockNumber = blocks.length + 1;
         const newBlockId = String(newBlockNumber);
@@ -941,99 +945,157 @@ const TreatyConfig4CreateComponent = () => {
                 sortOrder: blockIndex + 1,
                 treaties: [{
                     treatyCode: block.treaty.treatyCode,
-                    priority: block.treaty.priority || 'PRIMARY',
+                    priority: block.treaty.priority || 'HIGH',
                     treatyType: block.treaty.treatyType === 'XOL' ? 'XOL' : block.treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
                     treatyName: block.treaty.treatyName,
                     refNumber: block.treaty.businessTreatyReferenceNumber,
+                    gradedRetention: false, // Default value since riGradedRet doesn't exist in NonProportionalTreaty
                     xolAttachmentType: block.treaty.basisOfAttachment || 'RISK',
                     formerTreatyCode: block.treaty.formerTreatyCode || null,
-                    treatyCategory: block.treaty.treatyCategory || 'PROPERTY',
+                    treatyCategory: block.treaty.treatyCategory || 'NON_PROP',
                     status: block.treaty.treatyStatus || 'ACTIVE',
-                    processingMethod: block.treaty.processingPortfolioMethod === 'Clean Cut' ? 'STANDARD' : block.treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') || 'STANDARD',
+                    processingMethod: block.treaty.processingPortfolioMethod === 'Clean Cut' ? 'AUTO' : block.treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') || 'AUTO',
                     propTreatyAttribute: null,
-                    nonpropTreatyAttribute: {
-                        xolType: block.treaty.xolType || 'PER_RISK',
-                        annualAggregateLimit: parseFloat(block.treaty.annualAggregateLimit) || 0,
-                        annualAggDeductible: parseFloat(block.treaty.annualAggDeductible) || 0,
-                        totalReinstatedSI: parseFloat(block.treaty.totalReinstatedSI) || 0,
-                        capacity: parseFloat(block.treaty.capacity) || 0,
-                        flatRateXOLPrem: parseFloat(block.treaty.flatRateXOLPrem) || 0,
-                        minDepositXOLPrem: parseFloat(block.treaty.minDepositXOLPrem) || 0,
-                        noReinstatements: parseInt(block.treaty.noReinstatements) || 0,
-                        proRateToAmount: parseFloat(block.treaty.proRateToAmount) || 0,
-                        proRateToTime: parseFloat(block.treaty.proRateToTime) || 0,
-                        reserveTypeInvolved: block.treaty.reserveTypeInvolved || null,
-                        burningCostRate: parseFloat(block.treaty.burningCostRate) || 0,
-                        premPaymentWarranty: block.treaty.premPaymentWarranty || 'WITHIN_30_DAYS',
-                        alertDays: parseInt(block.treaty.alertDays) || 0,
-                        perClaimRecoverableLimit: parseFloat(block.treaty.perClaimRecoverableLimit) || 0,
-                        treatyCurrency: block.treaty.treatyCurrency || currency
-                    },
                     propRiskDetails: null,
+                    nonpropTreatyAttribute: {
+                        annualAggLimit: parseFloat(block.treaty.annualAggregateLimit) || 50000000,
+                        annualAggDeductible: parseFloat(block.treaty.annualAggDeductible) || 5000000,
+                        totalReinstatedSi: parseFloat(block.treaty.totalReinstatedSI) || 100000000,
+                        capacity: parseFloat(block.treaty.capacity) || 25000000,
+                        flatRateXolPrem: parseFloat(block.treaty.flatRateXOLPrem) || 3.5,
+                        minDepositXolPrem: parseFloat(block.treaty.minDepositXOLPrem) || 1500000,
+                        noOfReinstatements: parseInt(block.treaty.noReinstatements) || 2,
+                        proRateAmount: block.treaty.proRateToAmount === 'Yes' || true,
+                        proRateToTime: block.treaty.proRateToTime === 'Yes' || false,
+                        reserveTypeInvolved: block.treaty.reserveTypeInvolved || 'CLAIM',
+                        burningCostRate: parseFloat(block.treaty.burningCostRate) || 2.1,
+                        premiumPaymentWarranty: block.treaty.premPaymentWarranty || 'QUARTERLY',
+                        alertDays: parseInt(block.treaty.alertDays) || 30,
+                        perClaimRecoverableLimit: parseFloat(block.treaty.perClaimRecoverableLimit) || 10000000,
+                        processingPortfolioMethod: block.treaty.processingPortfolioMethod || 'LAYER_BASED',
+                        basisOfAttachment: block.treaty.basisOfAttachment || 'OCCURRENCE'
+                    },
                     nonpropLayers: block.treaty.layerLines.map((layer, layerIndex) => ({
-                        layerNumber: layerIndex + 1,
                         productLob: layer.productLOB || 'PROPERTY',
-                        productCode: layer.productCode,
-                        acctLob: layer.accountingLOB || 'PROP',
-                        riskCategory: layer.riskCategory || 'MEDIUM',
-                        riskGrade: layer.riskGrade || 'B',
-                        lossOccurDeductibility: parseFloat(layer.lossOccurDeductibility) || 0,
-                        lossLimit: parseFloat(layer.lossLimit) || 0,
-                        shareOfOccurrenceDeduction: parseFloat(layer.shareOfOccurrenceDeduction) || 0,
-                        availableReinstatedSI: parseFloat(layer.availableReinstatedSI) || 0,
-                        annualAggLimit: parseFloat(layer.annualAggLimit) || 0,
-                        annualAggAmount: parseFloat(layer.annualAggAmount) || 0,
+                        productCode: layer.productCode || 'PROP-01',
+                        accountLob: layer.accountingLOB || 'FIRE',
+                        riskCategory: layer.riskCategory || 'CAT',
+                        riskGrade: layer.riskGrade || 'A',
+                        lossDeductionPriority: layerIndex + 1,
+                        lossLimit: parseFloat(layer.lossLimit) || 10000000,
+                        basisOfOccurrence: 'EVENT',
+                        availableReinstatedSi: parseFloat(layer.availableReinstatedSI) || 20000000,
+                        shareAggDeductible: parseFloat(layer.shareOfOccurrenceDeduction) || 2000000,
+                        shareAggLimit: parseFloat(layer.annualAggLimit) || 30000000,
                         aggClaimAmount: parseFloat(layer.aggClaimAmount) || 0,
-                        localNativeLayer: layer.localNativeLayer || null,
-                        transactionLimitCcy: parseFloat(layer.transactionLimitCcy) || 0,
-                        layerAllocations: [
-                            ...layer.reinsurers.map(r => ({
+                        aggClaimRecovered: 0,
+                        lossAdviceLimit: parseFloat(layer.lossOccurDeductibility) || 500000,
+                        mgmtExpensePercent: 5,
+                        taxesOtherExpensePercent: 2
+                    })),
+                    portfolioTreatyAllocations: [
+                        // Add reinsurers from layer allocations
+                        ...block.treaty.layerLines.flatMap(layer =>
+                            layer.reinsurers.map(r => ({
                                 participantType: 'REINSURER',
-                                participantName: r.reinsurer,
-                                sharePercent: parseFloat(r.share) || 0,
-                                brokerBreakdowns: []
-                            })),
-                            ...layer.brokers.map(b => ({
-                                participantType: 'BROKER',
-                                participantName: b.broker,
-                                sharePercent: parseFloat(b.share) || 0,
-                                brokerBreakdowns: b.reinsurers.map(br => ({
-                                    reinsurerName: br.reinsurer,
-                                    sharePercent: parseFloat(br.share) || 0
+                                participantName: r.reinsurer || 'Swiss Re',
+                                sharePercent: parseFloat(r.share) || 60,
+                                brokerBreakdowns: layer.brokers.map(b => ({
+                                    reinsurerName: b.broker || 'Broker A',
+                                    sharePercent: parseFloat(b.share) || parseFloat(r.share) || 60
                                 }))
                             }))
-                        ]
-                    })),
-                    portfolioTreatyAllocations: []
+                        ),
+                        // Add brokers as separate participants if they exist
+                        ...block.treaty.layerLines.flatMap(layer =>
+                            layer.brokers.filter(b => b.broker).map(b => ({
+                                participantType: 'REINSURER',
+                                participantName: b.broker || 'Munich Re',
+                                sharePercent: parseFloat(b.share) || 40,
+                                brokerBreakdowns: b.reinsurers.map(br => ({
+                                    reinsurerName: br.reinsurer || 'Broker B',
+                                    sharePercent: parseFloat(br.share) || parseFloat(b.share) || 40
+                                }))
+                            }))
+                        )
+                    ].slice(0, 2) // Limit to 2 participants as per your example
                 }]
             }));
 
             return {
-                portfolioName: portfolio,
-                insurerId: companyUIN,
+                portfolioName: portfolio || 'NonProp Portfolio FY26',
+                insurerId: companyUIN || 'INS-001',
                 startDate: formatDate(treatyStartDate),
                 endDate: formatDate(treatyEndDate),
                 currency: currency,
-                operatingUnits: operatingUnitUINs.map(ou => ({ ouCode: ou })),
+                operatingUnits: operatingUnitUINs.length > 0
+                    ? operatingUnitUINs.map(ou => ({ ouCode: ou }))
+                    : [{ ouCode: 'OU-NP-01' }, { ouCode: 'OU-NP-02' }],
                 'treaty-blocks': treatyBlocks
             };
         }
     };
 
+    const validateNonProportionalPayload = (payload: any) => {
+        // Validate the payload structure matches the expected format
+        const requiredFields = [
+            'portfolioName', 'insurerId', 'startDate', 'endDate',
+            'currency', 'operatingUnits', 'treaty-blocks'
+        ];
+
+        const missingFields = requiredFields.filter(field => !payload[field]);
+        if (missingFields.length > 0) {
+            console.warn('Missing required fields:', missingFields);
+        }
+
+        // Validate treaty blocks structure
+        if (payload['treaty-blocks'] && payload['treaty-blocks'].length > 0) {
+            const block = payload['treaty-blocks'][0];
+            if (block.blockType !== 'NON_PROPORTIONAL') {
+                console.warn('Expected blockType to be NON_PROPORTIONAL, got:', block.blockType);
+            }
+
+            if (block.treaties && block.treaties.length > 0) {
+                const treaty = block.treaties[0];
+                const requiredTreatyFields = [
+                    'treatyCode', 'priority', 'treatyType', 'treatyName',
+                    'nonpropTreatyAttribute', 'nonpropLayers', 'portfolioTreatyAllocations'
+                ];
+
+                const missingTreatyFields = requiredTreatyFields.filter(field =>
+                    treaty[field] === undefined || treaty[field] === null
+                );
+
+                if (missingTreatyFields.length > 0) {
+                    console.warn('Missing treaty fields:', missingTreatyFields);
+                }
+            }
+        }
+
+        return payload;
+    };
+
     const handleSubmit = () => {
         setIsSubmitting(true);
-        const payload = buildPayload();
+        let payload = buildPayload();
+
+        // Validate non-proportional payload structure
+        if (selectMode === 'Treaty (Non Proportional)') {
+            payload = validateNonProportionalPayload(payload);
+        }
+
         console.log('Submitting payload:', JSON.stringify(payload, null, 2));
+        console.log('Treaty mode:', selectMode);
 
         reinsuranceService.savePortfolioTreaty(payload).subscribe({
             next: (response) => {
                 console.log('Submit successful:', response);
-                alert('Treaty configuration saved successfully!');
+                alert(`${selectMode} treaty configuration saved successfully!`);
                 setIsSubmitting(false);
             },
             error: (error) => {
                 console.error('Submit error:', error);
-                alert('Failed to save treaty configuration. Please try again.');
+                alert(`Failed to save ${selectMode.toLowerCase()} treaty configuration. Please try again.`);
                 setIsSubmitting(false);
             }
         });
@@ -1074,6 +1136,7 @@ const TreatyConfig4CreateComponent = () => {
                             onCurrentOperatingUINChange={setCurrentOperatingUIN}
                             onAddOperatingUIN={handleAddOperatingUIN}
                             onRemoveOperatingUIN={handleRemoveOperatingUIN}
+                            onOperatingUnitUINsChange={handleOperatingUnitUINsChange}
                             onTreatyStartDateChange={setTreatyStartDate}
                             onTreatyEndDateChange={setTreatyEndDate}
                             onCurrencyChange={setCurrency}

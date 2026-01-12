@@ -1,5 +1,5 @@
 'use client';
-import { Box, Card, Typography, Button, IconButton } from '@mui/material';
+import { Box, Typography, Button, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { NonProportionalTreatyFields } from './NonProportionalTreatyFields';
@@ -107,7 +107,7 @@ export const NonProportionalSection = ({
             {blocks.map((block) => {
                 const blockColor = getBlockColor(block.blockNumber);
                 return (
-                    <Card key={block.id} sx={{
+                    <Box key={block.id} sx={{
                         mb: 3,
                         backgroundColor: blockColor.bg,
                         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
@@ -145,13 +145,13 @@ export const NonProportionalSection = ({
                         </Box>
 
                         <Box sx={{ p: 3 }}>
-                            <Card sx={{
+                            <Box sx={{
                                 p: 3,
                                 backgroundColor: 'white',
                                 mb: 2,
                                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                 borderRadius: '8px',
-                                border: '1px solid #dee2e6'
+                                border: 'none'
                             }}>
                                 <Typography variant="subtitle2" sx={{
                                     color: '#495057',
@@ -169,9 +169,9 @@ export const NonProportionalSection = ({
                                     blockId={block.id}
                                     onTreatyChange={onTreatyChange}
                                 />
-                            </Card>
+                            </Box>
                         </Box>
-                    </Card>
+                    </Box>
                 );
             })}
         </Box>
