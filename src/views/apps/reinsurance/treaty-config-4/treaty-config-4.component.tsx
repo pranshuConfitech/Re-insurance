@@ -24,6 +24,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
@@ -108,6 +110,17 @@ const TreatyConfig4Component = () => {
 
     const handleCreate = () => {
         router.push('/reinsurance/treaty-config-4/create');
+    };
+
+    const handleEdit = (portfolioId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        console.log('Edit clicked, portfolioId:', portfolioId);
+        router.push(`/reinsurance/treaty-config-4/edit/${portfolioId}`);
+    };
+
+    const handleView = (portfolioId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        router.push(`/reinsurance/treaty-config-4/view/${portfolioId}`);
     };
 
     const formatDate = (dateStr: string) => {
@@ -648,12 +661,25 @@ const TreatyConfig4Component = () => {
                                         }}>
                                             Currency
                                         </TableCell>
+                                        <TableCell sx={{
+                                            fontWeight: 600,
+                                            fontSize: '12px',
+                                            backgroundColor: '#f8f9fa',
+                                            color: '#495057',
+                                            textTransform: 'uppercase',
+                                            py: 2,
+                                            borderBottom: '1px solid #dee2e6',
+                                            width: '120px',
+                                            textAlign: 'center'
+                                        }}>
+                                            Action
+                                        </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {data.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8, color: '#6c757d' }}>
+                                            <TableCell colSpan={7} sx={{ textAlign: 'center', py: 8, color: '#6c757d' }}>
                                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                                                     <Box sx={{
                                                         width: 64,
@@ -798,9 +824,50 @@ const TreatyConfig4Component = () => {
                                                             }}
                                                         />
                                                     </TableCell>
+                                                    <TableCell sx={{
+                                                        py: 2,
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => handleView(row.id, e)}
+                                                                sx={{
+                                                                    backgroundColor: '#e3f2fd',
+                                                                    color: '#1565c0',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#bbdefb',
+                                                                        transform: 'scale(1.1)'
+                                                                    },
+                                                                    width: 32,
+                                                                    height: 32,
+                                                                    transition: 'all 0.2s ease-in-out'
+                                                                }}
+                                                            >
+                                                                <VisibilityIcon sx={{ fontSize: 16 }} />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => handleEdit(row.id, e)}
+                                                                sx={{
+                                                                    backgroundColor: '#fff3e0',
+                                                                    color: '#e65100',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#ffe0b2',
+                                                                        transform: 'scale(1.1)'
+                                                                    },
+                                                                    width: 32,
+                                                                    height: 32,
+                                                                    transition: 'all 0.2s ease-in-out'
+                                                                }}
+                                                            >
+                                                                <EditIcon sx={{ fontSize: 16 }} />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </TableCell>
                                                 </TableRow>
                                                 <TableRow key={`collapse-${row.id || index}`}>
-                                                    <TableCell colSpan={6} sx={{ py: 0, borderBottom: expandedRow === row.id ? '1px solid #dee2e6' : 'none' }}>
+                                                    <TableCell colSpan={7} sx={{ py: 0, borderBottom: expandedRow === row.id ? '1px solid #dee2e6' : 'none' }}>
                                                         <Collapse in={expandedRow === row.id} timeout="auto" unmountOnExit>
                                                             {renderAccordionContent(row.id)}
                                                         </Collapse>

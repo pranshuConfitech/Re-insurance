@@ -153,6 +153,13 @@ export const RiskLimitsSection = ({
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
                                         <MenuItem value="Motor">Motor</MenuItem>
+                                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
+                                        <MenuItem value="FIRE">FIRE</MenuItem>
+                                        <MenuItem value="CASUALTY">CASUALTY</MenuItem>
+                                        {/* Show current value if not in list */}
+                                        {line.productLOB && !['', 'Fire', 'Marine', 'Motor', 'PROPERTY', 'FIRE', 'CASUALTY'].includes(line.productLOB) && (
+                                            <MenuItem value={line.productLOB}>{line.productLOB}</MenuItem>
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -196,6 +203,12 @@ export const RiskLimitsSection = ({
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
+                                        <MenuItem value="PROP">PROP</MenuItem>
+                                        <MenuItem value="FIRE">FIRE</MenuItem>
+                                        {/* Show current value if not in list */}
+                                        {line.accountingLOB && !['', 'Fire', 'Marine', 'PROP', 'FIRE'].includes(line.accountingLOB) && (
+                                            <MenuItem value={line.accountingLOB}>{line.accountingLOB}</MenuItem>
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -219,6 +232,14 @@ export const RiskLimitsSection = ({
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Comm">Comm</MenuItem>
                                         <MenuItem value="Residential">Residential</MenuItem>
+                                        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+                                        <MenuItem value="HIGH">HIGH</MenuItem>
+                                        <MenuItem value="LOW">LOW</MenuItem>
+                                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
+                                        {/* Show current value if not in list */}
+                                        {line.riskCategory && !['', 'Comm', 'Residential', 'MEDIUM', 'HIGH', 'LOW', 'PROPERTY'].includes(line.riskCategory) && (
+                                            <MenuItem value={line.riskCategory}>{line.riskCategory}</MenuItem>
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Grid>

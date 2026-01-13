@@ -81,14 +81,12 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Priority</FieldLabel>
-                <TextField
-                    fullWidth
-                    size="small"
-                    type="number"
-                    value={treaty.priority}
-                    onChange={(e) => handleChange('priority', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
+                <FormControl fullWidth size="small">
+                    <Select
+                        value={treaty.priority}
+                        onChange={(e) => handleChange('priority', e.target.value)}
+                        displayEmpty
+                        sx={{
                             backgroundColor: '#fafafa',
                             '& .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #e9ecef'
@@ -96,9 +94,23 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #626BDA'
                             }
-                        }
-                    }}
-                />
+                        }}
+                    >
+                        <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="PRIMARY">PRIMARY</MenuItem>
+                        <MenuItem value="SECONDARY">SECONDARY</MenuItem>
+                        <MenuItem value="HIGH">HIGH</MenuItem>
+                        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+                        <MenuItem value="LOW">LOW</MenuItem>
+                        <MenuItem value="1">1</MenuItem>
+                        <MenuItem value="2">2</MenuItem>
+                        <MenuItem value="3">3</MenuItem>
+                        {/* Show current value if not in list */}
+                        {treaty.priority && !['', 'PRIMARY', 'SECONDARY', 'HIGH', 'MEDIUM', 'LOW', '1', '2', '3'].includes(treaty.priority) && (
+                            <MenuItem value={treaty.priority}>{treaty.priority}</MenuItem>
+                        )}
+                    </Select>
+                </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Type</FieldLabel>
@@ -227,6 +239,15 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="M">M</MenuItem>
                         <MenuItem value="F">F</MenuItem>
+                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
+                        <MenuItem value="CASUALTY">CASUALTY</MenuItem>
+                        <MenuItem value="MARINE">MARINE</MenuItem>
+                        <MenuItem value="PROPORTIONAL">PROPORTIONAL</MenuItem>
+                        <MenuItem value="NON_PROP">NON_PROP</MenuItem>
+                        {/* Show current value if not in list */}
+                        {treaty.treatyCategory && !['', 'M', 'F', 'PROPERTY', 'CASUALTY', 'MARINE', 'PROPORTIONAL', 'NON_PROP'].includes(treaty.treatyCategory) && (
+                            <MenuItem value={treaty.treatyCategory}>{treaty.treatyCategory}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -250,8 +271,13 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         }}
                     >
                         <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="Monthly">Monthly</MenuItem>
+                        <MenuItem value="Quarterly">Quarterly</MenuItem>
+                        <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
+                        <MenuItem value="Annual">Annual</MenuItem>
                         <MenuItem value="M">M</MenuItem>
                         <MenuItem value="Q">Q</MenuItem>
+                        <MenuItem value="S">S</MenuItem>
                         <MenuItem value="A">A</MenuItem>
                     </Select>
                 </FormControl>
