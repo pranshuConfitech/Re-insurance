@@ -31,7 +31,12 @@ const OPERATING_UNITS = [
     'OU-West',
     'OU-Central',
     'OU-Northeast',
-    'OU-Southwest'
+    'OU-Southwest',
+    'PROP-IN',
+    'PROP-IN-2',
+    'NP-IN-01',
+    'NP-IN-02',
+    'OU-INDIAs'
 ];
 
 export const TopFormSection = ({
@@ -41,6 +46,9 @@ export const TopFormSection = ({
     onAddOperatingUIN, onRemoveOperatingUIN, onOperatingUnitUINsChange,
     onTreatyStartDateChange, onTreatyEndDateChange, onCurrencyChange, onSelectModeChange
 }: TopFormSectionProps) => {
+
+    // Combine predefined units with any custom units from the data
+    const allOperatingUnits = [...new Set([...OPERATING_UNITS, ...operatingUnitUINs])];
 
     const handleOperatingUnitChange = (event: any) => {
         const value = event.target.value;
@@ -147,6 +155,13 @@ export const TopFormSection = ({
                             <MenuItem value="UIN-1001">UIN-1001</MenuItem>
                             <MenuItem value="UIN-1002">UIN-1002</MenuItem>
                             <MenuItem value="UIN-1003">UIN-1003</MenuItem>
+                            <MenuItem value="INS-RE-002">INS-RE-002</MenuItem>
+                            <MenuItem value="INS-RE-003">INS-RE-003</MenuItem>
+                            <MenuItem value="INS-1001">INS-1001</MenuItem>
+                            {/* Show current value if not in list */}
+                            {companyUIN && !['', 'UIN-1001', 'UIN-1002', 'UIN-1003', 'INS-RE-002', 'INS-RE-003', 'INS-1001'].includes(companyUIN) && (
+                                <MenuItem value={companyUIN}>{companyUIN}</MenuItem>
+                            )}
                         </Select>
                     </FormControl>
                 </Grid>
@@ -202,7 +217,7 @@ export const TopFormSection = ({
                             <MenuItem disabled value="">
                                 <em style={{ color: '#6c757d' }}>Select Operating Units...</em>
                             </MenuItem>
-                            {OPERATING_UNITS.map((unit) => (
+                            {allOperatingUnits.map((unit) => (
                                 <MenuItem key={unit} value={unit}>
                                     <Checkbox
                                         checked={operatingUnitUINs.indexOf(unit) > -1}

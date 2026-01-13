@@ -323,4 +323,10 @@ export class ReinsuranceService {
             .get<any>(`${this.QUERY_CONTEXT}/portfolio-treaty/${id}`)
             .pipe(map((response) => response));
     }
+
+    updatePortfolioTreaty(id: any, payload: any): Observable<any> {
+        return http
+            .patch<any>(`${this.COMMAND_CONTEXT}/portfolio-treaty/${id}`, payload)
+            .pipe(map((response) => response.data));
+    }
 }

@@ -67,14 +67,12 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Priority</FieldLabel>
-                <TextField
-                    fullWidth
-                    size="small"
-                    type="number"
-                    value={treaty.priority}
-                    onChange={(e) => handleChange('priority', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
+                <FormControl fullWidth size="small">
+                    <Select
+                        value={treaty.priority}
+                        onChange={(e) => handleChange('priority', e.target.value)}
+                        displayEmpty
+                        sx={{
                             backgroundColor: '#fafafa',
                             '& .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #e9ecef'
@@ -82,9 +80,20 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #626BDA'
                             }
-                        }
-                    }}
-                />
+                        }}
+                    >
+                        <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="PRIMARY">Primary</MenuItem>
+                        <MenuItem value="SECONDARY">Secondary</MenuItem>
+                        <MenuItem value="TERTIARY">Tertiary</MenuItem>
+                        <MenuItem value="HIGH">High</MenuItem>
+                        <MenuItem value="MEDIUM">Medium</MenuItem>
+                        <MenuItem value="LOW">Low</MenuItem>
+                        {treaty.priority && !['', 'PRIMARY', 'SECONDARY', 'TERTIARY', 'HIGH', 'MEDIUM', 'LOW'].includes(treaty.priority) && (
+                            <MenuItem value={treaty.priority}>{treaty.priority}</MenuItem>
+                        )}
+                    </Select>
+                </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Treaty Type</FieldLabel>
@@ -170,6 +179,11 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Risk Attaching">Risk Attaching</MenuItem>
                         <MenuItem value="Loss Occurring">Loss Occurring</MenuItem>
+                        <MenuItem value="RISK_ATTACHING">Risk Attaching</MenuItem>
+                        <MenuItem value="LOSS_OCCURRING">Loss Occurring</MenuItem>
+                        {treaty.xolType && !['', 'Risk Attaching', 'Loss Occurring', 'RISK_ATTACHING', 'LOSS_OCCURRING'].includes(treaty.xolType) && (
+                            <MenuItem value={treaty.xolType}>{treaty.xolType}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -211,8 +225,16 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         }}
                     >
                         <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="PROPERTY">Property</MenuItem>
+                        <MenuItem value="CASUALTY">Casualty</MenuItem>
+                        <MenuItem value="MARINE">Marine</MenuItem>
+                        <MenuItem value="AVIATION">Aviation</MenuItem>
+                        <MenuItem value="NON_PROP">Non-Proportional</MenuItem>
                         <MenuItem value="M">M</MenuItem>
                         <MenuItem value="F">F</MenuItem>
+                        {treaty.treatyCategory && !['', 'PROPERTY', 'CASUALTY', 'MARINE', 'AVIATION', 'NON_PROP', 'M', 'F'].includes(treaty.treatyCategory) && (
+                            <MenuItem value={treaty.treatyCategory}>{treaty.treatyCategory}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -236,9 +258,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         }}
                     >
                         <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="ACTIVE">Active</MenuItem>
+                        <MenuItem value="INACTIVE">Inactive</MenuItem>
+                        <MenuItem value="PENDING">Pending</MenuItem>
                         <MenuItem value="Active">Active</MenuItem>
                         <MenuItem value="Inactive">Inactive</MenuItem>
                         <MenuItem value="Pending">Pending</MenuItem>
+                        {treaty.treatyStatus && !['', 'ACTIVE', 'INACTIVE', 'PENDING', 'Active', 'Inactive', 'Pending'].includes(treaty.treatyStatus) && (
+                            <MenuItem value={treaty.treatyStatus}>{treaty.treatyStatus}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -532,13 +560,12 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Prem Payment Warranty</FieldLabel>
-                <TextField
-                    fullWidth
-                    size="small"
-                    value={treaty.premPaymentWarranty}
-                    onChange={(e) => handleChange('premPaymentWarranty', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
+                <FormControl fullWidth size="small">
+                    <Select
+                        value={treaty.premPaymentWarranty}
+                        onChange={(e) => handleChange('premPaymentWarranty', e.target.value)}
+                        displayEmpty
+                        sx={{
                             backgroundColor: '#fafafa',
                             '& .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #e9ecef'
@@ -546,9 +573,28 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 border: '1px solid #626BDA'
                             }
-                        }
-                    }}
-                />
+                        }}
+                    >
+                        <MenuItem value="">Select...</MenuItem>
+                        <MenuItem value="Within 30 Days">Within 30 Days</MenuItem>
+                        <MenuItem value="Within 45 Days">Within 45 Days</MenuItem>
+                        <MenuItem value="Within 60 Days">Within 60 Days</MenuItem>
+                        <MenuItem value="Within 90 Days">Within 90 Days</MenuItem>
+                        <MenuItem value="Quarterly">Quarterly</MenuItem>
+                        <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
+                        <MenuItem value="Annual">Annual</MenuItem>
+                        <MenuItem value="WITHIN_30_DAYS">Within 30 Days</MenuItem>
+                        <MenuItem value="WITHIN_45_DAYS">Within 45 Days</MenuItem>
+                        <MenuItem value="WITHIN_60_DAYS">Within 60 Days</MenuItem>
+                        <MenuItem value="WITHIN_90_DAYS">Within 90 Days</MenuItem>
+                        <MenuItem value="QUARTERLY">Quarterly</MenuItem>
+                        <MenuItem value="SEMI_ANNUAL">Semi-Annual</MenuItem>
+                        <MenuItem value="ANNUAL">Annual</MenuItem>
+                        {treaty.premPaymentWarranty && !['', 'Within 30 Days', 'Within 45 Days', 'Within 60 Days', 'Within 90 Days', 'Quarterly', 'Semi-Annual', 'Annual', 'WITHIN_30_DAYS', 'WITHIN_45_DAYS', 'WITHIN_60_DAYS', 'WITHIN_90_DAYS', 'QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL'].includes(treaty.premPaymentWarranty) && (
+                            <MenuItem value={treaty.premPaymentWarranty}>{treaty.premPaymentWarranty}</MenuItem>
+                        )}
+                    </Select>
+                </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
                 <FieldLabel>Alert Days</FieldLabel>
@@ -614,6 +660,12 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Clean Cut">Clean Cut</MenuItem>
                         <MenuItem value="Run Off">Run Off</MenuItem>
+                        <MenuItem value="AUTO">Clean Cut</MenuItem>
+                        <MenuItem value="SYSTEM">Clean Cut</MenuItem>
+                        <MenuItem value="STANDARD">Clean Cut</MenuItem>
+                        {treaty.processingPortfolioMethod && !['', 'Clean Cut', 'Run Off', 'AUTO', 'SYSTEM', 'STANDARD'].includes(treaty.processingPortfolioMethod) && (
+                            <MenuItem value={treaty.processingPortfolioMethod}>{treaty.processingPortfolioMethod}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -637,6 +689,12 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Risk Attaching Basis">Risk Attaching Basis</MenuItem>
                         <MenuItem value="Loss">Loss</MenuItem>
+                        <MenuItem value="LOSS_OCCURRING">Loss Occurring</MenuItem>
+                        <MenuItem value="RISK_ATTACHING">Risk Attaching</MenuItem>
+                        <MenuItem value="OCCURRENCE">Occurrence</MenuItem>
+                        {treaty.basisOfAttachment && !['', 'Risk Attaching Basis', 'Loss', 'LOSS_OCCURRING', 'RISK_ATTACHING', 'OCCURRENCE'].includes(treaty.basisOfAttachment) && (
+                            <MenuItem value={treaty.basisOfAttachment}>{treaty.basisOfAttachment}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>

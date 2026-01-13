@@ -41,6 +41,90 @@ export const ParticipatingSection = ({
 }: ParticipatingSectionProps) => {
     // Use lineId if provided, otherwise use treatyId
     const effectiveId = lineId || treatyId;
+
+    // Predefined reinsurer options
+    const predefinedReinsurers = [
+        'Hannover Re',
+        'Swiss Re',
+        'Munich Re',
+        'SCOR Re',
+        'Lloyd\'s of London',
+        'Berkshire Hathaway Re',
+        'Reinsurance Group of America',
+        'China Re',
+        'Korean Re',
+        'Transatlantic Re'
+    ];
+
+    // Predefined broker options
+    const predefinedBrokers = [
+        'Aon',
+        'Marsh',
+        'Willis Towers Watson',
+        'Guy Carpenter',
+        'JLT Re',
+        'BMS Group',
+        'TigerRisk',
+        'Gallagher Re',
+        'Miller',
+        'Cooper Gay Swett & Crawford'
+    ];
+
+    // Get all unique reinsurer values from current data
+    const getAllReinsurerValues = () => {
+        const currentValues = new Set<string>();
+
+        // Add values from direct reinsurers
+        reinsurers.forEach(r => {
+            if (r.reinsurer && r.reinsurer.trim()) {
+                currentValues.add(r.reinsurer.trim());
+            }
+        });
+
+        // Add values from broker reinsurers
+        brokers.forEach(b => {
+            b.reinsurers.forEach(br => {
+                if (br.reinsurer && br.reinsurer.trim()) {
+                    currentValues.add(br.reinsurer.trim());
+                }
+            });
+        });
+
+        // Combine predefined and current values
+        const allValues = [...predefinedReinsurers];
+        currentValues.forEach(value => {
+            if (!allValues.includes(value)) {
+                allValues.push(value);
+            }
+        });
+
+        return allValues.sort();
+    };
+
+    // Get all unique broker values from current data
+    const getAllBrokerValues = () => {
+        const currentValues = new Set<string>();
+
+        // Add values from current brokers
+        brokers.forEach(b => {
+            if (b.broker && b.broker.trim()) {
+                currentValues.add(b.broker.trim());
+            }
+        });
+
+        // Combine predefined and current values
+        const allValues = [...predefinedBrokers];
+        currentValues.forEach(value => {
+            if (!allValues.includes(value)) {
+                allValues.push(value);
+            }
+        });
+
+        return allValues.sort();
+    };
+
+    const availableReinsurers = getAllReinsurerValues();
+    const availableBrokers = getAllBrokerValues();
     return (
         <Box sx={{
             backgroundColor: '#f8f9fa',
@@ -153,9 +237,11 @@ export const ParticipatingSection = ({
                                             }}
                                         >
                                             <MenuItem value="">Select Reinsurer...</MenuItem>
-                                            <MenuItem value="Reinsurer 1">Reinsurer 1</MenuItem>
-                                            <MenuItem value="Reinsurer 2">Reinsurer 2</MenuItem>
-                                            <MenuItem value="Reinsurer 3">Reinsurer 3</MenuItem>
+                                            {availableReinsurers.map((reinsurerName) => (
+                                                <MenuItem key={reinsurerName} value={reinsurerName}>
+                                                    {reinsurerName}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -235,9 +321,11 @@ export const ParticipatingSection = ({
                                             }}
                                         >
                                             <MenuItem value="">Select Broker...</MenuItem>
-                                            <MenuItem value="Broker 1">Broker 1</MenuItem>
-                                            <MenuItem value="Broker 2">Broker 2</MenuItem>
-                                            <MenuItem value="Broker 3">Broker 3</MenuItem>
+                                            {availableBrokers.map((brokerName) => (
+                                                <MenuItem key={brokerName} value={brokerName}>
+                                                    {brokerName}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -317,9 +405,11 @@ export const ParticipatingSection = ({
                                                     }}
                                                 >
                                                     <MenuItem value="">Select Reinsurer...</MenuItem>
-                                                    <MenuItem value="Reinsurer 1">Reinsurer 1</MenuItem>
-                                                    <MenuItem value="Reinsurer 2">Reinsurer 2</MenuItem>
-                                                    <MenuItem value="Reinsurer 3">Reinsurer 3</MenuItem>
+                                                    {availableReinsurers.map((reinsurerName) => (
+                                                        <MenuItem key={reinsurerName} value={reinsurerName}>
+                                                            {reinsurerName}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </Grid>
