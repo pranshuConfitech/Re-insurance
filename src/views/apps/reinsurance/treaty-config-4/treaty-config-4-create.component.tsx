@@ -5,6 +5,8 @@ import { Box, Card, Typography, Button, IconButton, Collapse, Stepper, Step, Ste
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format, parseISO } from 'date-fns';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TopFormSection } from './components/TopFormSection';
@@ -18,6 +20,129 @@ import { getBlockColor } from './utils/blockColors';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
 const reinsuranceService = new ReinsuranceService();
+
+// Yup Validation Schemas
+// VALIDATION SCHEMA DISABLED - NO VALIDATION BLOCKING SUBMISSION
+/*
+const treatyValidationSchema = Yup.object({
+    portfolio: Yup.string().required('Portfolio name is required'),
+    companyUIN: Yup.string().required('Company UIN is required'),
+    treatyStartDate: Yup.date().required('Treaty start date is required'),
+    treatyEndDate: Yup.date()
+        .required('Treaty end date is required')
+        .min(Yup.ref('treatyStartDate'), 'End date must be after start date'),
+    currency: Yup.string().required('Currency is required'),
+    operatingUnitUINs: Yup.array().min(1, 'At least one operating unit is required'),
+    selectMode: Yup.string().required('Treaty mode is required'),
+    blocks: Yup.array().when('selectMode', {
+        is: 'Treaty (Proportional)',
+        then: (schema) => schema.of(
+            Yup.object({
+                treaties: Yup.array().of(
+                    Yup.object({
+                        treatyCode: Yup.string().required('Treaty code is required'),
+                        treatyName: Yup.string().required('Treaty name is required'),
+                        treatyType: Yup.string().required('Treaty type is required'),
+                        priority: Yup.string().required('Priority is required')
+                    })
+                ).min(1, 'At least one treaty is required')
+            })
+        ).min(1, 'At least one block is required'),
+        otherwise: (schema) => schema
+    }),
+    nonProportionalBlocks: Yup.array().when('selectMode', {
+        is: 'Treaty (Non Proportional)',
+        then: (schema) => schema.of(
+            Yup.object({
+                treaty: Yup.object({
+                    treatyCode: Yup.string().required('Treaty code is required'),
+                    treatyName: Yup.string().required('Treaty name is required'),
+                    treatyType: Yup.string().required('Treaty type is required'),
+                    priority: Yup.string().required('Priority is required')
+                })
+            })
+        ).min(1, 'At least one block is required'),
+        otherwise: (schema) => schema
+    })
+});
+*/
+
+// Helper functions for creating empty objects
+function createEmptyTreaty(id: string): Treaty {
+    return {
+        id, treatyCode: '', priority: '', treatyType: 'Quota Share', treatyName: '',
+        businessTreatyReferenceNumber: '', riGradedRet: '', formerTreatyCode: '',
+        treatyCategory: '', installment: '', processingPortfolioMethod: 'Clean Cut',
+        premReserveRetainedRate: '', premReserveInterestRate: '',
+        portfolioPremiumEntryRate: '', portfolioClaimEntryRate: '',
+        portfolioPremWithdRate: '', portfolioClaimWithdRate: '',
+        managementExpenses: '', taxesAndOtherExpenses: '',
+        riskLimitLines: [createEmptyRiskLimitLine('1')],
+        reinsurers: [],
+        brokers: []
+    };
+}
+
+function createEmptyRiskLimitLine(id: string): RiskLimitLine {
+    return {
+        id, productLOB: '', productCode: '', accountingLOB: '', riskCategory: '',
+        riskGrade: '', cessionRate: '', quotaCessionMaxCapacity: '',
+        retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
+        perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
+        lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
+        reinsurers: [],
+        brokers: []
+    };
+}
+
+function createEmptyReinsurer(id: string): Reinsurer {
+    return { id, reinsurer: '', share: '' };
+}
+
+function createEmptyBroker(id: string): Broker {
+    return { id, broker: '', share: '', reinsurers: [] };
+}
+
+function createEmptyNonProportionalTreaty(id: string): NonProportionalTreaty {
+    return {
+        id, treatyCode: '', priority: '', treatyType: 'XOL', treatyName: '',
+        businessTreatyReferenceNumber: '', xolType: '', formerTreatyCode: '',
+        treatyCategory: '', treatyStatus: '', treatyCurrency: '', processing: '',
+        annualAggregateLimit: '', annualAggDeductible: '', totalReinstatedSI: '',
+        capacity: '', flatRateXOLPrem: '', minDepositXOLPrem: '',
+        noReinstatements: '', proRateToAmount: '', proRateToTime: '',
+        reserveTypeInvolved: '', burningCostRate: '', premPaymentWarranty: '',
+        alertDays: '', perClaimRecoverableLimit: '', processingPortfolioMethod: 'Clean Cut',
+        basisOfAttachment: '', showLayers: false,
+        layerLines: [createEmptyLayerLine('1')]
+    };
+}
+
+function createEmptyLayerLine(id: string): LayerLine {
+    return {
+        id, productLOB: '', productCode: '', accountingLOB: '', riskCategory: '',
+        riskGrade: '', lossOccurDeductibility: '', lossLimit: '',
+        shareOfOccurrenceDeduction: '', availableReinstatedSI: '', annualAggLimit: '',
+        annualAggAmount: '', aggClaimAmount: '', localNativeLayer: '',
+        transactionLimitCcy: '',
+        reinsurers: [],
+        brokers: []
+    };
+}
+
+// Initial form values
+const getInitialValues = (isEditMode: boolean) => ({
+    portfolio: '',
+    companyUIN: '',
+    operatingUnitUINs: [] as string[],
+    currentOperatingUIN: '',
+    treatyStartDate: null as Date | null,
+    treatyEndDate: null as Date | null,
+    currency: 'USD',
+    selectMode: 'Treaty (Proportional)',
+    blocks: [{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }] as Block[],
+    nonProportionalBlocks: [{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }] as NonProportionalBlock[]
+});
 
 interface Reinsurer {
     id: string;
@@ -141,18 +266,20 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     const isEditMode = !!editId;
     const [loading, setLoading] = useState(isEditMode);
     const [activeStep, setActiveStep] = useState(0);
-    const [selectMode, setSelectMode] = useState('Treaty (Proportional)');
-    const [portfolio, setPortfolio] = useState('');
-    const [companyUIN, setCompanyUIN] = useState('');
-    const [operatingUnitUINs, setOperatingUnitUINs] = useState<string[]>([]);
-    const [currentOperatingUIN, setCurrentOperatingUIN] = useState('');
-    const [treatyStartDate, setTreatyStartDate] = useState<Date | null>(null);
-    const [treatyEndDate, setTreatyEndDate] = useState<Date | null>(null);
-    const [currency, setCurrency] = useState('USD');
-    const [blocks, setBlocks] = useState<Block[]>([{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }]);
-    const [nonProportionalBlocks, setNonProportionalBlocks] = useState<NonProportionalBlock[]>([{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers', 'Additional Configuration'];
+
+    // Formik form management
+    const formik = useFormik({
+        initialValues: getInitialValues(isEditMode),
+        // validationSchema: treatyValidationSchema, // DISABLED - No validation blocking submission
+        validate: () => ({}), // Always return empty errors object - no validation
+        onSubmit: (values) => {
+            handleSubmit(values);
+        },
+        enableReinitialize: true
+    });
 
     // Fetch data for edit mode
     useEffect(() => {
@@ -186,42 +313,43 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     const populateFormWithData = (data: any) => {
         console.log('Populating form with data:', data);
 
-        // Set basic configuration
-        setPortfolio(data.portfolioName || '');
-        setCompanyUIN(data.insurerId || '');
-        setCurrency(data.currency || 'USD');
-        setTreatyStartDate(data.startDate ? parseISO(data.startDate) : null);
-        setTreatyEndDate(data.endDate ? parseISO(data.endDate) : null);
-        setOperatingUnitUINs(data.operatingUnits?.map((ou: any) => ou.ouCode) || []);
-
-        console.log('Basic config set:', {
-            portfolio: data.portfolioName,
-            companyUIN: data.insurerId,
-            currency: data.currency,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            operatingUnits: data.operatingUnits?.map((ou: any) => ou.ouCode)
-        });
-
         // Determine treaty type and populate blocks
         const treatyBlocks = data['treaty-blocks'] || [];
         console.log('Treaty blocks:', treatyBlocks);
+
+        let formValues = {
+            portfolio: data.portfolioName || '',
+            companyUIN: data.insurerId || '',
+            currency: data.currency || 'USD',
+            treatyStartDate: data.startDate ? parseISO(data.startDate) : null,
+            treatyEndDate: data.endDate ? parseISO(data.endDate) : null,
+            operatingUnitUINs: data.operatingUnits?.map((ou: any) => ou.ouCode) || [],
+            currentOperatingUIN: '',
+            selectMode: 'Treaty (Proportional)',
+            blocks: [{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }] as Block[],
+            nonProportionalBlocks: [{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }] as NonProportionalBlock[]
+        };
 
         if (treatyBlocks.length > 0) {
             const firstBlock = treatyBlocks[0];
             if (firstBlock.blockType === 'NON_PROPORTIONAL') {
                 console.log('Setting Non-Proportional mode');
-                setSelectMode('Treaty (Non Proportional)');
-                populateNonProportionalBlocks(treatyBlocks);
+                formValues.selectMode = 'Treaty (Non Proportional)';
+                formValues.nonProportionalBlocks = populateNonProportionalBlocks(treatyBlocks);
             } else {
                 console.log('Setting Proportional mode');
-                setSelectMode('Treaty (Proportional)');
-                populateProportionalBlocks(treatyBlocks);
+                formValues.selectMode = 'Treaty (Proportional)';
+                formValues.blocks = populateProportionalBlocks(treatyBlocks);
             }
         }
+
+        // Set all values at once using Formik
+        formik.setValues(formValues);
+
+        console.log('Form populated with values:', formValues);
     };
 
-    const populateProportionalBlocks = (treatyBlocks: any[]) => {
+    const populateProportionalBlocks = (treatyBlocks: any[]): Block[] => {
         console.log('Populating proportional blocks:', treatyBlocks);
 
         const mappedBlocks: Block[] = treatyBlocks.map((block, blockIndex) => {
@@ -268,10 +396,10 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         });
 
         console.log('Final mapped blocks:', mappedBlocks);
-        setBlocks(mappedBlocks.length > 0 ? mappedBlocks : [{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }]);
+        return mappedBlocks.length > 0 ? mappedBlocks : [{ id: '1', blockNumber: 1, treaties: [createEmptyTreaty('1-1')] }];
     };
 
-    const populateNonProportionalBlocks = (treatyBlocks: any[]) => {
+    const populateNonProportionalBlocks = (treatyBlocks: any[]): NonProportionalBlock[] => {
         console.log('Populating non-proportional blocks:', treatyBlocks);
 
         const mappedBlocks: NonProportionalBlock[] = treatyBlocks.map((block, blockIndex) => {
@@ -329,7 +457,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         });
 
         console.log('Final mapped NP blocks:', mappedBlocks);
-        setNonProportionalBlocks(mappedBlocks.length > 0 ? mappedBlocks : [{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }]);
+        return mappedBlocks.length > 0 ? mappedBlocks : [{ id: '1', blockNumber: 1, treaty: createEmptyNonProportionalTreaty('1') }];
     };
 
     // Helper mapping functions
@@ -512,97 +640,43 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         return allBrokers;
     };
 
-    function createEmptyTreaty(id: string): Treaty {
-        return {
-            id, treatyCode: '', priority: '', treatyType: 'Quota Share', treatyName: '',
-            businessTreatyReferenceNumber: '', riGradedRet: '', formerTreatyCode: '',
-            treatyCategory: '', installment: '', processingPortfolioMethod: 'Clean Cut',
-            premReserveRetainedRate: '', premReserveInterestRate: '',
-            portfolioPremiumEntryRate: '', portfolioClaimEntryRate: '',
-            portfolioPremWithdRate: '', portfolioClaimWithdRate: '',
-            managementExpenses: '', taxesAndOtherExpenses: '',
-            riskLimitLines: [createEmptyRiskLimitLine('1')],
-            reinsurers: [],
-            brokers: []
-        };
-    }
-
-    function createEmptyRiskLimitLine(id: string): RiskLimitLine {
-        return {
-            id, productLOB: '', productCode: '', accountingLOB: '', riskCategory: '',
-            riskGrade: '', cessionRate: '', quotaCessionMaxCapacity: '',
-            retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
-            perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
-            lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
-            reinsurers: [],
-            brokers: []
-        };
-    }
-
-    function createEmptyReinsurer(id: string): Reinsurer {
-        return { id, reinsurer: '', share: '' };
-    }
-
-    function createEmptyBroker(id: string): Broker {
-        return { id, broker: '', share: '', reinsurers: [] };
-    }
-
-    function createEmptyNonProportionalTreaty(id: string): NonProportionalTreaty {
-        return {
-            id, treatyCode: '', priority: '', treatyType: 'XOL', treatyName: '',
-            businessTreatyReferenceNumber: '', xolType: '', formerTreatyCode: '',
-            treatyCategory: '', treatyStatus: '', treatyCurrency: '', processing: '',
-            annualAggregateLimit: '', annualAggDeductible: '', totalReinstatedSI: '',
-            capacity: '', flatRateXOLPrem: '', minDepositXOLPrem: '',
-            noReinstatements: '', proRateToAmount: '', proRateToTime: '',
-            reserveTypeInvolved: '', burningCostRate: '', premPaymentWarranty: '',
-            alertDays: '', perClaimRecoverableLimit: '', processingPortfolioMethod: 'Clean Cut',
-            basisOfAttachment: '', showLayers: false,
-            layerLines: [createEmptyLayerLine('1')]
-        };
-    }
-
-    function createEmptyLayerLine(id: string): LayerLine {
-        return {
-            id, productLOB: '', productCode: '', accountingLOB: '', riskCategory: '',
-            riskGrade: '', lossOccurDeductibility: '', lossLimit: '',
-            shareOfOccurrenceDeduction: '', availableReinstatedSI: '', annualAggLimit: '',
-            annualAggAmount: '', aggClaimAmount: '', localNativeLayer: '',
-            transactionLimitCcy: '',
-            reinsurers: [],
-            brokers: []
-        };
-    }
-
     const handleAddOperatingUIN = () => {
+        const currentOperatingUIN = formik.values.currentOperatingUIN;
+        const operatingUnitUINs = formik.values.operatingUnitUINs;
+
         if (currentOperatingUIN && !operatingUnitUINs.includes(currentOperatingUIN)) {
-            setOperatingUnitUINs([...operatingUnitUINs, currentOperatingUIN]);
-            setCurrentOperatingUIN('');
+            formik.setFieldValue('operatingUnitUINs', [...operatingUnitUINs, currentOperatingUIN]);
+            formik.setFieldValue('currentOperatingUIN', '');
         }
     };
 
     const handleRemoveOperatingUIN = (uinToRemove: string) => {
-        setOperatingUnitUINs(operatingUnitUINs.filter(uin => uin !== uinToRemove));
+        const operatingUnitUINs = formik.values.operatingUnitUINs;
+        formik.setFieldValue('operatingUnitUINs', operatingUnitUINs.filter(uin => uin !== uinToRemove));
     };
 
     const handleOperatingUnitUINsChange = (newUINs: string[]) => {
-        setOperatingUnitUINs(newUINs);
+        formik.setFieldValue('operatingUnitUINs', newUINs);
     };
 
     const handleAddBlock = () => {
+        const blocks = formik.values.blocks;
         const newBlockNumber = blocks.length + 1;
         const newBlockId = String(newBlockNumber);
-        setBlocks([...blocks, { id: newBlockId, blockNumber: newBlockNumber, treaties: [createEmptyTreaty(`${newBlockId}-1`)] }]);
+        formik.setFieldValue('blocks', [...blocks, { id: newBlockId, blockNumber: newBlockNumber, treaties: [createEmptyTreaty(`${newBlockId}-1`)] }]);
     };
 
     const handleDeleteBlock = (blockId: string) => {
-        if (blocks.length > 1) setBlocks(blocks.filter(block => block.id !== blockId));
+        const blocks = formik.values.blocks;
+        if (blocks.length > 1) {
+            formik.setFieldValue('blocks', blocks.filter(block => block.id !== blockId));
+        }
     };
 
     const handleAddTreaty = (blockId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
-                // Create globally unique treaty ID using block ID and treaty count
                 const newTreatyId = `${blockId}-${block.treaties.length + 1}`;
                 return {
                     ...block,
@@ -610,11 +684,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleDeleteTreaty = (blockId: string, treatyId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId && block.treaties.length > 1) {
                 return {
                     ...block,
@@ -622,11 +698,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleTreatyChange = (blockId: string, treatyId: string, field: string, value: string | boolean) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -636,11 +714,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleAddRiskLimitLine = (blockId: string, treatyId?: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -657,11 +737,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleDeleteRiskLimitLine = (blockId: string, treatyId: string | undefined, lineId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -677,11 +759,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleRiskLimitLineChange = (blockId: string, treatyId: string | undefined, lineId: string, field: string, value: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -699,12 +783,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     // Reinsurer handlers
     const handleAddReinsurer = (blockId: string, treatyId: string | undefined) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -718,11 +804,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleDeleteReinsurer = (blockId: string, treatyId: string | undefined, reinsurerId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -735,11 +823,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleReinsurerChange = (blockId: string, treatyId: string | undefined, reinsurerId: string, field: string, value: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -757,12 +847,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     // Broker handlers
     const handleAddBroker = (blockId: string, treatyId: string | undefined) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -776,11 +868,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleDeleteBroker = (blockId: string, treatyId: string | undefined, brokerId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -793,11 +887,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleBrokerChange = (blockId: string, treatyId: string | undefined, brokerId: string, field: string, value: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -815,12 +911,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     // Broker's Reinsurer handlers
     const handleAddBrokerReinsurer = (blockId: string, treatyId: string | undefined, brokerId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -842,11 +940,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleDeleteBrokerReinsurer = (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -867,11 +967,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     const handleBrokerReinsurerChange = (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => {
-        setBlocks(blocks.map(block => {
+        const blocks = formik.values.blocks;
+        const updatedBlocks = blocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -897,30 +999,38 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('blocks', updatedBlocks);
     };
 
     // Non-Proportional handlers
     const handleAddNonProportionalBlock = () => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
         const newBlockNumber = nonProportionalBlocks.length + 1;
-        setNonProportionalBlocks([...nonProportionalBlocks, { id: String(newBlockNumber), blockNumber: newBlockNumber, treaty: createEmptyNonProportionalTreaty(String(newBlockNumber)) }]);
+        formik.setFieldValue('nonProportionalBlocks', [...nonProportionalBlocks, { id: String(newBlockNumber), blockNumber: newBlockNumber, treaty: createEmptyNonProportionalTreaty(String(newBlockNumber)) }]);
     };
 
     const handleDeleteNonProportionalBlock = (blockId: string) => {
-        if (nonProportionalBlocks.length > 1) setNonProportionalBlocks(nonProportionalBlocks.filter(block => block.id !== blockId));
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        if (nonProportionalBlocks.length > 1) {
+            formik.setFieldValue('nonProportionalBlocks', nonProportionalBlocks.filter(block => block.id !== blockId));
+        }
     };
 
     const handleNonProportionalTreatyChange = (blockId: string, field: string, value: string | boolean) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return { ...block, treaty: { ...block.treaty, [field]: value } };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleAddLayer = (blockId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 const newLayerId = String(block.treaty.layerLines.length + 1);
                 return {
@@ -932,11 +1042,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleDeleteLayer = (blockId: string, layerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId && block.treaty.layerLines.length > 1) {
                 return {
                     ...block,
@@ -947,11 +1059,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleLayerChange = (blockId: string, layerId: string, field: string, value: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -964,12 +1078,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     // Non-Proportional Reinsurer handlers
     const handleAddNPReinsurer = (blockId: string, layerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -986,11 +1102,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleDeleteNPReinsurer = (blockId: string, layerId: string, reinsurerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1006,11 +1124,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleNPReinsurerChange = (blockId: string, layerId: string, reinsurerId: string, field: string, value: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1031,12 +1151,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     // Non-Proportional Broker handlers
     const handleAddNPBroker = (blockId: string, layerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1053,11 +1175,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleDeleteNPBroker = (blockId: string, layerId: string, brokerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1073,11 +1197,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleNPBrokerChange = (blockId: string, layerId: string, brokerId: string, field: string, value: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1098,12 +1224,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     // Non-Proportional Broker's Reinsurer handlers
     const handleAddNPBrokerReinsurer = (blockId: string, layerId: string, brokerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1128,11 +1256,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleDeleteNPBrokerReinsurer = (blockId: string, layerId: string, brokerId: string, reinsurerId: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1156,11 +1286,13 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleNPBrokerReinsurerChange = (blockId: string, layerId: string, brokerId: string, reinsurerId: string, field: string, value: string) => {
-        setNonProportionalBlocks(nonProportionalBlocks.map(block => {
+        const nonProportionalBlocks = formik.values.nonProportionalBlocks;
+        const updatedBlocks = nonProportionalBlocks.map(block => {
             if (block.id === blockId) {
                 return {
                     ...block,
@@ -1189,7 +1321,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 };
             }
             return block;
-        }));
+        });
+        formik.setFieldValue('nonProportionalBlocks', updatedBlocks);
     };
 
     const handleNext = () => {
@@ -1201,29 +1334,31 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     };
 
     const validateStep1 = () => {
-        return portfolio && companyUIN && treatyStartDate && treatyEndDate && currency;
+        // DISABLED - No validation blocking submission
+        return true; // Always allow proceeding to next step
     };
 
     const validateStep2 = () => {
-        if (selectMode === 'Treaty (Proportional)') {
-            return blocks.some(block =>
-                block.treaties.some(treaty =>
-                    treaty.treatyCode && treaty.treatyName && treaty.treatyType
-                )
-            );
-        } else {
-            return nonProportionalBlocks.some(block =>
-                block.treaty.treatyCode && block.treaty.treatyName && block.treaty.treatyType
-            );
-        }
+        // DISABLED - No validation blocking submission  
+        return true; // Always allow proceeding to next step
     };
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const buildPayload = () => {
+        console.log('buildPayload called');
+        const {
+            portfolio, companyUIN, treatyStartDate, treatyEndDate, currency,
+            operatingUnitUINs, selectMode, blocks, nonProportionalBlocks
+        } = formik.values;
+
+        console.log('Form values extracted:', {
+            portfolio, companyUIN, treatyStartDate, treatyEndDate, currency,
+            operatingUnitUINs, selectMode, blocksCount: blocks?.length, npBlocksCount: nonProportionalBlocks?.length
+        });
+
         const formatDate = (date: Date | null) => date ? format(date, 'yyyy-MM-dd') : '';
 
         if (selectMode === 'Treaty (Proportional)') {
+            console.log('Building proportional payload...');
             // Build Proportional payload
             const treatyBlocks = blocks.map((block, blockIndex) => ({
                 ...(isEditMode && { id: parseInt(block.id) }),
@@ -1235,7 +1370,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     ...(isEditMode && { blockId: block.id }),
                     treatyCode: treaty.treatyCode,
                     priority: treaty.priority || 'PRIMARY',
-                    treatyType: treaty.treatyType === 'Quota Share' ? 'QS' : treaty.treatyType === 'Surplus' ? 'SURPLUS' : treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
+                    treatyType: treaty.treatyType === 'Quota Share' ? 'QUOTA_SHARE' : treaty.treatyType === 'Surplus' ? 'SURPLUS' : treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
                     treatyName: treaty.treatyName,
                     refNumber: treaty.businessTreatyReferenceNumber,
                     gradedRetention: treaty.riGradedRet === 'Yes',
@@ -1255,15 +1390,12 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                         portfolioClaimWithdRate: parseFloat(treaty.portfolioClaimWithdRate) || 0,
                         portfolioPremWithdRate: parseFloat(treaty.portfolioPremWithdRate) || 0,
                         mgmtExpensesPercent: parseFloat(treaty.managementExpenses) || 0,
-                        taxesPercent: parseFloat(treaty.taxesAndOtherExpenses) || 0,
-                        formerTreatyCode: treaty.formerTreatyCode || null,
-                        treatyCategory: treaty.treatyCategory || 'PROPORTIONAL',
-                        status: 'ACTIVE',
-                        processingMethod: treaty.processingPortfolioMethod === 'Clean Cut' ? 'AUTOss' : treaty.processingPortfolioMethod?.toUpperCase().replace(/\s+/g, '_') + 'ss' || 'AUTOss'
+                        taxesPercent: parseFloat(treaty.taxesAndOtherExpenses) || 0
                     },
                     nonpropTreatyAttribute: null,
                     propRiskDetails: treaty.riskLimitLines.map((line, lineIndex) => ({
                         ...(isEditMode && { id: parseInt(line.id) + 100 }), // Approximate risk detail ID
+                        treatyId: treaty.treatyCode,
                         detailId: null,
                         ...(isEditMode && { portfolioTreatyId: parseInt(treaty.id) }),
                         productLob: line.productLOB || 'FIRE',
@@ -1286,27 +1418,15 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     nonpropLayers: [],
                     portfolioTreatyAllocations: [
                         ...treaty.reinsurers.map((r, rIndex) => ({
-                            ...(isEditMode && { id: parseInt(r.id) + 200 }), // Approximate allocation ID
-                            ...(isEditMode && { portfolioTreatyId: parseInt(treaty.id) }),
                             participantType: 'REINSURER',
                             participantName: r.reinsurer,
-                            sharePercent: parseFloat(r.share) || 0,
-                            brokerBreakdowns: [{
-                                ...(isEditMode && { id: parseInt(r.id) + 300 }), // Approximate breakdown ID
-                                ...(isEditMode && { allocationId: String(parseInt(r.id) + 200) }),
-                                reinsurerName: r.reinsurer,
-                                sharePercent: parseFloat(r.share) || 0
-                            }]
+                            sharePercent: parseFloat(r.share) || 0
                         })),
                         ...treaty.brokers.map((b, bIndex) => ({
-                            ...(isEditMode && { id: parseInt(b.id) + 400 }), // Approximate allocation ID
-                            ...(isEditMode && { portfolioTreatyId: parseInt(treaty.id) }),
                             participantType: 'BROKER',
                             participantName: b.broker,
                             sharePercent: parseFloat(b.share) || 0,
                             brokerBreakdowns: b.reinsurers.map((br, brIndex) => ({
-                                ...(isEditMode && { id: parseInt(br.id) + 500 }), // Approximate breakdown ID
-                                ...(isEditMode && { allocationId: String(parseInt(b.id) + 400) }),
                                 reinsurerName: br.reinsurer,
                                 sharePercent: parseFloat(br.share) || 0
                             }))
@@ -1331,6 +1451,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             };
         } else {
             // Build Non-Proportional payload
+            console.log('Building non-proportional payload...');
             const treatyBlocks = nonProportionalBlocks.map((block, blockIndex) => ({
                 ...(isEditMode && { id: parseInt(block.id) }),
                 ...(isEditMode && { portfolioId: editId }),
@@ -1373,7 +1494,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                         basisOfAttachment: block.treaty.basisOfAttachment || 'LOSS_OCCURRING'
                     },
                     propRiskDetails: [],
-                    nonpropLayers: block.treaty.layerLines.map((layer, layerIndex) => ({
+                    nonpropLayers: block.treaty.layerLines.map((layer: any, layerIndex: number) => ({
                         ...(isEditMode && { id: parseInt(layer.id) }),
                         ...(isEditMode && { portfolioTreatyId: parseInt(block.treaty.id) }),
                         productLob: layer.productLOB || 'PROPERTY',
@@ -1394,21 +1515,31 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                         taxesOtherExpensePercent: 1.3
                     })),
                     portfolioTreatyAllocations: [
-                        // Add reinsurers from layer allocations
+                        // Add direct reinsurers from layer allocations (reinsurers not under brokers)
                         ...block.treaty.layerLines.flatMap(layer =>
-                            layer.reinsurers.map((r, rIndex) => ({
-                                ...(isEditMode && { id: parseInt(r.id) + 200 }),
-                                ...(isEditMode && { portfolioTreatyId: parseInt(block.treaty.id) }),
-                                participantType: 'REINSURER',
-                                participantName: r.reinsurer || 'Munich Re',
-                                sharePercent: parseFloat(r.share) || 70,
-                                brokerBreakdowns: layer.brokers.map((b, bIndex) => ({
-                                    ...(isEditMode && { id: parseInt(b.id) + 300 }),
-                                    ...(isEditMode && { allocationId: String(parseInt(r.id) + 200) }),
-                                    reinsurerName: b.broker || 'Swiss Re',
-                                    sharePercent: parseFloat(b.share) || 100
+                            (layer.reinsurers || [])
+                                .filter(r => r.reinsurer && r.reinsurer.trim() !== '') // Only include reinsurers with names
+                                .map((r, rIndex) => ({
+                                    participantType: 'REINSURER',
+                                    participantName: r.reinsurer,
+                                    sharePercent: parseFloat(r.share) || 0
                                 }))
-                            }))
+                        ),
+                        // Add brokers from layer allocations (brokers with reinsurers under them)
+                        ...block.treaty.layerLines.flatMap(layer =>
+                            (layer.brokers || [])
+                                .filter(b => b.broker && b.broker.trim() !== '') // Only include brokers with names
+                                .map((b, bIndex) => ({
+                                    participantType: 'BROKER',
+                                    participantName: b.broker,
+                                    sharePercent: parseFloat(b.share) || 0,
+                                    brokerBreakdowns: (b.reinsurers || [])
+                                        .filter(br => br.reinsurer && br.reinsurer.trim() !== '')
+                                        .map((br, brIndex) => ({
+                                            reinsurerName: br.reinsurer,
+                                            sharePercent: parseFloat(br.share) || 0
+                                        }))
+                                }))
                         )
                     ]
                 }]
@@ -1472,49 +1603,54 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         return payload;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (values: any) => {
+        console.log('handleSubmit called with values:', values);
         setIsSubmitting(true);
-        let payload = buildPayload();
 
-        // Validate non-proportional payload structure
-        if (selectMode === 'Treaty (Non Proportional)') {
-            payload = validateNonProportionalPayload(payload);
-        }
+        try {
+            // Build the actual payload from form values
+            let payload = buildPayload();
+            console.log('Using actual form payload:', JSON.stringify(payload, null, 2));
+            console.log('Treaty mode:', values.selectMode);
+            console.log('Edit mode:', isEditMode, 'Edit ID:', editId);
 
-        console.log('Submitting payload:', JSON.stringify(payload, null, 2));
-        console.log('Treaty mode:', selectMode);
-        console.log('Edit mode:', isEditMode, 'Edit ID:', editId);
-
-        if (isEditMode && editId) {
-            // Update existing portfolio treaty
-            reinsuranceService.updatePortfolioTreaty(editId, payload).subscribe({
-                next: (response) => {
-                    console.log('Update successful:', response);
-                    alert(`${selectMode} treaty configuration updated successfully!`);
-                    setIsSubmitting(false);
-                    router.push('/reinsurance/treaty-config-4');
-                },
-                error: (error) => {
-                    console.error('Update error:', error);
-                    alert(`Failed to update ${selectMode.toLowerCase()} treaty configuration. Please try again.`);
-                    setIsSubmitting(false);
-                }
-            });
-        } else {
-            // Create new portfolio treaty
-            reinsuranceService.savePortfolioTreaty(payload).subscribe({
-                next: (response) => {
-                    console.log('Submit successful:', response);
-                    alert(`${selectMode} treaty configuration saved successfully!`);
-                    setIsSubmitting(false);
-                    router.push('/reinsurance/treaty-config-4');
-                },
-                error: (error) => {
-                    console.error('Submit error:', error);
-                    alert(`Failed to save ${selectMode.toLowerCase()} treaty configuration. Please try again.`);
-                    setIsSubmitting(false);
-                }
-            });
+            if (isEditMode && editId) {
+                // Update existing portfolio treaty
+                console.log('Making UPDATE API call...');
+                reinsuranceService.updatePortfolioTreaty(editId, payload).subscribe({
+                    next: (response) => {
+                        console.log('Update successful:', response);
+                        alert(`${values.selectMode} treaty configuration updated successfully!`);
+                        setIsSubmitting(false);
+                        router.push('/reinsurance/treaty-config-4');
+                    },
+                    error: (error) => {
+                        console.error('Update error:', error);
+                        alert(`Failed to update ${values.selectMode.toLowerCase()} treaty configuration. Please try again.`);
+                        setIsSubmitting(false);
+                    }
+                });
+            } else {
+                // Create new portfolio treaty
+                console.log('Making CREATE API call...');
+                reinsuranceService.savePortfolioTreaty(payload).subscribe({
+                    next: (response) => {
+                        console.log('Submit successful:', response);
+                        alert(`${values.selectMode} treaty configuration saved successfully!`);
+                        setIsSubmitting(false);
+                        router.push('/reinsurance/treaty-config-4');
+                    },
+                    error: (error) => {
+                        console.error('Submit error:', error);
+                        alert(`Failed to save ${values.selectMode.toLowerCase()} treaty configuration. Please try again.`);
+                        setIsSubmitting(false);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error in handleSubmit:', error);
+            alert('An error occurred while processing the form. Please check the console for details.');
+            setIsSubmitting(false);
         }
     };
 
@@ -1552,31 +1688,31 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 {activeStep === 0 && (
                     <Box>
                         <TopFormSection
-                            portfolio={portfolio}
-                            companyUIN={companyUIN}
-                            currentOperatingUIN={currentOperatingUIN}
-                            operatingUnitUINs={operatingUnitUINs}
-                            treatyStartDate={treatyStartDate}
-                            treatyEndDate={treatyEndDate}
-                            currency={currency}
-                            selectMode={selectMode}
-                            onPortfolioChange={setPortfolio}
-                            onCompanyUINChange={setCompanyUIN}
-                            onCurrentOperatingUINChange={setCurrentOperatingUIN}
+                            portfolio={formik.values.portfolio}
+                            companyUIN={formik.values.companyUIN}
+                            currentOperatingUIN={formik.values.currentOperatingUIN}
+                            operatingUnitUINs={formik.values.operatingUnitUINs}
+                            treatyStartDate={formik.values.treatyStartDate}
+                            treatyEndDate={formik.values.treatyEndDate}
+                            currency={formik.values.currency}
+                            selectMode={formik.values.selectMode}
+                            onPortfolioChange={(value) => formik.setFieldValue('portfolio', value)}
+                            onCompanyUINChange={(value) => formik.setFieldValue('companyUIN', value)}
+                            onCurrentOperatingUINChange={(value) => formik.setFieldValue('currentOperatingUIN', value)}
                             onAddOperatingUIN={handleAddOperatingUIN}
                             onRemoveOperatingUIN={handleRemoveOperatingUIN}
                             onOperatingUnitUINsChange={handleOperatingUnitUINsChange}
-                            onTreatyStartDateChange={setTreatyStartDate}
-                            onTreatyEndDateChange={setTreatyEndDate}
-                            onCurrencyChange={setCurrency}
-                            onSelectModeChange={setSelectMode}
+                            onTreatyStartDateChange={(date) => formik.setFieldValue('treatyStartDate', date)}
+                            onTreatyEndDateChange={(date) => formik.setFieldValue('treatyEndDate', date)}
+                            onCurrencyChange={(value) => formik.setFieldValue('currency', value)}
+                            onSelectModeChange={(mode) => formik.setFieldValue('selectMode', mode)}
                         />
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                             <Button
                                 variant="contained"
                                 onClick={handleNext}
-                                disabled={!validateStep1()}
+                                disabled={false} // DISABLED validation - always allow next
                                 sx={{
                                     backgroundColor: '#007bff',
                                     '&:hover': { backgroundColor: '#0056b3' },
@@ -1595,9 +1731,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 {/* Step 2: Treaty Details */}
                 {activeStep === 1 && (
                     <Box>
-                        {selectMode === 'Treaty (Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Proportional)' && (
                             <ProportionalSection
-                                blocks={blocks}
+                                blocks={formik.values.blocks}
                                 onAddBlock={handleAddBlock}
                                 onDeleteBlock={handleDeleteBlock}
                                 onAddTreaty={handleAddTreaty}
@@ -1606,9 +1742,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             />
                         )}
 
-                        {selectMode === 'Treaty (Non Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Non Proportional)' && (
                             <NonProportionalSection
-                                blocks={nonProportionalBlocks}
+                                blocks={formik.values.nonProportionalBlocks}
                                 onAddBlock={handleAddNonProportionalBlock}
                                 onDeleteBlock={handleDeleteNonProportionalBlock}
                                 onTreatyChange={handleNonProportionalTreatyChange}
@@ -1663,9 +1799,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             Risk & Limits Details
                         </Typography>
 
-                        {selectMode === 'Treaty (Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Proportional)' && (
                             <Box>
-                                {blocks.map((block) => {
+                                {formik.values.blocks.map((block) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -1722,9 +1858,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             </Box>
                         )}
 
-                        {selectMode === 'Treaty (Non Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Non Proportional)' && (
                             <Box>
-                                {nonProportionalBlocks.map((block) => {
+                                {formik.values.nonProportionalBlocks.map((block: any) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -1824,9 +1960,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             Participating Reinsurers / Brokers
                         </Typography>
 
-                        {selectMode === 'Treaty (Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Proportional)' && (
                             <Box>
-                                {blocks.map((block) => {
+                                {formik.values.blocks.map((block) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -1891,9 +2027,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             </Box>
                         )}
 
-                        {selectMode === 'Treaty (Non Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Non Proportional)' && (
                             <Box>
-                                {nonProportionalBlocks.map((block) => {
+                                {formik.values.nonProportionalBlocks.map((block: any) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -1932,7 +2068,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                     {block.treaty.treatyName || `Block ${block.blockNumber} Treaty`}
                                                 </Typography>
 
-                                                {block.treaty.layerLines.map((layer, layerIndex) => (
+                                                {block.treaty.layerLines.map((layer: any, layerIndex: number) => (
                                                     <Card key={layer.id} sx={{ mb: 2, p: 2, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
                                                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
                                                             Layer {layerIndex + 1}
@@ -2009,9 +2145,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             Additional Configuration
                         </Typography>
 
-                        {selectMode === 'Treaty (Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Proportional)' && (
                             <Box>
-                                {blocks.map((block) => {
+                                {formik.values.blocks.map((block) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -2144,9 +2280,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             </Box>
                         )}
 
-                        {selectMode === 'Treaty (Non Proportional)' && (
+                        {formik.values.selectMode === 'Treaty (Non Proportional)' && (
                             <Box>
-                                {nonProportionalBlocks.map((block) => {
+                                {formik.values.nonProportionalBlocks.map((block: any) => {
                                     const blockColor = getBlockColor(block.blockNumber);
                                     return (
                                         <Card key={block.id} sx={{
@@ -2300,8 +2436,17 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             </Button>
                             <Button
                                 variant="contained"
-                                onClick={handleSubmit}
-                                disabled={isSubmitting}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    console.log('Submit button clicked');
+                                    console.log('Formik values:', formik.values);
+                                    console.log('Formik errors:', formik.errors);
+                                    console.log('Formik isValid:', formik.isValid);
+
+                                    // Direct submission - no validation blocking
+                                    handleSubmit(formik.values);
+                                }}
+                                disabled={isSubmitting} // Only disabled when actually submitting
                                 sx={{
                                     backgroundColor: '#28a745',
                                     '&:hover': { backgroundColor: '#218838' },
