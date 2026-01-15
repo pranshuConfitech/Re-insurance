@@ -349,26 +349,22 @@ export const RiskLimitsSection = ({
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Capacity(Calculate In XL)</FieldLabel>
-                                <FormControl fullWidth size="small">
-                                    <Select
-                                        value={line.capacityCalculateInXL}
-                                        onChange={(e) => onLineChange(blockId, treatyId, line.id, 'capacityCalculateInXL', e.target.value)}
-                                        displayEmpty
-                                        sx={{
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }}
-                                    >
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="Yes">Yes</MenuItem>
-                                        <MenuItem value="No">No</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    value={line.capacityCalculateInXL}
+                                    onChange={(e) => onLineChange(blockId, treatyId, line.id, 'capacityCalculateInXL', e.target.value)}
+                                    placeholder="Enter capacity value"
+                                    sx={{
+                                        backgroundColor: '#fafafa',
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            border: '1px solid #e9ecef'
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            border: '1px solid #626BDA'
+                                        }
+                                    }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FieldLabel>Per Risk Recovery Limit</FieldLabel>
@@ -496,6 +492,6 @@ export const RiskLimitsSection = ({
                     </Box>
                 ))}
             </Box>
-        </Box>
+        </Box >
     );
 };
