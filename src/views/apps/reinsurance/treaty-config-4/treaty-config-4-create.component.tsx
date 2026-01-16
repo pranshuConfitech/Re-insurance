@@ -16,6 +16,7 @@ import { RiskScoreLayersSection } from './components/RiskScoreLayersSection';
 import { NonProportionalSection } from './components/NonProportionalSection';
 import { ProportionalSection } from './components/ProportionalSection';
 import { ParticipatingSection } from './components/ParticipatingSection';
+import { PreviewPage } from './components/PreviewPage';
 import { getBlockColor } from './utils/blockColors';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
@@ -268,7 +269,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     const [activeStep, setActiveStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers', 'Additional Configuration'];
+    const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers', 'Additional Configuration', 'Preview & Submit'];
 
     // Formik form management
     const formik = useFormik({
@@ -2410,6 +2411,62 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 })}
                             </Box>
                         )}
+
+                        {/* Navigation Buttons */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleBack}
+                                disableRipple
+                                sx={{
+                                    borderColor: '#6c757d !important',
+                                    color: '#6c757d !important',
+                                    backgroundColor: 'transparent !important',
+                                    '&:hover': {
+                                        borderColor: '#6c757d !important',
+                                        backgroundColor: '#e9ecef !important',
+                                        color: '#6c757d !important'
+                                    },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                sx={{
+                                    backgroundColor: '#007bff',
+                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    py: 1.5
+                                }}
+                            >
+                                Next
+                            </Button>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Step 6: Preview & Submit */}
+                {activeStep === 5 && (
+                    <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
+                            Preview & Submit
+                        </Typography>
+
+                        <Card sx={{ p: 3, mb: 3, backgroundColor: '#e7f3ff', border: '1px solid #2196f3' }}>
+                            <Typography sx={{ fontSize: '14px', color: '#1565c0', fontWeight: 500 }}>
+                                📝 Please review all the information below before submitting. You can go back to any step to make changes.
+                            </Typography>
+                        </Card>
+
+                        <PreviewPage formValues={formik.values} />
 
                         {/* Navigation Buttons */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
