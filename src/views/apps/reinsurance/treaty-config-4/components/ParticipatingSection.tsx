@@ -1,7 +1,7 @@
-import { Box, Typography, Button, FormControl, Select, MenuItem, TextField, IconButton, Grid } from '@mui/material';
+import { Box, Typography, Button, FormControl, Select, MenuItem, TextField, IconButton, Grid, InputLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FieldLabel } from './FieldLabel';
+import { makeStyles } from '@mui/styles';
 
 interface Reinsurer {
     id: string;
@@ -33,12 +33,57 @@ interface ParticipatingSectionProps {
     onBrokerReinsurerChange: (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => void;
 }
 
+const useStyles = makeStyles((theme: any) => ({
+    formControl: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    },
+    textField: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    }
+}));
+
 export const ParticipatingSection = ({
     reinsurers, brokers, blockId, treatyId, lineId,
     onAddReinsurer, onDeleteReinsurer, onReinsurerChange,
     onAddBroker, onDeleteBroker, onBrokerChange,
     onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
 }: ParticipatingSectionProps) => {
+    const classes = useStyles();
+
     // Use lineId if provided, otherwise use treatyId
     const effectiveId = lineId || treatyId;
 
@@ -145,7 +190,7 @@ export const ParticipatingSection = ({
                     fontWeight: 600,
                     fontSize: '16px'
                 }}>
-                    Participating Reinsurers / Brokers
+                    Participants Reinsurance
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
@@ -220,21 +265,15 @@ export const ParticipatingSection = ({
                             </Box>
                             <Grid container spacing={2} sx={{ flex: 1 }}>
                                 <Grid item xs={12} sm={8}>
-                                    <FieldLabel>Reinsurer</FieldLabel>
-                                    <FormControl fullWidth size="small">
+                                    <FormControl className={classes.formControl} fullWidth>
+                                        <InputLabel id={`reinsurer-label-${reinsurer.id}`}>Reinsurer</InputLabel>
                                         <Select
+                                            labelId={`reinsurer-label-${reinsurer.id}`}
+                                            id={`reinsurer-${reinsurer.id}`}
+                                            name="reinsurer"
+                                            label="Reinsurer"
                                             value={reinsurer.reinsurer}
                                             onChange={(e) => onReinsurerChange(blockId, effectiveId, reinsurer.id, 'reinsurer', e.target.value)}
-                                            displayEmpty
-                                            sx={{
-                                                backgroundColor: '#fafafa',
-                                                '& .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #e9ecef'
-                                                },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #626BDA'
-                                                }
-                                            }}
                                         >
                                             <MenuItem value="">Select Reinsurer...</MenuItem>
                                             {availableReinsurers.map((reinsurerName) => (
@@ -246,23 +285,14 @@ export const ParticipatingSection = ({
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
-                                    <FieldLabel>Share (%)</FieldLabel>
                                     <TextField
+                                        id={`reinsurerShare-${reinsurer.id}`}
+                                        name="share"
+                                        label="Share (%)"
                                         fullWidth
-                                        size="small"
                                         value={reinsurer.share}
                                         onChange={(e) => onReinsurerChange(blockId, effectiveId, reinsurer.id, 'share', e.target.value)}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#fafafa',
-                                                '& .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #e9ecef'
-                                                },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #626BDA'
-                                                }
-                                            }
-                                        }}
+                                        className={classes.textField}
                                     />
                                 </Grid>
                             </Grid>
@@ -304,21 +334,15 @@ export const ParticipatingSection = ({
                             </Box>
                             <Grid container spacing={2} sx={{ flex: 1 }}>
                                 <Grid item xs={12} sm={8}>
-                                    <FieldLabel>Broker</FieldLabel>
-                                    <FormControl fullWidth size="small">
+                                    <FormControl className={classes.formControl} fullWidth>
+                                        <InputLabel id={`broker-label-${broker.id}`}>Broker</InputLabel>
                                         <Select
+                                            labelId={`broker-label-${broker.id}`}
+                                            id={`broker-${broker.id}`}
+                                            name="broker"
+                                            label="Broker"
                                             value={broker.broker}
                                             onChange={(e) => onBrokerChange(blockId, effectiveId, broker.id, 'broker', e.target.value)}
-                                            displayEmpty
-                                            sx={{
-                                                backgroundColor: '#fafafa',
-                                                '& .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #e9ecef'
-                                                },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #626BDA'
-                                                }
-                                            }}
                                         >
                                             <MenuItem value="">Select Broker...</MenuItem>
                                             {availableBrokers.map((brokerName) => (
@@ -330,23 +354,14 @@ export const ParticipatingSection = ({
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
-                                    <FieldLabel>Share (%)</FieldLabel>
                                     <TextField
+                                        id={`brokerShare-${broker.id}`}
+                                        name="share"
+                                        label="Share (%)"
                                         fullWidth
-                                        size="small"
                                         value={broker.share}
                                         onChange={(e) => onBrokerChange(blockId, effectiveId, broker.id, 'share', e.target.value)}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#fafafa',
-                                                '& .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #e9ecef'
-                                                },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    border: '1px solid #626BDA'
-                                                }
-                                            }
-                                        }}
+                                        className={classes.textField}
                                     />
                                 </Grid>
                             </Grid>
@@ -389,20 +404,13 @@ export const ParticipatingSection = ({
                                 <Box key={reinsurer.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                     <Grid container spacing={2} sx={{ flex: 1 }}>
                                         <Grid item xs={12} sm={8}>
-                                            <FormControl fullWidth size="small">
+                                            <FormControl className={classes.formControl} fullWidth>
+                                                <InputLabel id={`brokerReinsurer-label-${reinsurer.id}`}>Reinsurer</InputLabel>
                                                 <Select
+                                                    labelId={`brokerReinsurer-label-${reinsurer.id}`}
                                                     value={reinsurer.reinsurer}
+                                                    label="Reinsurer"
                                                     onChange={(e) => onBrokerReinsurerChange(blockId, effectiveId, broker.id, reinsurer.id, 'reinsurer', e.target.value)}
-                                                    displayEmpty
-                                                    sx={{
-                                                        backgroundColor: '#fafafa',
-                                                        '& .MuiOutlinedInput-notchedOutline': {
-                                                            border: '1px solid #e9ecef'
-                                                        },
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            border: '1px solid #626BDA'
-                                                        }
-                                                    }}
                                                 >
                                                     <MenuItem value="">Select Reinsurer...</MenuItem>
                                                     {availableReinsurers.map((reinsurerName) => (
@@ -416,21 +424,10 @@ export const ParticipatingSection = ({
                                         <Grid item xs={12} sm={4}>
                                             <TextField
                                                 fullWidth
-                                                size="small"
                                                 placeholder="%"
                                                 value={reinsurer.share}
                                                 onChange={(e) => onBrokerReinsurerChange(blockId, effectiveId, broker.id, reinsurer.id, 'share', e.target.value)}
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        backgroundColor: '#fafafa',
-                                                        '& .MuiOutlinedInput-notchedOutline': {
-                                                            border: '1px solid #e9ecef'
-                                                        },
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            border: '1px solid #626BDA'
-                                                        }
-                                                    }
-                                                }}
+                                                className={classes.textField}
                                             />
                                         </Grid>
                                     </Grid>

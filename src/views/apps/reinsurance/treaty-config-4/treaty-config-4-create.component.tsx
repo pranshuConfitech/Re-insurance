@@ -269,7 +269,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     const [activeStep, setActiveStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const steps = ['Basic Configuration', 'Treaty Details', 'Risk & Limits Details', 'Participating Reinsurers / Brokers', 'Additional Configuration', 'Preview & Submit'];
+    const steps = ['Basic Detail', 'Treaty Details', 'Risk & Limits Details', 'Participants Reinsurance', 'Special Condition', 'Preview & Submit'];
 
     // Formik form management
     const formik = useFormik({
@@ -1671,7 +1671,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ p: 4, backgroundColor: '#fafafa', minHeight: '100vh' }}>
                 <Typography variant="h4" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
-                    {isEditMode ? 'Edit Reinsurance Configuration' : 'Reinsurance Configuration'}
+                    {isEditMode ? 'Edit Reinsurance Definition' : 'Reinsurance Definition'}
                 </Typography>
 
                 {/* Stepper */}
@@ -1685,7 +1685,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     </Stepper>
                 </Card>
 
-                {/* Step 1: Basic Configuration */}
+                {/* Step 1: Basic Detail */}
                 {activeStep === 0 && (
                     <Box>
                         <TopFormSection
@@ -1715,8 +1715,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 onClick={handleNext}
                                 disabled={false} // DISABLED validation - always allow next
                                 sx={{
-                                    backgroundColor: '#007bff',
-                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    backgroundColor: '#D80E51',
+                                    '&:hover': { backgroundColor: '#b80c43' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,
@@ -1779,8 +1779,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 variant="contained"
                                 onClick={handleNext}
                                 sx={{
-                                    backgroundColor: '#007bff',
-                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    backgroundColor: '#D80E51',
+                                    '&:hover': { backgroundColor: '#b80c43' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,
@@ -1940,8 +1940,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 variant="contained"
                                 onClick={handleNext}
                                 sx={{
-                                    backgroundColor: '#007bff',
-                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    backgroundColor: '#D80E51',
+                                    '&:hover': { backgroundColor: '#b80c43' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,
@@ -1954,11 +1954,11 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     </Box>
                 )}
 
-                {/* Step 4: Participating Reinsurers / Brokers */}
+                {/* Step 4: Participants Reinsurance */}
                 {activeStep === 3 && (
                     <Box>
                         <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
-                            Participating Reinsurers / Brokers
+                            Participants Reinsurance
                         </Typography>
 
                         {formik.values.selectMode === 'Treaty (Proportional)' && (
@@ -1992,7 +1992,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                         boxShadow: `0 0 0 4px ${blockColor.light}60`
                                                     }} />
                                                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
-                                                        BLOCK {block.blockNumber} - PARTICIPATING REINSURERS / BROKERS
+                                                        BLOCK {block.blockNumber} - PARTICIPANTS REINSURANCE
                                                     </Typography>
                                                 </Box>
                                             </Box>
@@ -2059,7 +2059,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                         boxShadow: `0 0 0 4px ${blockColor.light}60`
                                                     }} />
                                                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
-                                                        BLOCK {block.blockNumber} - PARTICIPATING REINSURERS / BROKERS
+                                                        BLOCK {block.blockNumber} - PARTICIPANTS REINSURANCE
                                                     </Typography>
                                                 </Box>
                                             </Box>
@@ -2125,8 +2125,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 variant="contained"
                                 onClick={handleNext}
                                 sx={{
-                                    backgroundColor: '#007bff',
-                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    backgroundColor: '#D80E51',
+                                    '&:hover': { backgroundColor: '#b80c43' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,
@@ -2139,11 +2139,11 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     </Box>
                 )}
 
-                {/* Step 5: Additional Configuration */}
+                {/* Step 5: Special Condition */}
                 {activeStep === 4 && (
                     <Box>
                         <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
-                            Additional Configuration
+                            Special Condition
                         </Typography>
 
                         {formik.values.selectMode === 'Treaty (Proportional)' && (
@@ -2177,7 +2177,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                         boxShadow: `0 0 0 4px ${blockColor.light}60`
                                                     }} />
                                                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
-                                                        BLOCK {block.blockNumber} - ADDITIONAL CONFIGURATION
+                                                        BLOCK {block.blockNumber} - SPECIAL CONDITION
                                                     </Typography>
                                                 </Box>
                                             </Box>
@@ -2191,7 +2191,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
 
                                                         <Card sx={{ p: 3, backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 3, color: '#495057', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                                                Additional Configurations
+                                                                Special Conditions
                                                             </Typography>
                                                             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
                                                                 <Button
@@ -2199,14 +2199,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                                     startIcon={<Box component="span" sx={{ fontSize: '16px' }}>📊</Box>}
                                                                     sx={{
                                                                         p: 2,
-                                                                        borderColor: '#007bff',
-                                                                        color: '#007bff',
+                                                                        borderColor: '#D80E51',
+                                                                        color: '#D80E51',
                                                                         backgroundColor: 'white',
                                                                         textTransform: 'none',
                                                                         fontWeight: 600,
                                                                         justifyContent: 'flex-start',
                                                                         '&:hover': {
-                                                                            borderColor: '#0056b3',
+                                                                            borderColor: '#b80c43',
                                                                             backgroundColor: '#f8f9ff'
                                                                         }
                                                                     }}
@@ -2312,7 +2312,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                         boxShadow: `0 0 0 4px ${blockColor.light}60`
                                                     }} />
                                                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50', fontSize: '15px', letterSpacing: '0.3px' }}>
-                                                        BLOCK {block.blockNumber} - ADDITIONAL CONFIGURATION
+                                                        BLOCK {block.blockNumber} - SPECIAL CONDITION
                                                     </Typography>
                                                 </Box>
                                             </Box>
@@ -2324,7 +2324,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
 
                                                 <Card sx={{ p: 3, backgroundColor: 'white', border: '1px solid #dee2e6' }}>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 3, color: '#495057', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                                        Additional Configurations
+                                                        Special Conditions
                                                     </Typography>
                                                     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
                                                         <Button
@@ -2332,14 +2332,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                             startIcon={<Box component="span" sx={{ fontSize: '16px' }}>📊</Box>}
                                                             sx={{
                                                                 p: 2,
-                                                                borderColor: '#007bff',
-                                                                color: '#007bff',
+                                                                borderColor: '#D80E51',
+                                                                color: '#D80E51',
                                                                 backgroundColor: 'white',
                                                                 textTransform: 'none',
                                                                 fontWeight: 600,
                                                                 justifyContent: 'flex-start',
                                                                 '&:hover': {
-                                                                    borderColor: '#0056b3',
+                                                                    borderColor: '#b80c43',
                                                                     backgroundColor: '#f8f9ff'
                                                                 }
                                                             }}
@@ -2439,8 +2439,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 variant="contained"
                                 onClick={handleNext}
                                 sx={{
-                                    backgroundColor: '#007bff',
-                                    '&:hover': { backgroundColor: '#0056b3' },
+                                    backgroundColor: '#D80E51',
+                                    '&:hover': { backgroundColor: '#b80c43' },
                                     textTransform: 'none',
                                     fontWeight: 600,
                                     px: 4,

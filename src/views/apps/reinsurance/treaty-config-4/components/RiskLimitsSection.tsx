@@ -1,7 +1,7 @@
-import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, Button, IconButton } from '@mui/material';
+import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, Button, IconButton, InputLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FieldLabel } from './FieldLabel';
+import { makeStyles } from '@mui/styles';
 
 interface Reinsurer {
     id: string;
@@ -45,10 +45,55 @@ interface RiskLimitsSectionProps {
     onLineChange: (blockId: string, treatyId: string | undefined, lineId: string, field: string, value: string) => void;
 }
 
+const useStyles = makeStyles((theme: any) => ({
+    formControl: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    },
+    textField: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    }
+}));
+
 export const RiskLimitsSection = ({
     riskLimitLines, blockId, treatyId,
     onAddLine, onDeleteLine, onLineChange
 }: RiskLimitsSectionProps) => {
+    const classes = useStyles();
+
     return (
         <Box sx={{
             backgroundColor: '#f8f9fa',
@@ -133,21 +178,15 @@ export const RiskLimitsSection = ({
                         <Grid container spacing={3}>
                             {/* Row 1 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Product LOB</FieldLabel>
-                                <FormControl fullWidth size="small">
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`productLOB-label-${line.id}`}>Product LOB</InputLabel>
                                     <Select
+                                        labelId={`productLOB-label-${line.id}`}
+                                        id={`productLOB-${line.id}`}
+                                        name="productLOB"
+                                        label="Product LOB"
                                         value={line.productLOB}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productLOB', e.target.value)}
-                                        displayEmpty
-                                        sx={{
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }}
                                     >
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
@@ -156,7 +195,6 @@ export const RiskLimitsSection = ({
                                         <MenuItem value="PROPERTY">PROPERTY</MenuItem>
                                         <MenuItem value="FIRE">FIRE</MenuItem>
                                         <MenuItem value="CASUALTY">CASUALTY</MenuItem>
-                                        {/* Show current value if not in list */}
                                         {line.productLOB && !['', 'Fire', 'Marine', 'Motor', 'PROPERTY', 'FIRE', 'CASUALTY'].includes(line.productLOB) && (
                                             <MenuItem value={line.productLOB}>{line.productLOB}</MenuItem>
                                         )}
@@ -164,48 +202,32 @@ export const RiskLimitsSection = ({
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Product Code</FieldLabel>
                                 <TextField
+                                    id={`productCode-${line.id}`}
+                                    name="productCode"
+                                    label="Product Code"
                                     fullWidth
-                                    size="small"
                                     value={line.productCode}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productCode', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Accounting LOB</FieldLabel>
-                                <FormControl fullWidth size="small">
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`accountingLOB-label-${line.id}`}>Accounting LOB</InputLabel>
                                     <Select
+                                        labelId={`accountingLOB-label-${line.id}`}
+                                        id={`accountingLOB-${line.id}`}
+                                        name="accountingLOB"
+                                        label="Accounting LOB"
                                         value={line.accountingLOB}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'accountingLOB', e.target.value)}
-                                        displayEmpty
-                                        sx={{
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }}
                                     >
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Fire">Fire</MenuItem>
                                         <MenuItem value="Marine">Marine</MenuItem>
                                         <MenuItem value="PROP">PROP</MenuItem>
                                         <MenuItem value="FIRE">FIRE</MenuItem>
-                                        {/* Show current value if not in list */}
                                         {line.accountingLOB && !['', 'Fire', 'Marine', 'PROP', 'FIRE'].includes(line.accountingLOB) && (
                                             <MenuItem value={line.accountingLOB}>{line.accountingLOB}</MenuItem>
                                         )}
@@ -213,21 +235,15 @@ export const RiskLimitsSection = ({
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Risk Category</FieldLabel>
-                                <FormControl fullWidth size="small">
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`riskCategory-label-${line.id}`}>Risk Category</InputLabel>
                                     <Select
+                                        labelId={`riskCategory-label-${line.id}`}
+                                        id={`riskCategory-${line.id}`}
+                                        name="riskCategory"
+                                        label="Risk Category"
                                         value={line.riskCategory}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskCategory', e.target.value)}
-                                        displayEmpty
-                                        sx={{
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }}
                                     >
                                         <MenuItem value="">Select...</MenuItem>
                                         <MenuItem value="Comm">Comm</MenuItem>
@@ -236,7 +252,6 @@ export const RiskLimitsSection = ({
                                         <MenuItem value="HIGH">HIGH</MenuItem>
                                         <MenuItem value="LOW">LOW</MenuItem>
                                         <MenuItem value="PROPERTY">PROPERTY</MenuItem>
-                                        {/* Show current value if not in list */}
                                         {line.riskCategory && !['', 'Comm', 'Residential', 'MEDIUM', 'HIGH', 'LOW', 'PROPERTY'].includes(line.riskCategory) && (
                                             <MenuItem value={line.riskCategory}>{line.riskCategory}</MenuItem>
                                         )}
@@ -246,246 +261,140 @@ export const RiskLimitsSection = ({
 
                             {/* Row 2 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Risk Grade</FieldLabel>
                                 <TextField
+                                    id={`riskGrade-${line.id}`}
+                                    name="riskGrade"
+                                    label="Risk Grade"
                                     fullWidth
-                                    size="small"
                                     value={line.riskGrade}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskGrade', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Cession Rate %</FieldLabel>
                                 <TextField
+                                    id={`cessionRate-${line.id}`}
+                                    name="cessionRate"
+                                    label="Cession Rate %"
                                     fullWidth
-                                    size="small"
                                     value={line.cessionRate}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cessionRate', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Quota Cession Max Capacity</FieldLabel>
                                 <TextField
+                                    id={`quotaCessionMaxCapacity-${line.id}`}
+                                    name="quotaCessionMaxCapacity"
+                                    label="Quota Cession Max Capacity"
                                     fullWidth
-                                    size="small"
                                     value={line.quotaCessionMaxCapacity}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'quotaCessionMaxCapacity', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Retention (Gross/Net)</FieldLabel>
                                 <TextField
+                                    id={`retentionGrossNet-${line.id}`}
+                                    name="retentionGrossNet"
+                                    label="Retention (Gross/Net)"
                                     fullWidth
-                                    size="small"
                                     value={line.retentionGrossNet}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'retentionGrossNet', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
 
                             {/* Row 3 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Surplus Capacity</FieldLabel>
                                 <TextField
+                                    id={`surplusCapacity-${line.id}`}
+                                    name="surplusCapacity"
+                                    label="Surplus Capacity"
                                     fullWidth
-                                    size="small"
                                     value={line.surplusCapacity}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'surplusCapacity', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Capacity(Calculate In XL)</FieldLabel>
                                 <TextField
+                                    id={`capacityCalculateInXL-${line.id}`}
+                                    name="capacityCalculateInXL"
+                                    label="Capacity(Calculate In XL)"
+                                    placeholder="Enter capacity value"
                                     fullWidth
-                                    size="small"
                                     value={line.capacityCalculateInXL}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'capacityCalculateInXL', e.target.value)}
-                                    placeholder="Enter capacity value"
-                                    sx={{
-                                        backgroundColor: '#fafafa',
-                                        '& .MuiOutlinedInput-notchedOutline': {
-                                            border: '1px solid #e9ecef'
-                                        },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            border: '1px solid #626BDA'
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Per Risk Recovery Limit</FieldLabel>
                                 <TextField
+                                    id={`perRiskRecoveryLimit-${line.id}`}
+                                    name="perRiskRecoveryLimit"
+                                    label="Per Risk Recovery Limit"
                                     fullWidth
-                                    size="small"
                                     value={line.perRiskRecoveryLimit}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'perRiskRecoveryLimit', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Event Limit</FieldLabel>
                                 <TextField
+                                    id={`eventLimit-${line.id}`}
+                                    name="eventLimit"
+                                    label="Event Limit"
                                     fullWidth
-                                    size="small"
                                     value={line.eventLimit}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'eventLimit', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
 
                             {/* Row 4 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Cash Call Limit</FieldLabel>
                                 <TextField
+                                    id={`cashCallLimit-${line.id}`}
+                                    name="cashCallLimit"
+                                    label="Cash Call Limit"
                                     fullWidth
-                                    size="small"
                                     value={line.cashCallLimit}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'cashCallLimit', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Loss Advice Limit</FieldLabel>
                                 <TextField
+                                    id={`lossAdviceLimit-${line.id}`}
+                                    name="lossAdviceLimit"
+                                    label="Loss Advice Limit"
                                     fullWidth
-                                    size="small"
                                     value={line.lossAdviceLimit}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'lossAdviceLimit', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Premium Payment Warranty</FieldLabel>
                                 <TextField
+                                    id={`premiumPaymentWarranty-${line.id}`}
+                                    name="premiumPaymentWarranty"
+                                    label="Premium Payment Warranty"
                                     fullWidth
-                                    size="small"
                                     value={line.premiumPaymentWarranty}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'premiumPaymentWarranty', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Alert Days</FieldLabel>
                                 <TextField
+                                    id={`alertDays-${line.id}`}
+                                    name="alertDays"
+                                    label="Alert Days"
                                     fullWidth
-                                    size="small"
                                     value={line.alertDays}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'alertDays', e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fafafa',
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #e9ecef'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                border: '1px solid #626BDA'
-                                            }
-                                        }
-                                    }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                         </Grid>

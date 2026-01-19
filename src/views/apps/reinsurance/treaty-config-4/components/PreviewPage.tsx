@@ -57,7 +57,7 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
 
     return (
         <Box sx={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto', pr: 2 }}>
-            {/* Basic Configuration Section */}
+            {/* Basic Detail Section */}
             <Accordion defaultExpanded sx={{
                 mb: 2,
                 boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
@@ -89,7 +89,7 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
                             📋
                         </Box>
                         <Typography sx={{ fontWeight: 700, fontSize: '16px', color: '#1a1a1a' }}>
-                            Basic Configuration
+                            Basic Detail
                         </Typography>
                     </Box>
                 </AccordionSummary>
@@ -97,12 +97,12 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                             <InfoRow label="Portfolio Name" value={formValues.portfolio} />
-                            <InfoRow label="Company UIN" value={formValues.companyUIN} />
+                            <InfoRow label="Company" value={formValues.companyUIN} />
                             <InfoRow label="Currency" value={formValues.currency} />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <InfoRow label="Treaty Start Date" value={formatDate(formValues.treatyStartDate)} />
-                            <InfoRow label="Treaty End Date" value={formatDate(formValues.treatyEndDate)} />
+                            <InfoRow label="Start Date" value={formatDate(formValues.treatyStartDate)} />
+                            <InfoRow label="End Date" value={formatDate(formValues.treatyEndDate)} />
                             <InfoRow label="Treaty Mode" value={formValues.selectMode} />
                         </Grid>
                         <Grid item xs={12}>
@@ -383,12 +383,12 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
 
                                         <Divider sx={{ my: 3 }} />
 
-                                        {/* 3. Treaty Level Participating Reinsurers */}
+                                        {/* 3. Treaty Level Participants Reinsurance */}
                                         {treaty.reinsurers?.length > 0 && (
                                             <Box sx={{ mb: 3 }}>
                                                 <SectionHeader
                                                     icon="🏦"
-                                                    title={`Participating Reinsurers (${treaty.reinsurers.length})`}
+                                                    title={`Participants Reinsurance (${treaty.reinsurers.length})`}
                                                 />
                                                 <Grid container spacing={1.5}>
                                                     {treaty.reinsurers.map((reinsurer: any, idx: number) => (
@@ -520,8 +520,8 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
 
                                         <Divider sx={{ my: 3 }} />
 
-                                        {/* 4. Additional Treaty Configuration */}
-                                        <SectionHeader icon="⚙️" title="Additional Configuration" />
+                                        {/* 4. Additional Treaty Definition */}
+                                        <SectionHeader icon="⚙️" title="Special Condition" />
                                         <Grid container spacing={2}>
                                             <Grid item xs={12} md={6}>
                                                 <InfoRow label="Prem Reserve Retained Rate (%)" value={treaty.premReserveRetainedRate} />
@@ -789,8 +789,8 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
 
                                     <Divider sx={{ my: 3 }} />
 
-                                    {/* 3. Additional Configuration */}
-                                    <SectionHeader icon="⚙️" title="Additional Configuration" />
+                                    {/* 3. Special Condition */}
+                                    <SectionHeader icon="⚙️" title="Special Condition" />
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} md={6}>
                                             <InfoRow label="Capacity" value={block.treaty.capacity} />
