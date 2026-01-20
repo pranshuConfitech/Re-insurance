@@ -24,7 +24,8 @@ const TreatyConfig4ViewComponent: React.FC<TreatyConfig4ViewComponentProps> = ({
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [portfolioData, setPortfolioData] = useState<any>(null);
-    const [expandedBlock, setExpandedBlock] = useState<string | false>('block-0');
+    const [expandedBlock, setExpandedBlock] = useState<string | false>(false); // Changed to false to allow multiple blocks to be expanded
+    const [expandedTreaties, setExpandedTreaties] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         if (viewId) {
@@ -53,7 +54,15 @@ const TreatyConfig4ViewComponent: React.FC<TreatyConfig4ViewComponentProps> = ({
     };
 
     const handleBlockChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-        setExpandedBlock(isExpanded ? panel : false);
+        // Allow multiple blocks to be expanded/collapsed independently
+        // This function is no longer needed for controlling expansion since we'll use defaultExpanded
+    };
+
+    const handleTreatyChange = (treatyId: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+        setExpandedTreaties(prev => ({
+            ...prev,
+            [treatyId]: isExpanded
+        }));
     };
 
     if (loading) {
@@ -149,7 +158,7 @@ const TreatyConfig4ViewComponent: React.FC<TreatyConfig4ViewComponentProps> = ({
             </Card>
 
             {treatyBlocks.map((block: any, blockIndex: number) => (
-                <Accordion key={block.id} expanded={expandedBlock === `block-${blockIndex}`} onChange={handleBlockChange(`block-${blockIndex}`)} sx={{ mb: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', borderRadius: '8px !important', border: '1px solid #e2e8f0', '&:before': { display: 'none' }, '&.Mui-expanded': { margin: '0 0 16px 0' } }}>
+                <Accordion key={block.id} defaultExpanded={true} sx={{ mb: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', borderRadius: '8px !important', border: '1px solid #e2e8f0', '&:before': { display: 'none' }, '&.Mui-expanded': { margin: '0 0 16px 0' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: '#f8fafc', borderRadius: '8px', minHeight: '56px', '&.Mui-expanded': { minHeight: '56px', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }, '& .MuiAccordionSummary-content': { my: 1.5 } }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                             <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#e91e63' }} />
@@ -160,7 +169,7 @@ const TreatyConfig4ViewComponent: React.FC<TreatyConfig4ViewComponentProps> = ({
                     </AccordionSummary>
                     <AccordionDetails sx={{ p: 3, backgroundColor: '#ffffff' }}>
                         {block.treaties?.map((treaty: any, treatyIndex: number) => (
-                            <Accordion key={treaty.id} sx={{ mb: 2, boxShadow: 'none', border: '1px solid #e2e8f0', borderRadius: '8px !important', '&:last-child': { mb: 0 }, '&:before': { display: 'none' } }}>
+                            <Accordion key={treaty.id} defaultExpanded={true} sx={{ mb: 2, boxShadow: 'none', border: '1px solid #e2e8f0', borderRadius: '8px !important', '&:last-child': { mb: 0 }, '&:before': { display: 'none' } }}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: '#f8fafc', borderRadius: '8px', '&.Mui-expanded': { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }, minHeight: '56px', '& .MuiAccordionSummary-content': { my: 1.5 } }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', pr: 1 }}>
                                         <Typography sx={{ fontWeight: 600, fontSize: '14px', color: '#e91e63' }}>Treaty: {treaty.treatyName}</Typography>
