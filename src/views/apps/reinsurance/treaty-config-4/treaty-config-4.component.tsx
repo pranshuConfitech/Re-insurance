@@ -24,8 +24,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import Edit from '@mui/icons-material/Edit';
+import Visibility from '@mui/icons-material/Visibility';
 
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
@@ -833,35 +833,31 @@ const TreatyConfig4Component = () => {
                                                                 size="small"
                                                                 onClick={(e) => handleView(row.id, e)}
                                                                 sx={{
-                                                                    backgroundColor: '#e3f2fd',
-                                                                    color: '#1565c0',
+                                                                    color: '#18a2b8',
                                                                     '&:hover': {
-                                                                        backgroundColor: '#bbdefb',
+                                                                        backgroundColor: 'rgba(24, 162, 184, 0.1)',
                                                                         transform: 'scale(1.1)'
                                                                     },
-                                                                    width: 32,
-                                                                    height: 32,
+                                                                    padding: '4px',
                                                                     transition: 'all 0.2s ease-in-out'
                                                                 }}
                                                             >
-                                                                <VisibilityIcon sx={{ fontSize: 16 }} />
+                                                                <Visibility sx={{ fontSize: 18 }} />
                                                             </IconButton>
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={(e) => handleEdit(row.id, e)}
                                                                 sx={{
-                                                                    backgroundColor: '#fff3e0',
-                                                                    color: '#e65100',
+                                                                    color: '#fbac05',
                                                                     '&:hover': {
-                                                                        backgroundColor: '#ffe0b2',
+                                                                        backgroundColor: 'rgba(251, 172, 5, 0.1)',
                                                                         transform: 'scale(1.1)'
                                                                     },
-                                                                    width: 32,
-                                                                    height: 32,
+                                                                    padding: '4px',
                                                                     transition: 'all 0.2s ease-in-out'
                                                                 }}
                                                             >
-                                                                <EditIcon sx={{ fontSize: 16 }} />
+                                                                <Edit sx={{ fontSize: 18 }} />
                                                             </IconButton>
                                                         </Box>
                                                     </TableCell>

@@ -1,5 +1,5 @@
-import { Grid, TextField, FormControl, Select, MenuItem } from '@mui/material';
-import { FieldLabel } from './FieldLabel';
+import { Grid, TextField, FormControl, Select, MenuItem, Box, InputLabel } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 interface NonProportionalTreaty {
     treatyCode: string;
@@ -37,7 +37,52 @@ interface NonProportionalTreatyFieldsProps {
     onTreatyChange: (blockId: string, field: string, value: string) => void;
 }
 
+const useStyles = makeStyles((theme: any) => ({
+    formControl: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    },
+    textField: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    }
+}));
+
 export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }: NonProportionalTreatyFieldsProps) => {
+    const classes = useStyles();
+
     const handleChange = (field: string, value: string) => {
         onTreatyChange(blockId, field, value);
     };
@@ -46,41 +91,26 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
         <Grid container spacing={3}>
             {/* Row 1 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Code</FieldLabel>
                 <TextField
+                    id={`treatyCode-${blockId}`}
+                    name="treatyCode"
+                    label="Treaty Code"
                     fullWidth
-                    size="small"
                     value={treaty.treatyCode}
                     onChange={(e) => handleChange('treatyCode', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Priority</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`priority-label-${blockId}`}>Priority</InputLabel>
                     <Select
+                        labelId={`priority-label-${blockId}`}
+                        id={`priority-${blockId}`}
+                        name="priority"
+                        label="Priority"
                         value={treaty.priority}
                         onChange={(e) => handleChange('priority', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="PRIMARY">Primary</MenuItem>
@@ -96,20 +126,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Type</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`treatyType-label-${blockId}`}>Treaty Type</InputLabel>
                     <Select
+                        labelId={`treatyType-label-${blockId}`}
+                        id={`treatyType-${blockId}`}
+                        name="treatyType"
+                        label="Treaty Type"
                         value={treaty.treatyType}
                         onChange={(e) => handleChange('treatyType', e.target.value)}
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="XOL">XOL</MenuItem>
                         <MenuItem value="Stop Loss">Stop Loss</MenuItem>
@@ -118,63 +143,39 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Name</FieldLabel>
                 <TextField
+                    id={`treatyName-${blockId}`}
+                    name="treatyName"
+                    label="Treaty Name"
                     fullWidth
-                    size="small"
                     value={treaty.treatyName}
                     onChange={(e) => handleChange('treatyName', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
 
             {/* Row 2 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Business Treaty Reference Number</FieldLabel>
                 <TextField
+                    id={`businessTreatyReferenceNumber-${blockId}`}
+                    name="businessTreatyReferenceNumber"
+                    label="Business Treaty Reference Number"
                     fullWidth
-                    size="small"
                     value={treaty.businessTreatyReferenceNumber}
                     onChange={(e) => handleChange('businessTreatyReferenceNumber', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>XOL Type</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`xolType-label-${blockId}`}>XOL Type</InputLabel>
                     <Select
+                        labelId={`xolType-label-${blockId}`}
+                        id={`xolType-${blockId}`}
+                        name="xolType"
+                        label="XOL Type"
                         value={treaty.xolType}
                         onChange={(e) => handleChange('xolType', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Risk Attaching">Risk Attaching</MenuItem>
@@ -188,41 +189,26 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Former Treaty Code</FieldLabel>
                 <TextField
+                    id={`formerTreatyCode-${blockId}`}
+                    name="formerTreatyCode"
+                    label="Former Treaty Code"
                     fullWidth
-                    size="small"
                     value={treaty.formerTreatyCode}
                     onChange={(e) => handleChange('formerTreatyCode', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Category</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`treatyCategory-label-${blockId}`}>Treaty Category</InputLabel>
                     <Select
+                        labelId={`treatyCategory-label-${blockId}`}
+                        id={`treatyCategory-${blockId}`}
+                        name="treatyCategory"
+                        label="Treaty Category"
                         value={treaty.treatyCategory}
                         onChange={(e) => handleChange('treatyCategory', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="PROPERTY">Property</MenuItem>
@@ -241,21 +227,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
 
             {/* Row 3 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Status</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`treatyStatus-label-${blockId}`}>Treaty Status</InputLabel>
                     <Select
+                        labelId={`treatyStatus-label-${blockId}`}
+                        id={`treatyStatus-${blockId}`}
+                        name="treatyStatus"
+                        label="Treaty Status"
                         value={treaty.treatyStatus}
                         onChange={(e) => handleChange('treatyStatus', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="ACTIVE">Active</MenuItem>
@@ -271,21 +251,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Treaty Currency</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`treatyCurrency-label-${blockId}`}>Treaty Currency</InputLabel>
                     <Select
+                        labelId={`treatyCurrency-label-${blockId}`}
+                        id={`treatyCurrency-${blockId}`}
+                        name="treatyCurrency"
+                        label="Treaty Currency"
                         value={treaty.treatyCurrency}
                         onChange={(e) => handleChange('treatyCurrency', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="USD">USD</MenuItem>
@@ -296,21 +270,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Processing</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`processing-label-${blockId}`}>Processing</InputLabel>
                     <Select
+                        labelId={`processing-label-${blockId}`}
+                        id={`processing-${blockId}`}
+                        name="processing"
+                        label="Processing"
                         value={treaty.processing}
                         onChange={(e) => handleChange('processing', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Clean Cut">Clean Cut</MenuItem>
@@ -319,172 +287,103 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Annual Aggregate Limit</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`annualAggregateLimit-${blockId}`}
+                    name="annualAggregateLimit"
+                    label="Annual Aggregate Limit"
                     type="number"
+                    fullWidth
                     value={treaty.annualAggregateLimit}
                     onChange={(e) => handleChange('annualAggregateLimit', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
 
             {/* Row 4 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Annual Agg Deductible</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`annualAggDeductible-${blockId}`}
+                    name="annualAggDeductible"
+                    label="Annual Agg Deductible"
                     type="number"
+                    fullWidth
                     value={treaty.annualAggDeductible}
                     onChange={(e) => handleChange('annualAggDeductible', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Total Reinstated SI</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`totalReinstatedSI-${blockId}`}
+                    name="totalReinstatedSI"
+                    label="Total Reinstated SI"
                     type="number"
+                    fullWidth
                     value={treaty.totalReinstatedSI}
                     onChange={(e) => handleChange('totalReinstatedSI', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Capacity</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`capacity-${blockId}`}
+                    name="capacity"
+                    label="Capacity"
                     type="number"
+                    fullWidth
                     value={treaty.capacity}
                     onChange={(e) => handleChange('capacity', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Flat Rate XOL Prem</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`flatRateXOLPrem-${blockId}`}
+                    name="flatRateXOLPrem"
+                    label="Flat Rate XOL Prem"
                     type="number"
+                    fullWidth
                     value={treaty.flatRateXOLPrem}
                     onChange={(e) => handleChange('flatRateXOLPrem', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
 
             {/* Row 5 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Min Deposit XOL Prem</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`minDepositXOLPrem-${blockId}`}
+                    name="minDepositXOLPrem"
+                    label="Min Deposit XOL Prem"
                     type="number"
+                    fullWidth
                     value={treaty.minDepositXOLPrem}
                     onChange={(e) => handleChange('minDepositXOLPrem', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>No. Reinstatements</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`noReinstatements-${blockId}`}
+                    name="noReinstatements"
+                    label="No. Reinstatements"
                     type="number"
+                    fullWidth
                     value={treaty.noReinstatements}
                     onChange={(e) => handleChange('noReinstatements', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Pro Rate to Amount</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`proRateToAmount-label-${blockId}`}>Pro Rate to Amount</InputLabel>
                     <Select
+                        labelId={`proRateToAmount-label-${blockId}`}
+                        id={`proRateToAmount-${blockId}`}
+                        name="proRateToAmount"
+                        label="Pro Rate to Amount"
                         value={treaty.proRateToAmount}
                         onChange={(e) => handleChange('proRateToAmount', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Yes">Yes</MenuItem>
@@ -493,21 +392,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Pro Rate to Time</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`proRateToTime-label-${blockId}`}>Pro Rate to Time</InputLabel>
                     <Select
+                        labelId={`proRateToTime-label-${blockId}`}
+                        id={`proRateToTime-${blockId}`}
+                        name="proRateToTime"
+                        label="Pro Rate to Time"
                         value={treaty.proRateToTime}
                         onChange={(e) => handleChange('proRateToTime', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Yes">Yes</MenuItem>
@@ -518,62 +411,38 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
 
             {/* Row 6 - 4 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Reserve Type Involved</FieldLabel>
                 <TextField
+                    id={`reserveTypeInvolved-${blockId}`}
+                    name="reserveTypeInvolved"
+                    label="Reserve Type Involved"
                     fullWidth
-                    size="small"
                     value={treaty.reserveTypeInvolved}
                     onChange={(e) => handleChange('reserveTypeInvolved', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Burning Cost Rate</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`burningCostRate-${blockId}`}
+                    name="burningCostRate"
+                    label="Burning Cost Rate"
                     type="number"
+                    fullWidth
                     value={treaty.burningCostRate}
                     onChange={(e) => handleChange('burningCostRate', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Prem Payment Warranty</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`premPaymentWarranty-label-${blockId}`}>Prem Payment Warranty</InputLabel>
                     <Select
+                        labelId={`premPaymentWarranty-label-${blockId}`}
+                        id={`premPaymentWarranty-${blockId}`}
+                        name="premPaymentWarranty"
+                        label="Prem Payment Warranty"
                         value={treaty.premPaymentWarranty}
                         onChange={(e) => handleChange('premPaymentWarranty', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Within 30 Days">Within 30 Days</MenuItem>
@@ -597,65 +466,41 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Alert Days</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`alertDays-${blockId}`}
+                    name="alertDays"
+                    label="Alert Days"
                     type="number"
+                    fullWidth
                     value={treaty.alertDays}
                     onChange={(e) => handleChange('alertDays', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
 
             {/* Row 7 - 3 fields */}
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Per Claim Recoverable Limit</FieldLabel>
                 <TextField
-                    fullWidth
-                    size="small"
+                    id={`perClaimRecoverableLimit-${blockId}`}
+                    name="perClaimRecoverableLimit"
+                    label="Per Claim Recoverable Limit"
                     type="number"
+                    fullWidth
                     value={treaty.perClaimRecoverableLimit}
                     onChange={(e) => handleChange('perClaimRecoverableLimit', e.target.value)}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }
-                    }}
+                    className={classes.textField}
                 />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-                <FieldLabel>Processing Portfolio Method</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`processingPortfolioMethod-label-${blockId}`}>Processing Portfolio Method</InputLabel>
                     <Select
+                        labelId={`processingPortfolioMethod-label-${blockId}`}
+                        id={`processingPortfolioMethod-${blockId}`}
+                        name="processingPortfolioMethod"
+                        label="Processing Portfolio Method"
                         value={treaty.processingPortfolioMethod}
                         onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Clean Cut">Clean Cut</MenuItem>
@@ -670,21 +515,15 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-                <FieldLabel>Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss</FieldLabel>
-                <FormControl fullWidth size="small">
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel id={`basisOfAttachment-label-${blockId}`}>Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss</InputLabel>
                     <Select
+                        labelId={`basisOfAttachment-label-${blockId}`}
+                        id={`basisOfAttachment-${blockId}`}
+                        name="basisOfAttachment"
+                        label="Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss"
                         value={treaty.basisOfAttachment}
                         onChange={(e) => handleChange('basisOfAttachment', e.target.value)}
-                        displayEmpty
-                        sx={{
-                            backgroundColor: '#fafafa',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #e9ecef'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                border: '1px solid #626BDA'
-                            }
-                        }}
                     >
                         <MenuItem value="">Select...</MenuItem>
                         <MenuItem value="Risk Attaching Basis">Risk Attaching Basis</MenuItem>

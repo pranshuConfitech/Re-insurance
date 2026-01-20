@@ -1,25 +1,4 @@
-import { Typography } from '@mui/material';
+import React from 'react';
 
-interface FieldLabelProps {
-    children: React.ReactNode;
-}
-
-export const FieldLabel = ({ children }: FieldLabelProps) => (
-    <Typography
-        variant="caption"
-        sx={{
-            color: '#666',
-            fontWeight: 500,
-            mb: 0.5,
-            display: 'block',
-            fontSize: '10px',
-            textTransform: 'uppercase',
-            minHeight: '28px',
-            lineHeight: '14px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-        }}
-    >
-        {children}
-    </Typography>
-);
+// This component is no longer needed as we're using standard MUI InputLabel
+export const FieldLabel: React.FC<any> = () => null;

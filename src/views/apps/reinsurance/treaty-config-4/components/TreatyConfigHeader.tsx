@@ -8,7 +8,7 @@ interface TreatyConfigHeaderProps {
 export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyConfigHeaderProps) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
-            Reinsurance Configuration
+            Reinsurance Definition
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button
@@ -23,20 +23,20 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
                     py: 1,
                     borderRadius: '6px',
                     ...(selectMode === 'Treaty (Proportional)' ? {
-                        backgroundColor: '#007bff !important',
+                        backgroundColor: '#D80E51 !important',
                         color: 'white !important',
                         '&:hover': {
-                            backgroundColor: '#0056b3 !important'
+                            backgroundColor: '#b80c43 !important'
                         },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     } : {
-                        borderColor: '#007bff !important',
-                        color: '#007bff !important',
+                        borderColor: '#D80E51 !important',
+                        color: '#D80E51 !important',
                         backgroundColor: 'transparent !important',
                         '&:hover': {
-                            borderColor: '#007bff !important',
-                            backgroundColor: '#e9ecef !important',
-                            color: '#007bff !important'
+                            borderColor: '#D80E51 !important',
+                            backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                            color: '#D80E51 !important'
                         }
                     })
                 }}
@@ -55,20 +55,20 @@ export const TreatyConfigHeader = ({ selectMode, onSelectModeChange }: TreatyCon
                     py: 1,
                     borderRadius: '6px',
                     ...(selectMode === 'Treaty (Non Proportional)' ? {
-                        backgroundColor: '#007bff !important',
+                        backgroundColor: '#D80E51 !important',
                         color: 'white !important',
                         '&:hover': {
-                            backgroundColor: '#0056b3 !important'
+                            backgroundColor: '#b80c43 !important'
                         },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     } : {
-                        borderColor: '#007bff !important',
-                        color: '#007bff !important',
+                        borderColor: '#D80E51 !important',
+                        color: '#D80E51 !important',
                         backgroundColor: 'transparent !important',
                         '&:hover': {
-                            borderColor: '#007bff !important',
-                            backgroundColor: '#e9ecef !important',
-                            color: '#007bff !important'
+                            borderColor: '#D80E51 !important',
+                            backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                            color: '#D80E51 !important'
                         }
                     })
                 }}

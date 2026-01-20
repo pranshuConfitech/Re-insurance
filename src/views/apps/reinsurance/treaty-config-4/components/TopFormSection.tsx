@@ -1,7 +1,7 @@
-import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid, Typography, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
+import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid, Typography, Checkbox, ListItemText, InputLabel } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import AddIcon from '@mui/icons-material/Add';
-import { FieldLabel } from './FieldLabel';
+import { makeStyles } from '@mui/styles';
 
 interface TopFormSectionProps {
     portfolio: string;
@@ -25,19 +25,62 @@ interface TopFormSectionProps {
 }
 
 const OPERATING_UNITS = [
-    'OU-North',
-    'OU-South',
-    'OU-East',
-    'OU-West',
-    'OU-Central',
-    'OU-Northeast',
-    'OU-Southwest',
+    'UN-North',
+    'UN-South',
+    'UN-East',
+    'UN-West',
+    'UN-Central',
+    'UN-Northeast',
+    'UN-Southwest',
     'PROP-IN',
     'PROP-IN-2',
     'NP-IN-01',
     'NP-IN-02',
-    'OU-INDIAs'
+    'UN-INDIAs'
 ];
+
+const useStyles = makeStyles((theme: any) => ({
+    formControl: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    },
+    textField: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    }
+}));
 
 export const TopFormSection = ({
     portfolio, companyUIN, currentOperatingUIN, operatingUnitUINs,
@@ -46,6 +89,7 @@ export const TopFormSection = ({
     onAddOperatingUIN, onRemoveOperatingUIN, onOperatingUnitUINsChange,
     onTreatyStartDateChange, onTreatyEndDateChange, onCurrencyChange, onSelectModeChange
 }: TopFormSectionProps) => {
+    const classes = useStyles();
 
     // Combine predefined units with any custom units from the data
     const allOperatingUnits = [...new Set([...OPERATING_UNITS, ...operatingUnitUINs])];
@@ -60,96 +104,135 @@ export const TopFormSection = ({
         <Card sx={{ p: 3, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
             {/* Treaty Type Selection */}
             <Box sx={{ mb: 3, pb: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 2 }}>
-                    Treaty Type
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Button
-                        variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
-                        onClick={() => onSelectModeChange('Treaty (Proportional)')}
-                        disableRipple
-                        disableElevation
-                        sx={{
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 3,
-                            py: 1,
-                            borderRadius: '6px',
-                            ...(selectMode === 'Treaty (Proportional)' ? {
-                                backgroundColor: '#007bff !important',
-                                color: 'white !important',
-                                '&:hover': {
-                                    backgroundColor: '#0056b3 !important'
-                                },
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                            } : {
-                                borderColor: '#007bff !important',
-                                color: '#007bff !important',
-                                backgroundColor: 'transparent !important',
-                                '&:hover': {
-                                    borderColor: '#007bff !important',
-                                    backgroundColor: '#e9ecef !important',
-                                    color: '#007bff !important'
-                                }
-                            })
-                        }}
-                    >
-                        Treaty Proportional
-                    </Button>
-                    <Button
-                        variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
-                        onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
-                        disableRipple
-                        disableElevation
-                        sx={{
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 3,
-                            py: 1,
-                            borderRadius: '6px',
-                            ...(selectMode === 'Treaty (Non Proportional)' ? {
-                                backgroundColor: '#007bff !important',
-                                color: 'white !important',
-                                '&:hover': {
-                                    backgroundColor: '#0056b3 !important'
-                                },
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                            } : {
-                                borderColor: '#007bff !important',
-                                color: '#007bff !important',
-                                backgroundColor: 'transparent !important',
-                                '&:hover': {
-                                    borderColor: '#007bff !important',
-                                    backgroundColor: '#e9ecef !important',
-                                    color: '#007bff !important'
-                                }
-                            })
-                        }}
-                    >
-                        Treaty Non Proportional
-                    </Button>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+                        Treaty Type
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Button
+                            variant={selectMode === 'Treaty (Proportional)' ? 'contained' : 'outlined'}
+                            onClick={() => onSelectModeChange('Treaty (Proportional)')}
+                            disableRipple
+                            disableElevation
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                py: 1,
+                                borderRadius: '6px',
+                                ...(selectMode === 'Treaty (Proportional)' ? {
+                                    backgroundColor: '#D80E51 !important',
+                                    color: 'white !important',
+                                    border: 'none !important',
+                                    '&:hover': {
+                                        backgroundColor: '#b80c43 !important'
+                                    },
+                                    '&:active': {
+                                        backgroundColor: '#b80c43 !important'
+                                    },
+                                    '&.Mui-focusVisible': {
+                                        backgroundColor: '#D80E51 !important'
+                                    },
+                                    boxShadow: '0 2px 4px rgba(216, 14, 81, 0.3) !important',
+                                } : {
+                                    borderColor: '#D80E51 !important',
+                                    color: '#D80E51 !important',
+                                    backgroundColor: 'transparent !important',
+                                    '&:hover': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    },
+                                    '&:active': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    },
+                                    '&.Mui-focusVisible': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    }
+                                })
+                            }}
+                        >
+                            Treaty Proportional
+                        </Button>
+                        <Button
+                            variant={selectMode === 'Treaty (Non Proportional)' ? 'contained' : 'outlined'}
+                            onClick={() => onSelectModeChange('Treaty (Non Proportional)')}
+                            disableRipple
+                            disableElevation
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                py: 1,
+                                borderRadius: '6px',
+                                ...(selectMode === 'Treaty (Non Proportional)' ? {
+                                    backgroundColor: '#D80E51 !important',
+                                    color: 'white !important',
+                                    border: 'none !important',
+                                    '&:hover': {
+                                        backgroundColor: '#b80c43 !important'
+                                    },
+                                    '&:active': {
+                                        backgroundColor: '#b80c43 !important'
+                                    },
+                                    '&.Mui-focusVisible': {
+                                        backgroundColor: '#D80E51 !important'
+                                    },
+                                    boxShadow: '0 2px 4px rgba(216, 14, 81, 0.3) !important',
+                                } : {
+                                    borderColor: '#D80E51 !important',
+                                    color: '#D80E51 !important',
+                                    backgroundColor: 'transparent !important',
+                                    '&:hover': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    },
+                                    '&:active': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    },
+                                    '&.Mui-focusVisible': {
+                                        borderColor: '#D80E51 !important',
+                                        backgroundColor: 'rgba(216, 14, 81, 0.1) !important',
+                                        color: '#D80E51 !important'
+                                    }
+                                })
+                            }}
+                        >
+                            Treaty Non Proportional
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Portfolio</FieldLabel>
                     <TextField
+                        id="portfolio"
+                        name="portfolio"
+                        label="Portfolio"
                         fullWidth
-                        size="small"
                         value={portfolio}
                         onChange={(e) => onPortfolioChange(e.target.value)}
-                        sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                        className={classes.textField}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Company UIN</FieldLabel>
-                    <FormControl fullWidth size="small">
+                    <FormControl className={classes.formControl} fullWidth>
+                        <InputLabel id="companyUIN-label">Company</InputLabel>
                         <Select
+                            labelId="companyUIN-label"
+                            id="companyUIN"
+                            name="companyUIN"
+                            label="Company"
                             value={companyUIN}
                             onChange={(e) => onCompanyUINChange(e.target.value)}
-                            displayEmpty
-                            sx={{ backgroundColor: 'white' }}
                         >
                             <MenuItem value="">Select Company...</MenuItem>
                             <MenuItem value="UIN-1001">UIN-1001</MenuItem>
@@ -158,7 +241,6 @@ export const TopFormSection = ({
                             <MenuItem value="INS-RE-002">INS-RE-002</MenuItem>
                             <MenuItem value="INS-RE-003">INS-RE-003</MenuItem>
                             <MenuItem value="INS-1001">INS-1001</MenuItem>
-                            {/* Show current value if not in list */}
                             {companyUIN && !['', 'UIN-1001', 'UIN-1002', 'UIN-1003', 'INS-RE-002', 'INS-RE-003', 'INS-1001'].includes(companyUIN) && (
                                 <MenuItem value={companyUIN}>{companyUIN}</MenuItem>
                             )}
@@ -166,13 +248,16 @@ export const TopFormSection = ({
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Operating Unit UIN</FieldLabel>
-                    <FormControl fullWidth size="small">
+                    <FormControl className={classes.formControl} fullWidth>
+                        <InputLabel id="operatingUnitUIN-label">Operating Unit</InputLabel>
                         <Select
+                            labelId="operatingUnitUIN-label"
+                            id="operatingUnitUIN"
+                            name="operatingUnitUIN"
+                            label="Operating Unit"
                             multiple
                             value={operatingUnitUINs}
                             onChange={handleOperatingUnitChange}
-                            input={<OutlinedInput />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {(selected as string[]).length === 0 ? (
@@ -196,15 +281,6 @@ export const TopFormSection = ({
                                     )}
                                 </Box>
                             )}
-                            displayEmpty
-                            sx={{
-                                backgroundColor: 'white',
-                                '& .MuiSelect-select': {
-                                    minHeight: '20px',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }
-                            }}
                             MenuProps={{
                                 PaperProps: {
                                     style: {
@@ -243,33 +319,38 @@ export const TopFormSection = ({
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Treaty Start Date</FieldLabel>
                     <DatePicker
-                        label=""
+                        label="Start Date"
                         value={treatyStartDate}
                         onChange={onTreatyStartDateChange}
                         renderInput={(params: any) => (
-                            <TextField {...params} size="small" fullWidth sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                            <TextField {...params} id="treatyStartDate" fullWidth className={classes.textField} />
                         )}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Treaty End Date</FieldLabel>
                     <DatePicker
-                        label=""
+                        label="End Date"
                         value={treatyEndDate}
                         onChange={onTreatyEndDateChange}
                         renderInput={(params: any) => (
-                            <TextField {...params} size="small" fullWidth sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                            <TextField {...params} id="treatyEndDate" fullWidth className={classes.textField} />
                         )}
                     />
                 </Grid>
             </Grid>
             <Grid container spacing={3} sx={{ mt: 0.5 }}>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FieldLabel>Currency</FieldLabel>
-                    <FormControl fullWidth size="small">
-                        <Select value={currency} onChange={(e) => onCurrencyChange(e.target.value)} sx={{ backgroundColor: 'white' }}>
+                    <FormControl className={classes.formControl} fullWidth>
+                        <InputLabel id="currency-label">Currency</InputLabel>
+                        <Select
+                            labelId="currency-label"
+                            id="currency"
+                            name="currency"
+                            label="Currency"
+                            value={currency}
+                            onChange={(e) => onCurrencyChange(e.target.value)}
+                        >
                             <MenuItem value="USD">USD</MenuItem>
                             <MenuItem value="EUR">EUR</MenuItem>
                             <MenuItem value="GBP">GBP</MenuItem>
@@ -278,6 +359,6 @@ export const TopFormSection = ({
                     </FormControl>
                 </Grid>
             </Grid>
-        </Card>
+        </Card >
     );
 };
