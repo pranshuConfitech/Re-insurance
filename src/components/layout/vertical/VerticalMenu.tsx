@@ -68,9 +68,18 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-fill' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href="/dashboards" icon={<i className="ri-home-smile-line" />}>
-          Dashboards
-        </MenuItem>
+        <SubMenu label="Dashboards" icon={<i className="ri-home-smile-line" />}>
+          <MenuItem href="/dashboards">CRM Dashboard</MenuItem>
+          <MenuItem href="/reinsurance/dashboard">Reinsurance Portfolio</MenuItem>
+          <MenuItem href="/reinsurance/treaty-performance">Treaty Performance</MenuItem>
+          <MenuItem href="/reinsurance/underwriting-performance">Underwriting Performance</MenuItem>
+          <MenuItem href="/reinsurance/facultative-placement">Facultative Placement</MenuItem>
+          <MenuItem href="/reinsurance/claims-recoveries">Claims & Recoveries</MenuItem>
+          <MenuItem href="/reinsurance/finance-accounting">Finance & Accounting</MenuItem>
+          <MenuItem href="/reinsurance/actuarial-risk">Actuarial & Risk Exposure</MenuItem>
+          <MenuItem href="/reinsurance/compliance-controls">Compliance & Controls</MenuItem>
+          <MenuItem href="/reinsurance/marketing">Insurance Marketing</MenuItem>
+        </SubMenu>
         <SubMenu label="Master Data" icon={<i className="ri-database-2-line" />}>
           <MenuItem href="/masters/insurance-config/basic-details">Insurance Details</MenuItem>
           <MenuItem href="/masters/insurance-config/address-config">Address Config</MenuItem>
