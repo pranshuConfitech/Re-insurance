@@ -127,22 +127,17 @@ const ClaimsRecoveriesDashboard = () => {
     ];
 
     return (
-        <Box sx={{
-            backgroundColor: '#f8fafc',
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 25%, #f8fafc 50%, #f1f5f9 75%, #e2e8f0 100%)',
-            p: { xs: 2, sm: 3, md: 4 }
-        }}>
+        <Box>
 
             {/* ================= HEADER ================= */}
             <Box sx={{
-                mb: 4,
+                mb: 3,
                 display: 'flex',
                 flexDirection: { xs: 'column', md: 'row' },
                 justifyContent: 'space-between',
                 alignItems: { xs: 'flex-start', md: 'center' },
-                gap: 3,
-                p: { xs: 3, md: 4 },
+                gap: 2,
+                p: 3,
                 background: '#e91e63',
                 borderRadius: '8px',
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
@@ -175,7 +170,7 @@ const ClaimsRecoveriesDashboard = () => {
                 </Typography>
             </Box>
 
-            <Box sx={{ px: { xs: 0, sm: 2, md: 3 } }}>
+            <Box sx={{ p: 3 }}>
                 {/* ================= FILTERS ================= */}
                 <Grid container spacing={2} mb={4}>
                     <Grid item>

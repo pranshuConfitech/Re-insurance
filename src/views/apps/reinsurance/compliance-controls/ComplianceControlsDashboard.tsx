@@ -298,21 +298,16 @@ const ComplianceControlsDashboard = () => {
     const statusInfo = getComplianceStatusInfo();
 
     return (
-        <Box sx={{
-            backgroundColor: '#f8fafc',
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 25%, #f8fafc 50%, #f1f5f9 75%, #e2e8f0 100%)',
-            p: { xs: 2, sm: 3, md: 4 }
-        }}>
+        <Box>
             {/* Header */}
             <Box sx={{
-                mb: 4,
+                mb: 3,
                 display: 'flex',
                 flexDirection: { xs: 'column', md: 'row' },
                 justifyContent: 'space-between',
                 alignItems: { xs: 'flex-start', md: 'center' },
-                gap: 3,
-                p: { xs: 3, md: 4 },
+                gap: 2,
+                p: 3,
                 background: '#e91e63',
                 borderRadius: '8px',
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
@@ -344,12 +339,32 @@ const ComplianceControlsDashboard = () => {
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: 'rgba(255, 255, 255, 0.15)',
                             borderRadius: '8px',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(255, 255, 255, 0.3)'
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                            },
+                            '&.Mui-focused': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
                             }
                         },
                         '& .MuiInputLabel-root': {
-                            color: 'rgba(255, 255, 255, 0.8)'
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            '&.Mui-focused': {
+                                color: 'white'
+                            }
+                        },
+                        '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.5) !important'
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.5) !important'
+                        },
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'white !important',
+                            borderWidth: '2px'
                         }
                     }}>
                         <InputLabel>Regulator</InputLabel>
@@ -384,16 +399,33 @@ const ComplianceControlsDashboard = () => {
                                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
                                 borderRadius: '8px',
                                 color: 'white',
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(255, 255, 255, 0.3)'
+                                transition: 'all 0.2s ease-in-out',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                                },
+                                '&.Mui-focused': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
                                 }
+                            },
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(255, 255, 255, 0.5) !important'
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(255, 255, 255, 0.5) !important'
+                            },
+                            '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'white !important',
+                                borderWidth: '2px'
                             }
                         }}
                     />
                 </Box>
             </Box>
 
-            <Box sx={{ px: { xs: 0, sm: 2, md: 3 } }}>
+            <Box sx={{ p: 3 }}>
                 {/* KPI Cards */}
                 <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 4 }}>
                     {[

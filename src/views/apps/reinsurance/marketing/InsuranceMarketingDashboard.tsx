@@ -285,12 +285,7 @@ const InsuranceMarketingDashboard = () => {
     }
 
     return (
-        <Box sx={{
-            backgroundColor: '#f8fafc',
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 25%, #f8fafc 50%, #f1f5f9 75%, #e2e8f0 100%)',
-            p: 3
-        }}>
+        <Box>
             {/* Header */}
             <Box sx={{
                 mb: 3,
@@ -510,7 +505,7 @@ const InsuranceMarketingDashboard = () => {
                 </Box>
             </Box>
 
-            <Box sx={{ px: 0 }}>
+            <Box sx={{ p: 3 }}>
                 {/* KPI Cards */}
                 <Grid container spacing={2} sx={{ mb: 3 }}>
                     {[
