@@ -1,7 +1,11 @@
-import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, Button, IconButton } from '@mui/material';
+import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, Button, IconButton, InputLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FieldLabel } from './FieldLabel';
+import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
+
+const commonMastersService = new CommonMastersService();
 
 interface Reinsurer {
     id: string;
@@ -44,10 +48,145 @@ interface RiskScoreLayersSectionProps {
     onLayerChange: (blockId: string, layerId: string, field: string, value: string) => void;
 }
 
+const useStyles = makeStyles((theme: any) => ({
+    formControl: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    },
+    textField: {
+        width: '100%',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
+            },
+            '&.Mui-focused': {
+                boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+            }
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#D80E51'
+        },
+        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#D80E51',
+            borderWidth: '2px'
+        }
+    }
+}));
+
 export const RiskScoreLayersSection = ({
     layerLines, blockId,
     onAddLayer, onDeleteLayer, onLayerChange
 }: RiskScoreLayersSectionProps) => {
+    const classes = useStyles();
+
+    // State for API dropdown data
+    const [productLobOptions, setProductLobOptions] = useState<any[]>([]);
+    const [accountingLobOptions, setAccountingLobOptions] = useState<any[]>([]);
+    const [riskCategoryOptions, setRiskCategoryOptions] = useState<any[]>([]);
+    const [loadingProductLob, setLoadingProductLob] = useState(false);
+    const [loadingAccountingLob, setLoadingAccountingLob] = useState(false);
+    const [loadingRiskCategory, setLoadingRiskCategory] = useState(false);
+
+    // Fetch Product LOB options from API
+    useEffect(() => {
+        setLoadingProductLob(true);
+        commonMastersService.getProductLobOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setProductLobOptions(response.content);
+                }
+                setLoadingProductLob(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Product LOB options:', error);
+                setLoadingProductLob(false);
+                // Fallback to hardcoded values
+                setProductLobOptions([
+                    { commonCode: 'PROPERTY', commonDesc: 'Property' },
+                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
+                    { commonCode: 'MARINE', commonDesc: 'Marine' },
+                    { commonCode: 'AVIATION', commonDesc: 'Aviation' },
+                    { commonCode: 'FIRE', commonDesc: 'Fire' },
+                    { commonCode: 'Fire', commonDesc: 'Fire' },
+                    { commonCode: 'Marine', commonDesc: 'Marine' },
+                    { commonCode: 'Motor', commonDesc: 'Motor' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Accounting LOB options from API
+    useEffect(() => {
+        setLoadingAccountingLob(true);
+        commonMastersService.getAccountingLobOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setAccountingLobOptions(response.content);
+                }
+                setLoadingAccountingLob(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Accounting LOB options:', error);
+                setLoadingAccountingLob(false);
+                // Fallback to hardcoded values
+                setAccountingLobOptions([
+                    { commonCode: 'PROP', commonDesc: 'Property' },
+                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
+                    { commonCode: 'MARINE', commonDesc: 'Marine' },
+                    { commonCode: 'AVIATION', commonDesc: 'Aviation' },
+                    { commonCode: 'FIRE', commonDesc: 'Fire' },
+                    { commonCode: 'Fire', commonDesc: 'Fire' },
+                    { commonCode: 'Marine', commonDesc: 'Marine' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Risk Category options from API
+    useEffect(() => {
+        setLoadingRiskCategory(true);
+        commonMastersService.getRiskCategoryOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setRiskCategoryOptions(response.content);
+                }
+                setLoadingRiskCategory(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Risk Category options:', error);
+                setLoadingRiskCategory(false);
+                // Fallback to hardcoded values
+                setRiskCategoryOptions([
+                    { commonCode: 'HIGH', commonDesc: 'High' },
+                    { commonCode: 'MEDIUM', commonDesc: 'Medium' },
+                    { commonCode: 'LOW', commonDesc: 'Low' },
+                    { commonCode: 'PROPERTY', commonDesc: 'Property' },
+                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
+                    { commonCode: 'CAT', commonDesc: 'Catastrophe' },
+                    { commonCode: 'Comm', commonDesc: 'Commercial' },
+                    { commonCode: 'Residential', commonDesc: 'Residential' }
+                ]);
+            }
+        });
+    }, []);
     return (
         <Box sx={{
             backgroundColor: '#f8f9fa',
@@ -133,171 +272,213 @@ export const RiskScoreLayersSection = ({
                         <Grid container spacing={3}>
                             {/* Row 1 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Product LOB</FieldLabel>
-                                <FormControl fullWidth size="small">
-                                    <Select value={layer.productLOB} onChange={(e) => onLayerChange(blockId, layer.id, 'productLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="PROPERTY">Property</MenuItem>
-                                        <MenuItem value="CASUALTY">Casualty</MenuItem>
-                                        <MenuItem value="MARINE">Marine</MenuItem>
-                                        <MenuItem value="AVIATION">Aviation</MenuItem>
-                                        <MenuItem value="FIRE">Fire</MenuItem>
-                                        <MenuItem value="Fire">Fire</MenuItem>
-                                        <MenuItem value="Marine">Marine</MenuItem>
-                                        <MenuItem value="Motor">Motor</MenuItem>
-                                        {layer.productLOB && !['', 'PROPERTY', 'CASUALTY', 'MARINE', 'AVIATION', 'FIRE', 'Fire', 'Marine', 'Motor'].includes(layer.productLOB) && (
-                                            <MenuItem value={layer.productLOB}>{layer.productLOB}</MenuItem>
-                                        )}
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`productLOB-label-${layer.id}`}>Product LOB</InputLabel>
+                                    <Select
+                                        labelId={`productLOB-label-${layer.id}`}
+                                        id={`productLOB-${layer.id}`}
+                                        name="productLOB"
+                                        label="Product LOB"
+                                        value={layer.productLOB}
+                                        onChange={(e) => onLayerChange(blockId, layer.id, 'productLOB', e.target.value)}
+                                        disabled={loadingProductLob}
+                                    >
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingProductLob ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {productLobOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Product Code</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.productCode} onChange={(e) => onLayerChange(blockId, layer.id, 'productCode', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField
+                                    id={`productCode-${layer.id}`}
+                                    name="productCode"
+                                    label="Product Code"
+                                    fullWidth
+                                    value={layer.productCode}
+                                    onChange={(e) => onLayerChange(blockId, layer.id, 'productCode', e.target.value)}
+                                    className={classes.textField}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Accounting LOB</FieldLabel>
-                                <FormControl fullWidth size="small">
-                                    <Select value={layer.accountingLOB} onChange={(e) => onLayerChange(blockId, layer.id, 'accountingLOB', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="PROP">Property</MenuItem>
-                                        <MenuItem value="CASUALTY">Casualty</MenuItem>
-                                        <MenuItem value="MARINE">Marine</MenuItem>
-                                        <MenuItem value="AVIATION">Aviation</MenuItem>
-                                        <MenuItem value="FIRE">Fire</MenuItem>
-                                        <MenuItem value="Fire">Fire</MenuItem>
-                                        <MenuItem value="Marine">Marine</MenuItem>
-                                        {layer.accountingLOB && !['', 'PROP', 'CASUALTY', 'MARINE', 'AVIATION', 'FIRE', 'Fire', 'Marine'].includes(layer.accountingLOB) && (
-                                            <MenuItem value={layer.accountingLOB}>{layer.accountingLOB}</MenuItem>
-                                        )}
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`accountingLOB-label-${layer.id}`}>Accounting LOB</InputLabel>
+                                    <Select
+                                        labelId={`accountingLOB-label-${layer.id}`}
+                                        id={`accountingLOB-${layer.id}`}
+                                        name="accountingLOB"
+                                        label="Accounting LOB"
+                                        value={layer.accountingLOB}
+                                        onChange={(e) => onLayerChange(blockId, layer.id, 'accountingLOB', e.target.value)}
+                                        disabled={loadingAccountingLob}
+                                    >
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingAccountingLob ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {accountingLobOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Risk Category</FieldLabel>
-                                <FormControl fullWidth size="small">
-                                    <Select value={layer.riskCategory} onChange={(e) => onLayerChange(blockId, layer.id, 'riskCategory', e.target.value)} displayEmpty sx={{ backgroundColor: 'white' }}>
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="HIGH">High</MenuItem>
-                                        <MenuItem value="MEDIUM">Medium</MenuItem>
-                                        <MenuItem value="LOW">Low</MenuItem>
-                                        <MenuItem value="PROPERTY">Property</MenuItem>
-                                        <MenuItem value="CASUALTY">Casualty</MenuItem>
-                                        <MenuItem value="CAT">Catastrophe</MenuItem>
-                                        <MenuItem value="Comm">Commercial</MenuItem>
-                                        <MenuItem value="Residential">Residential</MenuItem>
-                                        {layer.riskCategory && !['', 'HIGH', 'MEDIUM', 'LOW', 'PROPERTY', 'CASUALTY', 'CAT', 'Comm', 'Residential'].includes(layer.riskCategory) && (
-                                            <MenuItem value={layer.riskCategory}>{layer.riskCategory}</MenuItem>
-                                        )}
+                                <FormControl className={classes.formControl} fullWidth>
+                                    <InputLabel id={`riskCategory-label-${layer.id}`}>Risk Category</InputLabel>
+                                    <Select
+                                        labelId={`riskCategory-label-${layer.id}`}
+                                        id={`riskCategory-${layer.id}`}
+                                        name="riskCategory"
+                                        label="Risk Category"
+                                        value={layer.riskCategory}
+                                        onChange={(e) => onLayerChange(blockId, layer.id, 'riskCategory', e.target.value)}
+                                        disabled={loadingRiskCategory}
+                                    >
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingRiskCategory ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {riskCategoryOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
 
                             {/* Row 2 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Risk Grade</FieldLabel>
-                                <TextField fullWidth size="small" value={layer.riskGrade} onChange={(e) => onLayerChange(blockId, layer.id, 'riskGrade', e.target.value)} sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }} />
+                                <TextField
+                                    id={`riskGrade-${layer.id}`}
+                                    name="riskGrade"
+                                    label="Risk Grade"
+                                    fullWidth
+                                    value={layer.riskGrade}
+                                    onChange={(e) => onLayerChange(blockId, layer.id, 'riskGrade', e.target.value)}
+                                    className={classes.textField}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Loss Occur Deductibility</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`lossOccurDeductibility-${layer.id}`}
+                                    name="lossOccurDeductibility"
+                                    label="Loss Occur Deductibility"
                                     type="number"
+                                    fullWidth
                                     value={layer.lossOccurDeductibility}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'lossOccurDeductibility', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Loss Limit</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`lossLimit-${layer.id}`}
+                                    name="lossLimit"
+                                    label="Loss Limit"
                                     type="number"
+                                    fullWidth
                                     value={layer.lossLimit}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'lossLimit', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Share Of Occurrence Deduction</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`shareOfOccurrenceDeduction-${layer.id}`}
+                                    name="shareOfOccurrenceDeduction"
+                                    label="Share Of Occurrence Deduction"
                                     type="number"
+                                    fullWidth
                                     value={layer.shareOfOccurrenceDeduction}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'shareOfOccurrenceDeduction', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
 
                             {/* Row 3 - 4 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Available Reinstated SI</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`availableReinstatedSI-${layer.id}`}
+                                    name="availableReinstatedSI"
+                                    label="Available Reinstated SI"
                                     type="number"
+                                    fullWidth
                                     value={layer.availableReinstatedSI}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'availableReinstatedSI', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Annual Agg Limit (Zone)</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`annualAggLimit-${layer.id}`}
+                                    name="annualAggLimit"
+                                    label="Annual Agg Limit (Zone)"
                                     type="number"
+                                    fullWidth
                                     value={layer.annualAggLimit}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'annualAggLimit', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Shared Agg Limit (Zone)</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`annualAggAmount-${layer.id}`}
+                                    name="annualAggAmount"
+                                    label="Shared Agg Limit (Zone)"
                                     type="number"
+                                    fullWidth
                                     value={layer.annualAggAmount}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'annualAggAmount', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Agg Claim Amount</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`aggClaimAmount-${layer.id}`}
+                                    name="aggClaimAmount"
+                                    label="Agg Claim Amount"
                                     type="number"
+                                    fullWidth
                                     value={layer.aggClaimAmount}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'aggClaimAmount', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
 
                             {/* Row 4 - 2 fields */}
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Local Native Layer</FieldLabel>
                                 <TextField
+                                    id={`localNativeLayer-${layer.id}`}
+                                    name="localNativeLayer"
+                                    label="Local Native Layer"
                                     fullWidth
-                                    size="small"
                                     value={layer.localNativeLayer}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'localNativeLayer', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldLabel>Transaction Limit Ccy</FieldLabel>
                                 <TextField
-                                    fullWidth
-                                    size="small"
+                                    id={`transactionLimitCcy-${layer.id}`}
+                                    name="transactionLimitCcy"
+                                    label="Transaction Limit Ccy"
                                     type="number"
+                                    fullWidth
                                     value={layer.transactionLimitCcy}
                                     onChange={(e) => onLayerChange(blockId, layer.id, 'transactionLimitCcy', e.target.value)}
-                                    sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'white' } }}
+                                    className={classes.textField}
                                 />
                             </Grid>
                         </Grid>

@@ -148,6 +148,7 @@ export const PreviewPage = ({ formValues }: PreviewPageProps) => {
                                 <Grid item xs={12} sm={6} md={3}>
                                     <InfoRow label="Cash Call Limit" value={line.cashCallLimit} />
                                     <InfoRow label="Alert Days" value={line.alertDays} />
+                                    <InfoRow label="Treaty Commission (%)" value={line.riskCommission} />
                                 </Grid>
                             </Grid>
                         </Paper>

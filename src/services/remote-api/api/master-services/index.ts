@@ -5,6 +5,7 @@ export * from "./benefit.service";
 export * from "./cardtype.services";
 export * from "./category.service";
 export * from "./cleint.type.service";
+export * from "./common.masters.service";
 export * from "./country.service";
 export * from "./currency.service";
 export * from "./denomination.service";

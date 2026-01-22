@@ -1,5 +1,9 @@
 import { Grid, TextField, FormControl, Select, MenuItem, Box, InputLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
+
+const commonMastersService = new CommonMastersService();
 
 interface RiskLimitLine {
     id: string;
@@ -19,6 +23,7 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
+    riskCommission: string;
     reinsurers: any[];
     brokers: any[];
 }
@@ -96,6 +101,86 @@ const useStyles = makeStyles((theme: any) => ({
 
 export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyFormFieldsProps) => {
     const classes = useStyles();
+
+    // State for API dropdown data
+    const [riGradedOptions, setRiGradedOptions] = useState<any[]>([]);
+    const [installmentOptions, setInstallmentOptions] = useState<any[]>([]);
+    const [processingMethodOptions, setProcessingMethodOptions] = useState<any[]>([]);
+    const [loadingRiGraded, setLoadingRiGraded] = useState(false);
+    const [loadingInstallment, setLoadingInstallment] = useState(false);
+    const [loadingProcessingMethod, setLoadingProcessingMethod] = useState(false);
+
+    // Fetch RI Graded options from API
+    useEffect(() => {
+        setLoadingRiGraded(true);
+        commonMastersService.getRiGradedOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setRiGradedOptions(response.content);
+                }
+                setLoadingRiGraded(false);
+            },
+            error: (error) => {
+                console.error('Error fetching RI Graded options:', error);
+                setLoadingRiGraded(false);
+                // Fallback to hardcoded values
+                setRiGradedOptions([
+                    { commonCode: 'No', commonDesc: 'No' },
+                    { commonCode: 'Yes', commonDesc: 'Yes' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Installment options from API
+    useEffect(() => {
+        setLoadingInstallment(true);
+        commonMastersService.getInstallmentOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setInstallmentOptions(response.content);
+                }
+                setLoadingInstallment(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Installment options:', error);
+                setLoadingInstallment(false);
+                // Fallback to hardcoded values
+                setInstallmentOptions([
+                    { commonCode: 'Monthly', commonDesc: 'Monthly' },
+                    { commonCode: 'Quarterly', commonDesc: 'Quarterly' },
+                    { commonCode: 'Semi-Annual', commonDesc: 'Semi-Annual' },
+                    { commonCode: 'Annual', commonDesc: 'Annual' },
+                    { commonCode: 'M', commonDesc: 'M' },
+                    { commonCode: 'Q', commonDesc: 'Q' },
+                    { commonCode: 'S', commonDesc: 'S' },
+                    { commonCode: 'A', commonDesc: 'A' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Processing Method options from API
+    useEffect(() => {
+        setLoadingProcessingMethod(true);
+        commonMastersService.getProcessingMethodOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setProcessingMethodOptions(response.content);
+                }
+                setLoadingProcessingMethod(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Processing Method options:', error);
+                setLoadingProcessingMethod(false);
+                // Fallback to hardcoded values
+                setProcessingMethodOptions([
+                    { commonCode: 'Clean Cut', commonDesc: 'Clean Cut' },
+                    { commonCode: 'Run Off', commonDesc: 'Run Off' }
+                ]);
+            }
+        });
+    }, []);
 
     const handleChange = (field: string, value: string) => {
         onTreatyChange(blockId, field, value);
@@ -192,10 +277,18 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="RI Graded Ret"
                         value={treaty.riGradedRet}
                         onChange={(e) => handleChange('riGradedRet', e.target.value)}
+                        disabled={loadingRiGraded}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="No">No</MenuItem>
-                        <MenuItem value="Yes">Yes</MenuItem>
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingRiGraded ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {riGradedOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -247,16 +340,18 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="Installment"
                         value={treaty.installment}
                         onChange={(e) => handleChange('installment', e.target.value)}
+                        disabled={loadingInstallment}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Monthly">Monthly</MenuItem>
-                        <MenuItem value="Quarterly">Quarterly</MenuItem>
-                        <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
-                        <MenuItem value="Annual">Annual</MenuItem>
-                        <MenuItem value="M">M</MenuItem>
-                        <MenuItem value="Q">Q</MenuItem>
-                        <MenuItem value="S">S</MenuItem>
-                        <MenuItem value="A">A</MenuItem>
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingInstallment ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {installmentOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -270,10 +365,18 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="Processing Portfolio Method"
                         value={treaty.processingPortfolioMethod}
                         onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)}
+                        disabled={loadingProcessingMethod}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Clean Cut">Clean Cut</MenuItem>
-                        <MenuItem value="Run Off">Run Off</MenuItem>
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingProcessingMethod ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {processingMethodOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>

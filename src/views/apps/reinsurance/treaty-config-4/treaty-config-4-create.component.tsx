@@ -91,17 +91,18 @@ function createEmptyRiskLimitLine(id: string): RiskLimitLine {
         retentionGrossNet: '', surplusCapacity: '', capacityCalculateInXL: '',
         perRiskRecoveryLimit: '', eventLimit: '', cashCallLimit: '',
         lossAdviceLimit: '', premiumPaymentWarranty: '', alertDays: '',
+        riskCommission: '',
         reinsurers: [],
         brokers: []
     };
 }
 
 function createEmptyReinsurer(id: string): Reinsurer {
-    return { id, reinsurer: '', share: '' };
+    return { id, reinsurer: '', reinsurerCode: '', share: '' };
 }
 
 function createEmptyBroker(id: string): Broker {
-    return { id, broker: '', share: '', reinsurers: [] };
+    return { id, broker: '', brokerCode: '', share: '', reinsurers: [] };
 }
 
 function createEmptyNonProportionalTreaty(id: string): NonProportionalTreaty {
@@ -148,12 +149,14 @@ const getInitialValues = (isEditMode: boolean) => ({
 interface Reinsurer {
     id: string;
     reinsurer: string;
+    reinsurerCode?: string;
     share: string;
 }
 
 interface Broker {
     id: string;
     broker: string;
+    brokerCode?: string;
     share: string;
     reinsurers: Reinsurer[];
 }
@@ -176,6 +179,7 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
+    riskCommission: string;
     reinsurers: Reinsurer[];
     brokers: Broker[];
 }
@@ -269,6 +273,10 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     const [activeStep, setActiveStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // State for API participant data
+    const [apiReinsurers, setApiReinsurers] = useState<any[]>([]);
+    const [apiBrokers, setApiBrokers] = useState<any[]>([]);
+
     const steps = ['Basic Detail', 'Treaty Details', 'Risk & Limits Details', 'Participants Reinsurance', 'Special Condition', 'Preview & Submit'];
 
     // Formik form management
@@ -290,6 +298,43 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             fetchPortfolioData(editId);
         }
     }, [editId, isEditMode]);
+
+    // Fetch API participant data
+    useEffect(() => {
+        // Fetch reinsurers
+        reinsuranceService.getReinsurers({
+            page: 0,
+            size: 100,
+            summary: true,
+            active: true
+        }).subscribe({
+            next: (response) => {
+                if (response && response.content && Array.isArray(response.content)) {
+                    setApiReinsurers(response.content);
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching reinsurers for codes:', error);
+            }
+        });
+
+        // Fetch brokers
+        reinsuranceService.getBrokers({
+            page: 0,
+            size: 100,
+            summary: true,
+            active: true
+        }).subscribe({
+            next: (response) => {
+                if (response && response.content && Array.isArray(response.content)) {
+                    setApiBrokers(response.content);
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching brokers for codes:', error);
+            }
+        });
+    }, []);
 
     const fetchPortfolioData = (id: string) => {
         setLoading(true);
@@ -517,6 +562,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 lossAdviceLimit: String(risk.lossAdviceLimit ?? ''),
                 premiumPaymentWarranty: risk.premiumPaymentWarranty || '',
                 alertDays: String(risk.alertDays ?? ''),
+                riskCommission: String(risk.riskCommission ?? ''),
                 reinsurers: [],
                 brokers: []
             };
@@ -600,6 +646,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             .map((alloc: any, index: number) => ({
                 id: String(alloc.id || index + 1),
                 reinsurer: alloc.participantName || '',
+                reinsurerCode: alloc.participantCode || '',
                 share: String(alloc.sharePercent ?? '')
             }));
 
@@ -617,6 +664,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 alloc.brokerBreakdowns.map((bd: any, bdIndex: number) => ({
                     id: String(bd.id || bdIndex + 1),
                     broker: bd.reinsurerName || '',
+                    brokerCode: '', // Broker breakdowns don't have codes in this structure
                     share: String(bd.sharePercent ?? ''),
                     reinsurers: []
                 }))
@@ -628,10 +676,12 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             .map((alloc: any, index: number) => ({
                 id: String(alloc.id || index + 1),
                 broker: alloc.participantName || '',
+                brokerCode: alloc.participantCode || '',
                 share: String(alloc.sharePercent ?? ''),
                 reinsurers: (alloc.brokerBreakdowns || []).map((bd: any, bdIndex: number) => ({
                     id: String(bd.id || bdIndex + 1),
                     reinsurer: bd.reinsurerName || '',
+                    reinsurerCode: '', // Broker breakdowns don't have reinsurer codes
                     share: String(bd.sharePercent ?? '')
                 }))
             }));
@@ -1344,6 +1394,25 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
         return true; // Always allow proceeding to next step
     };
 
+    // Helper function to get participant codes from API data
+    const getParticipantCode = (participantName: string, participantType: 'REINSURER' | 'BROKER'): string => {
+        if (!participantName || !participantName.trim()) {
+            return '';
+        }
+
+        if (participantType === 'REINSURER') {
+            const reinsurer = apiReinsurers.find(r =>
+                r.reinsurerName === participantName || r.reinsurerCode === participantName
+            );
+            return reinsurer?.reinsurerCode || `RE-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+        } else {
+            const broker = apiBrokers.find(b =>
+                b.brokerName === participantName || b.brokerCode === participantName
+            );
+            return broker?.brokerCode || `BRK-${String(Math.floor(Math.random() * 1000)).padStart(4, '0')}`;
+        }
+    };
+
     const buildPayload = () => {
         console.log('buildPayload called');
         const {
@@ -1414,18 +1483,21 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                         cashCallLimit: parseFloat(line.cashCallLimit) || 0,
                         lossAdviceLimit: parseFloat(line.lossAdviceLimit) || 0,
                         premiumPaymentWarranty: line.premiumPaymentWarranty || 'YES',
-                        alertDays: parseInt(line.alertDays) || 0
+                        alertDays: parseInt(line.alertDays) || 0,
+                        riskCommission: parseFloat(line.riskCommission) || 0
                     })),
                     nonpropLayers: [],
                     portfolioTreatyAllocations: [
                         ...treaty.reinsurers.map((r, rIndex) => ({
                             participantType: 'REINSURER',
                             participantName: r.reinsurer,
+                            participantCode: getParticipantCode(r.reinsurer, 'REINSURER'),
                             sharePercent: parseFloat(r.share) || 0
                         })),
                         ...treaty.brokers.map((b, bIndex) => ({
                             participantType: 'BROKER',
                             participantName: b.broker,
+                            participantCode: getParticipantCode(b.broker, 'BROKER'),
                             sharePercent: parseFloat(b.share) || 0,
                             brokerBreakdowns: b.reinsurers.map((br, brIndex) => ({
                                 reinsurerName: br.reinsurer,
@@ -1523,6 +1595,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 .map((r, rIndex) => ({
                                     participantType: 'REINSURER',
                                     participantName: r.reinsurer,
+                                    participantCode: getParticipantCode(r.reinsurer, 'REINSURER'),
                                     sharePercent: parseFloat(r.share) || 0
                                 }))
                         ),
@@ -1533,6 +1606,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                 .map((b, bIndex) => ({
                                     participantType: 'BROKER',
                                     participantName: b.broker,
+                                    participantCode: getParticipantCode(b.broker, 'BROKER'),
                                     sharePercent: parseFloat(b.share) || 0,
                                     brokerBreakdowns: (b.reinsurers || [])
                                         .filter(br => br.reinsurer && br.reinsurer.trim() !== '')

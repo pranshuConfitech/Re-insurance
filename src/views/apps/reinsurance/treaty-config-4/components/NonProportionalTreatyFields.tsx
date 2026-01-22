@@ -1,5 +1,9 @@
 import { Grid, TextField, FormControl, Select, MenuItem, Box, InputLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
+
+const commonMastersService = new CommonMastersService();
 
 interface NonProportionalTreaty {
     treatyCode: string;
@@ -82,6 +86,61 @@ const useStyles = makeStyles((theme: any) => ({
 
 export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }: NonProportionalTreatyFieldsProps) => {
     const classes = useStyles();
+
+    // State for API dropdown data
+    const [currencies, setCurrencies] = useState<any[]>([]);
+    const [processingMethodOptions, setProcessingMethodOptions] = useState<any[]>([]);
+    const [loadingCurrencies, setLoadingCurrencies] = useState(false);
+    const [loadingProcessingMethod, setLoadingProcessingMethod] = useState(false);
+
+    // Fetch currencies from API
+    useEffect(() => {
+        setLoadingCurrencies(true);
+        commonMastersService.getCurrencies().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setCurrencies(response.content);
+                }
+                setLoadingCurrencies(false);
+            },
+            error: (error) => {
+                console.error('Error fetching currencies:', error);
+                setLoadingCurrencies(false);
+                // Fallback to hardcoded values
+                setCurrencies([
+                    { commonCode: 'USD', commonDesc: 'USD' },
+                    { commonCode: 'EUR', commonDesc: 'EUR' },
+                    { commonCode: 'GBP', commonDesc: 'GBP' },
+                    { commonCode: 'JPY', commonDesc: 'JPY' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Processing Method options from API
+    useEffect(() => {
+        setLoadingProcessingMethod(true);
+        commonMastersService.getProcessingMethodOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setProcessingMethodOptions(response.content);
+                }
+                setLoadingProcessingMethod(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Processing Method options:', error);
+                setLoadingProcessingMethod(false);
+                // Fallback to hardcoded values
+                setProcessingMethodOptions([
+                    { commonCode: 'Clean Cut', commonDesc: 'Clean Cut' },
+                    { commonCode: 'Run Off', commonDesc: 'Run Off' },
+                    { commonCode: 'AUTO', commonDesc: 'Clean Cut' },
+                    { commonCode: 'SYSTEM', commonDesc: 'Clean Cut' },
+                    { commonCode: 'STANDARD', commonDesc: 'Clean Cut' }
+                ]);
+            }
+        });
+    }, []);
 
     const handleChange = (field: string, value: string) => {
         onTreatyChange(blockId, field, value);
@@ -260,12 +319,18 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         label="Treaty Currency"
                         value={treaty.treatyCurrency}
                         onChange={(e) => handleChange('treatyCurrency', e.target.value)}
+                        disabled={loadingCurrencies}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="USD">USD</MenuItem>
-                        <MenuItem value="EUR">EUR</MenuItem>
-                        <MenuItem value="GBP">GBP</MenuItem>
-                        <MenuItem value="JPY">JPY</MenuItem>
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingCurrencies ? 'Loading currencies...' : 'Select Currency...'}
+                            </em>
+                        </MenuItem>
+                        {currencies.map((curr) => (
+                            <MenuItem key={curr.commonCode || curr.commonDesc} value={curr.commonCode || curr.commonDesc}>
+                                {curr.commonDesc || curr.commonCode}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -501,16 +566,18 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         label="Processing Portfolio Method"
                         value={treaty.processingPortfolioMethod}
                         onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)}
+                        disabled={loadingProcessingMethod}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Clean Cut">Clean Cut</MenuItem>
-                        <MenuItem value="Run Off">Run Off</MenuItem>
-                        <MenuItem value="AUTO">Clean Cut</MenuItem>
-                        <MenuItem value="SYSTEM">Clean Cut</MenuItem>
-                        <MenuItem value="STANDARD">Clean Cut</MenuItem>
-                        {treaty.processingPortfolioMethod && !['', 'Clean Cut', 'Run Off', 'AUTO', 'SYSTEM', 'STANDARD'].includes(treaty.processingPortfolioMethod) && (
-                            <MenuItem value={treaty.processingPortfolioMethod}>{treaty.processingPortfolioMethod}</MenuItem>
-                        )}
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingProcessingMethod ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {processingMethodOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
