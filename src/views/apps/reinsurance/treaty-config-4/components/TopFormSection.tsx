@@ -1,7 +1,11 @@
-import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid, Typography, Checkbox, ListItemText, InputLabel } from '@mui/material';
+import { Box, Card, FormControl, Select, MenuItem, TextField, Button, Chip, Grid, Typography, Checkbox, ListItemText, InputLabel, Autocomplete } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import AddIcon from '@mui/icons-material/Add';
 import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
+
+const commonMastersService = new CommonMastersService();
 
 interface TopFormSectionProps {
     portfolio: string;
@@ -91,14 +95,60 @@ export const TopFormSection = ({
 }: TopFormSectionProps) => {
     const classes = useStyles();
 
-    // Combine predefined units with any custom units from the data
-    const allOperatingUnits = [...new Set([...OPERATING_UNITS, ...operatingUnitUINs])];
+    // State for API dropdown data
+    const [currencies, setCurrencies] = useState<any[]>([]);
+    const [operatingUnits, setOperatingUnits] = useState<any[]>([]);
+    const [loadingCurrencies, setLoadingCurrencies] = useState(false);
+    const [loadingOperatingUnits, setLoadingOperatingUnits] = useState(false);
 
-    const handleOperatingUnitChange = (event: any) => {
-        const value = event.target.value;
-        const newSelection = typeof value === 'string' ? value.split(',') : value;
-        onOperatingUnitUINsChange(newSelection);
-    };
+    // Fetch currencies from API
+    useEffect(() => {
+        setLoadingCurrencies(true);
+        commonMastersService.getCurrencies().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setCurrencies(response.content);
+                }
+                setLoadingCurrencies(false);
+            },
+            error: (error) => {
+                console.error('Error fetching currencies:', error);
+                setLoadingCurrencies(false);
+                // Fallback to hardcoded values
+                setCurrencies([
+                    { commonCode: 'USD', commonDesc: 'USD' },
+                    { commonCode: 'EUR', commonDesc: 'EUR' },
+                    { commonCode: 'GBP', commonDesc: 'GBP' },
+                    { commonCode: 'INR', commonDesc: 'INR' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch operating units from API
+    useEffect(() => {
+        setLoadingOperatingUnits(true);
+        commonMastersService.getOperatingUnits().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setOperatingUnits(response.content);
+                }
+                setLoadingOperatingUnits(false);
+            },
+            error: (error) => {
+                console.error('Error fetching operating units:', error);
+                setLoadingOperatingUnits(false);
+                // Fallback to hardcoded values
+                setOperatingUnits(OPERATING_UNITS.map(unit => ({ commonCode: unit, commonDesc: unit })));
+            }
+        });
+    }, []);
+
+    // Combine API data with any custom units from the form data
+    const allOperatingUnits = [
+        ...operatingUnits.map(unit => unit.commonCode || unit.commonDesc),
+        ...operatingUnitUINs.filter(uin => !operatingUnits.some(unit => (unit.commonCode || unit.commonDesc) === uin))
+    ];
 
     return (
         <Card sx={{ p: 3, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
@@ -248,75 +298,100 @@ export const TopFormSection = ({
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
-                    <FormControl className={classes.formControl} fullWidth>
-                        <InputLabel id="operatingUnitUIN-label">Operating Unit</InputLabel>
-                        <Select
-                            labelId="operatingUnitUIN-label"
-                            id="operatingUnitUIN"
-                            name="operatingUnitUIN"
-                            label="Operating Unit"
-                            multiple
-                            value={operatingUnitUINs}
-                            onChange={handleOperatingUnitChange}
-                            renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {(selected as string[]).length === 0 ? (
-                                        <Typography variant="body2" sx={{ color: '#9e9e9e', fontSize: '14px' }}>
-                                            Select Operating Units...
-                                        </Typography>
-                                    ) : (
-                                        (selected as string[]).map((value) => (
-                                            <Chip
-                                                key={value}
-                                                label={value}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: '#e3f2fd',
-                                                    color: '#1565c0',
-                                                    fontSize: '12px',
-                                                    height: '24px'
-                                                }}
-                                            />
-                                        ))
-                                    )}
-                                </Box>
-                            )}
-                            MenuProps={{
-                                PaperProps: {
-                                    style: {
-                                        maxHeight: 300,
-                                        width: 250,
-                                    },
+                    <Autocomplete
+                        multiple
+                        id="operatingUnitUIN"
+                        options={allOperatingUnits}
+                        value={operatingUnitUINs}
+                        onChange={(event, newValue) => {
+                            onOperatingUnitUINsChange(newValue);
+                        }}
+                        disabled={loadingOperatingUnits}
+                        filterSelectedOptions
+                        filterOptions={(options, { inputValue }) => {
+                            // Custom filter function for better search experience
+                            if (!inputValue) return options;
+
+                            return options.filter(option =>
+                                option.toLowerCase().includes(inputValue.toLowerCase()) ||
+                                option.toLowerCase().startsWith(inputValue.toLowerCase())
+                            );
+                        }}
+                        renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                                <Chip
+                                    {...getTagProps({ index })}
+                                    key={option}
+                                    label={option}
+                                    size="small"
+                                    sx={{
+                                        backgroundColor: '#e3f2fd',
+                                        color: '#1565c0',
+                                        fontSize: '12px',
+                                        height: '24px',
+                                        '& .MuiChip-deleteIcon': {
+                                            fontSize: '16px',
+                                            '&:hover': {
+                                                color: '#d32f2f'
+                                            }
+                                        }
+                                    }}
+                                />
+                            ))
+                        }
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Operating Unit"
+                                placeholder={operatingUnitUINs.length === 0 ? (loadingOperatingUnits ? 'Loading...' : 'Type to search operating units...') : 'Add more units...'}
+                                className={classes.textField}
+                                InputProps={{
+                                    ...params.InputProps,
+                                    sx: {
+                                        '& .MuiAutocomplete-input': {
+                                            fontSize: '14px',
+                                            '&::placeholder': {
+                                                color: '#9e9e9e',
+                                                opacity: 1
+                                            }
+                                        }
+                                    }
+                                }}
+                            />
+                        )}
+                        ListboxProps={{
+                            style: {
+                                maxHeight: 300,
+                            }
+                        }}
+                        noOptionsText={loadingOperatingUnits ? "Loading..." : "No operating units found"}
+                        loadingText="Loading operating units..."
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '8px',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    boxShadow: '0 2px 8px rgba(216, 14, 81, 0.1)'
                                 },
-                            }}
-                        >
-                            <MenuItem disabled value="">
-                                <em style={{ color: '#6c757d' }}>Select Operating Units...</em>
-                            </MenuItem>
-                            {allOperatingUnits.map((unit) => (
-                                <MenuItem key={unit} value={unit}>
-                                    <Checkbox
-                                        checked={operatingUnitUINs.indexOf(unit) > -1}
-                                        sx={{
-                                            color: '#626BDA',
-                                            '&.Mui-checked': {
-                                                color: '#626BDA',
-                                            }
-                                        }}
-                                    />
-                                    <ListItemText
-                                        primary={unit}
-                                        sx={{
-                                            '& .MuiListItemText-primary': {
-                                                fontSize: '14px',
-                                                fontWeight: operatingUnitUINs.indexOf(unit) > -1 ? 600 : 400
-                                            }
-                                        }}
-                                    />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                                '&.Mui-focused': {
+                                    boxShadow: '0 4px 12px rgba(216, 14, 81, 0.15)'
+                                }
+                            },
+                            '& .MuiInputLabel-root.Mui-focused': {
+                                color: '#D80E51'
+                            },
+                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#D80E51 !important',
+                                borderWidth: '2px'
+                            },
+                            '& .MuiAutocomplete-popupIndicator': {
+                                color: '#626BDA'
+                            },
+                            '& .MuiAutocomplete-clearIndicator': {
+                                color: '#626BDA'
+                            }
+                        }}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
                     <DatePicker
@@ -350,11 +425,18 @@ export const TopFormSection = ({
                             label="Currency"
                             value={currency}
                             onChange={(e) => onCurrencyChange(e.target.value)}
+                            disabled={loadingCurrencies}
                         >
-                            <MenuItem value="USD">USD</MenuItem>
-                            <MenuItem value="EUR">EUR</MenuItem>
-                            <MenuItem value="GBP">GBP</MenuItem>
-                            <MenuItem value="INR">INR</MenuItem>
+                            <MenuItem value="">
+                                <em style={{ color: '#6c757d' }}>
+                                    {loadingCurrencies ? 'Loading currencies...' : 'Select Currency...'}
+                                </em>
+                            </MenuItem>
+                            {currencies.map((curr) => (
+                                <MenuItem key={curr.commonCode || curr.commonDesc} value={curr.commonCode || curr.commonDesc}>
+                                    {curr.commonDesc || curr.commonCode}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid>

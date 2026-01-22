@@ -2,16 +2,22 @@ import { Box, Typography, Button, FormControl, Select, MenuItem, TextField, Icon
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
+
+const reinsuranceService = new ReinsuranceService();
 
 interface Reinsurer {
     id: string;
     reinsurer: string;
+    reinsurerCode?: string;
     share: string;
 }
 
 interface Broker {
     id: string;
     broker: string;
+    brokerCode?: string;
     share: string;
     reinsurers: Reinsurer[];
 }
@@ -87,7 +93,78 @@ export const ParticipatingSection = ({
     // Use lineId if provided, otherwise use treatyId
     const effectiveId = lineId || treatyId;
 
-    // Predefined reinsurer options
+    // State for API dropdown data
+    const [apiReinsurers, setApiReinsurers] = useState<any[]>([]);
+    const [apiBrokers, setApiBrokers] = useState<any[]>([]);
+    const [loadingReinsurers, setLoadingReinsurers] = useState(false);
+    const [loadingBrokers, setLoadingBrokers] = useState(false);
+
+    // Fetch reinsurers from API
+    useEffect(() => {
+        setLoadingReinsurers(true);
+        reinsuranceService.getReinsurers({
+            page: 0,
+            size: 100, // Get more items for dropdown
+            summary: true,
+            active: true
+        }).subscribe({
+            next: (response) => {
+                if (response && response.content && Array.isArray(response.content)) {
+                    setApiReinsurers(response.content);
+                } else {
+                    console.warn('Invalid reinsurers response format:', response);
+                    setApiReinsurers([]);
+                }
+                setLoadingReinsurers(false);
+            },
+            error: (error) => {
+                console.error('Error fetching reinsurers:', error);
+                setLoadingReinsurers(false);
+                // Fallback to hardcoded values
+                setApiReinsurers([
+                    { reinsurerCode: 'HANNOVER_RE', reinsurerName: 'Hannover Re' },
+                    { reinsurerCode: 'SWISS_RE', reinsurerName: 'Swiss Re' },
+                    { reinsurerCode: 'MUNICH_RE', reinsurerName: 'Munich Re' },
+                    { reinsurerCode: 'SCOR_RE', reinsurerName: 'SCOR Re' },
+                    { reinsurerCode: 'LLOYDS', reinsurerName: 'Lloyd\'s of London' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch brokers from API
+    useEffect(() => {
+        setLoadingBrokers(true);
+        reinsuranceService.getBrokers({
+            page: 0,
+            size: 100, // Get more items for dropdown
+            summary: true,
+            active: true
+        }).subscribe({
+            next: (response) => {
+                if (response && response.content && Array.isArray(response.content)) {
+                    setApiBrokers(response.content);
+                } else {
+                    console.warn('Invalid brokers response format:', response);
+                    setApiBrokers([]);
+                }
+                setLoadingBrokers(false);
+            },
+            error: (error) => {
+                console.error('Error fetching brokers:', error);
+                setLoadingBrokers(false);
+                // Fallback to hardcoded values
+                setApiBrokers([
+                    { brokerCode: 'AON', brokerName: 'Aon' },
+                    { brokerCode: 'MARSH', brokerName: 'Marsh' },
+                    { brokerCode: 'WILLIS', brokerName: 'Willis Towers Watson' },
+                    { brokerCode: 'GUY_CARPENTER', brokerName: 'Guy Carpenter' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Predefined reinsurer options (fallback)
     const predefinedReinsurers = [
         'Hannover Re',
         'Swiss Re',
@@ -101,7 +178,7 @@ export const ParticipatingSection = ({
         'Transatlantic Re'
     ];
 
-    // Predefined broker options
+    // Predefined broker options (fallback)
     const predefinedBrokers = [
         'Aon',
         'Marsh',
@@ -115,14 +192,14 @@ export const ParticipatingSection = ({
         'Cooper Gay Swett & Crawford'
     ];
 
-    // Get all unique reinsurer values from current data
+    // Get all unique reinsurer values from API and current data
     const getAllReinsurerValues = () => {
-        const currentValues = new Set<string>();
+        const allValues = new Set<string>();
 
         // Add values from direct reinsurers
         reinsurers.forEach(r => {
             if (r.reinsurer && r.reinsurer.trim()) {
-                currentValues.add(r.reinsurer.trim());
+                allValues.add(r.reinsurer.trim());
             }
         });
 
@@ -130,42 +207,108 @@ export const ParticipatingSection = ({
         brokers.forEach(b => {
             b.reinsurers.forEach(br => {
                 if (br.reinsurer && br.reinsurer.trim()) {
-                    currentValues.add(br.reinsurer.trim());
+                    allValues.add(br.reinsurer.trim());
                 }
             });
         });
 
-        // Combine predefined and current values
-        const allValues = [...predefinedReinsurers];
-        currentValues.forEach(value => {
-            if (!allValues.includes(value)) {
-                allValues.push(value);
+        // Use API data if available, otherwise fallback to predefined
+        const apiValues = apiReinsurers.length > 0
+            ? apiReinsurers.map(r => r.reinsurerName || r.reinsurerCode).filter(name => name && name.trim())
+            : predefinedReinsurers;
+
+        // Add API values to the set (automatically removes duplicates)
+        apiValues.forEach(value => {
+            if (value && value.trim()) {
+                allValues.add(value.trim());
             }
         });
 
-        return allValues.sort();
+        // Convert Set to Array and sort
+        return Array.from(allValues).sort();
     };
 
-    // Get all unique broker values from current data
+    // Get all unique broker values from API and current data
     const getAllBrokerValues = () => {
-        const currentValues = new Set<string>();
+        const allValues = new Set<string>();
 
         // Add values from current brokers
         brokers.forEach(b => {
             if (b.broker && b.broker.trim()) {
-                currentValues.add(b.broker.trim());
+                allValues.add(b.broker.trim());
             }
         });
 
-        // Combine predefined and current values
-        const allValues = [...predefinedBrokers];
-        currentValues.forEach(value => {
-            if (!allValues.includes(value)) {
-                allValues.push(value);
+        // Use API data if available, otherwise fallback to predefined
+        const apiValues = apiBrokers.length > 0
+            ? apiBrokers.map(b => b.brokerName || b.brokerCode).filter(name => name && name.trim())
+            : predefinedBrokers;
+
+        // Add API values to the set (automatically removes duplicates)
+        apiValues.forEach(value => {
+            if (value && value.trim()) {
+                allValues.add(value.trim());
             }
         });
 
-        return allValues.sort();
+        // Convert Set to Array and sort
+        return Array.from(allValues).sort();
+    };
+
+    // Helper function to get participant code from API data
+    const getParticipantCode = (participantName: string, participantType: 'REINSURER' | 'BROKER'): string => {
+        if (!participantName || !participantName.trim()) {
+            return '';
+        }
+
+        if (participantType === 'REINSURER') {
+            const reinsurer = apiReinsurers.find(r =>
+                r.reinsurerName === participantName || r.reinsurerCode === participantName
+            );
+            return reinsurer?.reinsurerCode || '';
+        } else {
+            const broker = apiBrokers.find(b =>
+                b.brokerName === participantName || b.brokerCode === participantName
+            );
+            return broker?.brokerCode || '';
+        }
+    };
+
+    // Enhanced change handlers that include participant codes
+    const handleReinsurerChange = (blockId: string, treatyId: string | undefined, reinsurerId: string, field: string, value: string) => {
+        if (field === 'reinsurer') {
+            // When reinsurer name changes, also update the code
+            const reinsurerCode = getParticipantCode(value, 'REINSURER');
+            // Call the original handler for the name
+            onReinsurerChange(blockId, treatyId, reinsurerId, field, value);
+            // Also update the code if we have a way to do it
+            // For now, we'll store it in the component state and use it in payload generation
+        } else {
+            onReinsurerChange(blockId, treatyId, reinsurerId, field, value);
+        }
+    };
+
+    const handleBrokerChange = (blockId: string, treatyId: string | undefined, brokerId: string, field: string, value: string) => {
+        if (field === 'broker') {
+            // When broker name changes, also update the code
+            const brokerCode = getParticipantCode(value, 'BROKER');
+            // Call the original handler for the name
+            onBrokerChange(blockId, treatyId, brokerId, field, value);
+            // Also update the code if we have a way to do it
+        } else {
+            onBrokerChange(blockId, treatyId, brokerId, field, value);
+        }
+    };
+
+    const handleBrokerReinsurerChange = (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => {
+        if (field === 'reinsurer') {
+            // When reinsurer name changes, also update the code
+            const reinsurerCode = getParticipantCode(value, 'REINSURER');
+            // Call the original handler for the name
+            onBrokerReinsurerChange(blockId, treatyId, brokerId, reinsurerId, field, value);
+        } else {
+            onBrokerReinsurerChange(blockId, treatyId, brokerId, reinsurerId, field, value);
+        }
     };
 
     const availableReinsurers = getAllReinsurerValues();
@@ -273,11 +416,16 @@ export const ParticipatingSection = ({
                                             name="reinsurer"
                                             label="Reinsurer"
                                             value={reinsurer.reinsurer}
-                                            onChange={(e) => onReinsurerChange(blockId, effectiveId, reinsurer.id, 'reinsurer', e.target.value)}
+                                            onChange={(e) => handleReinsurerChange(blockId, effectiveId, reinsurer.id, 'reinsurer', e.target.value)}
+                                            disabled={loadingReinsurers}
                                         >
-                                            <MenuItem value="">Select Reinsurer...</MenuItem>
-                                            {availableReinsurers.map((reinsurerName) => (
-                                                <MenuItem key={reinsurerName} value={reinsurerName}>
+                                            <MenuItem value="">
+                                                <em style={{ color: '#6c757d' }}>
+                                                    {loadingReinsurers ? 'Loading reinsurers...' : 'Select Reinsurer...'}
+                                                </em>
+                                            </MenuItem>
+                                            {availableReinsurers.map((reinsurerName, index) => (
+                                                <MenuItem key={`reinsurer-${index}-${reinsurerName}`} value={reinsurerName}>
                                                     {reinsurerName}
                                                 </MenuItem>
                                             ))}
@@ -342,11 +490,16 @@ export const ParticipatingSection = ({
                                             name="broker"
                                             label="Broker"
                                             value={broker.broker}
-                                            onChange={(e) => onBrokerChange(blockId, effectiveId, broker.id, 'broker', e.target.value)}
+                                            onChange={(e) => handleBrokerChange(blockId, effectiveId, broker.id, 'broker', e.target.value)}
+                                            disabled={loadingBrokers}
                                         >
-                                            <MenuItem value="">Select Broker...</MenuItem>
-                                            {availableBrokers.map((brokerName) => (
-                                                <MenuItem key={brokerName} value={brokerName}>
+                                            <MenuItem value="">
+                                                <em style={{ color: '#6c757d' }}>
+                                                    {loadingBrokers ? 'Loading brokers...' : 'Select Broker...'}
+                                                </em>
+                                            </MenuItem>
+                                            {availableBrokers.map((brokerName, index) => (
+                                                <MenuItem key={`broker-${index}-${brokerName}`} value={brokerName}>
                                                     {brokerName}
                                                 </MenuItem>
                                             ))}
@@ -410,11 +563,16 @@ export const ParticipatingSection = ({
                                                     labelId={`brokerReinsurer-label-${reinsurer.id}`}
                                                     value={reinsurer.reinsurer}
                                                     label="Reinsurer"
-                                                    onChange={(e) => onBrokerReinsurerChange(blockId, effectiveId, broker.id, reinsurer.id, 'reinsurer', e.target.value)}
+                                                    onChange={(e) => handleBrokerReinsurerChange(blockId, effectiveId, broker.id, reinsurer.id, 'reinsurer', e.target.value)}
+                                                    disabled={loadingReinsurers}
                                                 >
-                                                    <MenuItem value="">Select Reinsurer...</MenuItem>
-                                                    {availableReinsurers.map((reinsurerName) => (
-                                                        <MenuItem key={reinsurerName} value={reinsurerName}>
+                                                    <MenuItem value="">
+                                                        <em style={{ color: '#6c757d' }}>
+                                                            {loadingReinsurers ? 'Loading...' : 'Select Reinsurer...'}
+                                                        </em>
+                                                    </MenuItem>
+                                                    {availableReinsurers.map((reinsurerName, index) => (
+                                                        <MenuItem key={`broker-reinsurer-${index}-${reinsurerName}`} value={reinsurerName}>
                                                             {reinsurerName}
                                                         </MenuItem>
                                                     ))}

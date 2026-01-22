@@ -2,6 +2,10 @@ import { Card, Grid, TextField, FormControl, Select, MenuItem, Box, Typography, 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
+import { useState, useEffect } from 'react';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
+
+const commonMastersService = new CommonMastersService();
 
 interface Reinsurer {
     id: string;
@@ -34,6 +38,7 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
+    riskCommission: string;
 }
 
 interface RiskLimitsSectionProps {
@@ -93,6 +98,90 @@ export const RiskLimitsSection = ({
     onAddLine, onDeleteLine, onLineChange
 }: RiskLimitsSectionProps) => {
     const classes = useStyles();
+
+    // State for API dropdown data
+    const [productLobOptions, setProductLobOptions] = useState<any[]>([]);
+    const [accountingLobOptions, setAccountingLobOptions] = useState<any[]>([]);
+    const [riskCategoryOptions, setRiskCategoryOptions] = useState<any[]>([]);
+    const [loadingProductLob, setLoadingProductLob] = useState(false);
+    const [loadingAccountingLob, setLoadingAccountingLob] = useState(false);
+    const [loadingRiskCategory, setLoadingRiskCategory] = useState(false);
+
+    // Fetch Product LOB options from API
+    useEffect(() => {
+        setLoadingProductLob(true);
+        commonMastersService.getProductLobOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setProductLobOptions(response.content);
+                }
+                setLoadingProductLob(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Product LOB options:', error);
+                setLoadingProductLob(false);
+                // Fallback to hardcoded values
+                setProductLobOptions([
+                    { commonCode: 'Fire', commonDesc: 'Fire' },
+                    { commonCode: 'Marine', commonDesc: 'Marine' },
+                    { commonCode: 'Motor', commonDesc: 'Motor' },
+                    { commonCode: 'PROPERTY', commonDesc: 'PROPERTY' },
+                    { commonCode: 'FIRE', commonDesc: 'FIRE' },
+                    { commonCode: 'CASUALTY', commonDesc: 'CASUALTY' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Accounting LOB options from API
+    useEffect(() => {
+        setLoadingAccountingLob(true);
+        commonMastersService.getAccountingLobOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setAccountingLobOptions(response.content);
+                }
+                setLoadingAccountingLob(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Accounting LOB options:', error);
+                setLoadingAccountingLob(false);
+                // Fallback to hardcoded values
+                setAccountingLobOptions([
+                    { commonCode: 'Fire', commonDesc: 'Fire' },
+                    { commonCode: 'Marine', commonDesc: 'Marine' },
+                    { commonCode: 'PROP', commonDesc: 'PROP' },
+                    { commonCode: 'FIRE', commonDesc: 'FIRE' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Risk Category options from API
+    useEffect(() => {
+        setLoadingRiskCategory(true);
+        commonMastersService.getRiskCategoryOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setRiskCategoryOptions(response.content);
+                }
+                setLoadingRiskCategory(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Risk Category options:', error);
+                setLoadingRiskCategory(false);
+                // Fallback to hardcoded values
+                setRiskCategoryOptions([
+                    { commonCode: 'Comm', commonDesc: 'Comm' },
+                    { commonCode: 'Residential', commonDesc: 'Residential' },
+                    { commonCode: 'MEDIUM', commonDesc: 'MEDIUM' },
+                    { commonCode: 'HIGH', commonDesc: 'HIGH' },
+                    { commonCode: 'LOW', commonDesc: 'LOW' },
+                    { commonCode: 'PROPERTY', commonDesc: 'PROPERTY' }
+                ]);
+            }
+        });
+    }, []);
 
     return (
         <Box sx={{
@@ -187,17 +276,18 @@ export const RiskLimitsSection = ({
                                         label="Product LOB"
                                         value={line.productLOB}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'productLOB', e.target.value)}
+                                        disabled={loadingProductLob}
                                     >
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="Fire">Fire</MenuItem>
-                                        <MenuItem value="Marine">Marine</MenuItem>
-                                        <MenuItem value="Motor">Motor</MenuItem>
-                                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
-                                        <MenuItem value="FIRE">FIRE</MenuItem>
-                                        <MenuItem value="CASUALTY">CASUALTY</MenuItem>
-                                        {line.productLOB && !['', 'Fire', 'Marine', 'Motor', 'PROPERTY', 'FIRE', 'CASUALTY'].includes(line.productLOB) && (
-                                            <MenuItem value={line.productLOB}>{line.productLOB}</MenuItem>
-                                        )}
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingProductLob ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {productLobOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -222,15 +312,18 @@ export const RiskLimitsSection = ({
                                         label="Accounting LOB"
                                         value={line.accountingLOB}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'accountingLOB', e.target.value)}
+                                        disabled={loadingAccountingLob}
                                     >
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="Fire">Fire</MenuItem>
-                                        <MenuItem value="Marine">Marine</MenuItem>
-                                        <MenuItem value="PROP">PROP</MenuItem>
-                                        <MenuItem value="FIRE">FIRE</MenuItem>
-                                        {line.accountingLOB && !['', 'Fire', 'Marine', 'PROP', 'FIRE'].includes(line.accountingLOB) && (
-                                            <MenuItem value={line.accountingLOB}>{line.accountingLOB}</MenuItem>
-                                        )}
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingAccountingLob ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {accountingLobOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -244,17 +337,18 @@ export const RiskLimitsSection = ({
                                         label="Risk Category"
                                         value={line.riskCategory}
                                         onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskCategory', e.target.value)}
+                                        disabled={loadingRiskCategory}
                                     >
-                                        <MenuItem value="">Select...</MenuItem>
-                                        <MenuItem value="Comm">Comm</MenuItem>
-                                        <MenuItem value="Residential">Residential</MenuItem>
-                                        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
-                                        <MenuItem value="HIGH">HIGH</MenuItem>
-                                        <MenuItem value="LOW">LOW</MenuItem>
-                                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
-                                        {line.riskCategory && !['', 'Comm', 'Residential', 'MEDIUM', 'HIGH', 'LOW', 'PROPERTY'].includes(line.riskCategory) && (
-                                            <MenuItem value={line.riskCategory}>{line.riskCategory}</MenuItem>
-                                        )}
+                                        <MenuItem value="">
+                                            <em style={{ color: '#6c757d' }}>
+                                                {loadingRiskCategory ? 'Loading options...' : 'Select...'}
+                                            </em>
+                                        </MenuItem>
+                                        {riskCategoryOptions.map((option) => (
+                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                                {option.commonDesc || option.commonCode}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -395,6 +489,25 @@ export const RiskLimitsSection = ({
                                     value={line.alertDays}
                                     onChange={(e) => onLineChange(blockId, treatyId, line.id, 'alertDays', e.target.value)}
                                     className={classes.textField}
+                                />
+                            </Grid>
+
+                            {/* Row 5 - 1 field */}
+                            <Grid item xs={12} sm={6} md={3}>
+                                <TextField
+                                    id={`riskCommission-${line.id}`}
+                                    name="riskCommission"
+                                    label="Treaty Commission (%)"
+                                    type="number"
+                                    fullWidth
+                                    value={line.riskCommission}
+                                    onChange={(e) => onLineChange(blockId, treatyId, line.id, 'riskCommission', e.target.value)}
+                                    className={classes.textField}
+                                    inputProps={{
+                                        min: 0,
+                                        max: 100,
+                                        step: 0.01
+                                    }}
                                 />
                             </Grid>
                         </Grid>
