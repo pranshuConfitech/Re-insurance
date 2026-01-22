@@ -22,6 +22,7 @@ interface RiskLimitLine {
     lossAdviceLimit: string;
     premiumPaymentWarranty: string;
     alertDays: string;
+    riskCommission: string;
     reinsurers: any[];
     brokers: any[];
 }
