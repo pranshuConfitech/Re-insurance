@@ -1,0 +1,330 @@
+[
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 1",
+        "treatyCode": "T11",
+        "priorityOrder": 11,
+        "balanceSI": 200000000,
+        "controlCessionSI": 0,
+        "controlValue": 10000000,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 10000000,
+        "treatyCessionSI": 10000000,
+        "treatyCessionPercent": 5,
+        "treatyRIPremium": 100000,
+        "treatyCommision": 200000000000,
+        "participants": [
+            {
+                "participantType": "REINSURER",
+                "participantName": "General Insurance Corporation (GIC) of India",
+                "sharePercent": 50,
+                "participantRISI": 5000000,
+                "participantPremium": 50000,
+                "participantCommission": 5000,
+                "reinsurers": null
+            },
+            {
+                "participantType": "BROKER",
+                "participantName": "Lloyd's India",
+                "sharePercent": 50,
+                "participantRISI": 5000000,
+                "participantPremium": 50000,
+                "participantCommission": 5000,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 1",
+        "treatyCode": "T12",
+        "priorityOrder": 12,
+        "balanceSI": 200000000,
+        "controlCessionSI": 10000000,
+        "controlValue": 10000000,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 10000000,
+        "treatyCessionSI": 10000000,
+        "treatyCessionPercent": 5,
+        "treatyRIPremium": 100000,
+        "treatyCommision": 200000000000,
+        "participants": [
+            {
+                "participantType": "BROKER",
+                "participantName": "Mahindra Insurance Brokers Limited",
+                "sharePercent": 100,
+                "participantRISI": 10000000,
+                "participantPremium": 100000,
+                "participantCommission": 10000,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 1",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 180000000,
+        "controlCessionSI": 20000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 2",
+        "treatyCode": "21",
+        "priorityOrder": 21,
+        "balanceSI": 180000000,
+        "controlCessionSI": 20000000,
+        "controlValue": 10000000,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 10000000,
+        "treatyCessionSI": 10000000,
+        "treatyCessionPercent": 5,
+        "treatyRIPremium": 100000,
+        "treatyCommision": 200000000000,
+        "participants": [
+            {
+                "participantType": "REINSURER",
+                "participantName": "General Insurance Corporation (GIC) of India",
+                "sharePercent": 100,
+                "participantRISI": 10000000,
+                "participantPremium": 100000,
+                "participantCommission": 10000,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 2",
+        "treatyCode": "T22",
+        "priorityOrder": 22,
+        "balanceSI": 180000000,
+        "controlCessionSI": 30000000,
+        "controlValue": 0,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 0,
+        "treatyCessionSI": 0,
+        "treatyCessionPercent": 0,
+        "treatyRIPremium": 0,
+        "treatyCommision": 0,
+        "participants": [
+            {
+                "participantType": "BROKER",
+                "participantName": "Global Alliance Brokerage",
+                "sharePercent": 100,
+                "participantRISI": 0,
+                "participantPremium": 0,
+                "participantCommission": 0,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 2",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 170000000,
+        "controlCessionSI": 30000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 3",
+        "treatyCode": "T31",
+        "priorityOrder": 31,
+        "balanceSI": 170000000,
+        "controlCessionSI": 30000000,
+        "controlValue": 20000000,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 20000000,
+        "treatyCessionSI": 20000000,
+        "treatyCessionPercent": 10,
+        "treatyRIPremium": 200000,
+        "treatyCommision": 400000000000,
+        "participants": [
+            {
+                "participantType": "REINSURER",
+                "participantName": "General Insurance Corporation (GIC) of India",
+                "sharePercent": 20,
+                "participantRISI": 4000000,
+                "participantPremium": 40000,
+                "participantCommission": 4000,
+                "reinsurers": null
+            },
+            {
+                "participantType": "BROKER",
+                "participantName": "Lloyd's India",
+                "sharePercent": 30,
+                "participantRISI": 6000000,
+                "participantPremium": 60000,
+                "participantCommission": 6000,
+                "reinsurers": null
+            },
+            {
+                "participantType": "REINSURER",
+                "participantName": "RGA Life Reinsurance Co of Canada",
+                "sharePercent": 50,
+                "participantRISI": 10000000,
+                "participantPremium": 100000,
+                "participantCommission": 10000,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 3",
+        "treatyCode": "T32",
+        "priorityOrder": 32,
+        "balanceSI": 170000000,
+        "controlCessionSI": 50000000,
+        "controlValue": 0,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 0,
+        "treatyCessionSI": 0,
+        "treatyCessionPercent": 0,
+        "treatyRIPremium": 0,
+        "treatyCommision": 0,
+        "participants": [
+            {
+                "participantType": "REINSURER",
+                "participantName": "Allianz Global",
+                "sharePercent": 100,
+                "participantRISI": 0,
+                "participantPremium": 0,
+                "participantCommission": 0,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 3",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 4",
+        "treatyCode": "T41",
+        "priorityOrder": 41,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": 0,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 0,
+        "treatyCessionSI": 0,
+        "treatyCessionPercent": 0,
+        "treatyRIPremium": 0,
+        "treatyCommision": 0,
+        "participants": [
+            {
+                "participantType": "REINSURER",
+                "participantName": "RGA Life Reinsurance Co of Canada",
+                "sharePercent": 100,
+                "participantRISI": 0,
+                "participantPremium": 0,
+                "participantCommission": 0,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 4",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
+    },
+    {
+        "blockSummaryRow": false,
+        "participantRow": false,
+        "blockNumber": "Block 5",
+        "treatyCode": "FAC",
+        "priorityOrder": 99,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": 0,
+        "earlierTreatySI": 0,
+        "incrementalTreatySI": 0,
+        "treatyCessionSI": 0,
+        "treatyCessionPercent": 0,
+        "treatyRIPremium": 0,
+        "treatyCommision": 0,
+        "participants": [
+            {
+                "participantType": "BROKER",
+                "participantName": "Mahindra Insurance Brokers Limited",
+                "sharePercent": 100,
+                "participantRISI": 0,
+                "participantPremium": 0,
+                "participantCommission": 0,
+                "reinsurers": null
+            }
+        ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 5",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
+    }
+]
