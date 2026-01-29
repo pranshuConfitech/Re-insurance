@@ -22,7 +22,7 @@
                 "participantRISI": 5000000,
                 "participantPremium": 50000,
                 "participantCommission": 5000,
-                "reinsurers": null
+                "reinsurers": []
             },
             {
                 "participantType": "BROKER",
@@ -31,7 +31,26 @@
                 "participantRISI": 5000000,
                 "participantPremium": 50000,
                 "participantCommission": 5000,
-                "reinsurers": null
+                "reinsurers": [
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "Munich Re",
+                        "sharePercent": 50,
+                        "participantRISI": 3000000,
+                        "participantPremium": 30000,
+                        "participantCommission": 500,
+                        "reinsurers": null
+                    },
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "AXA France Vie",
+                        "sharePercent": 50,
+                        "participantRISI": 2000000,
+                        "participantPremium": 20000,
+                        "participantCommission": 500,
+                        "reinsurers": null
+                    }
+                ]
             }
         ]
     },
@@ -58,15 +77,51 @@
                 "participantRISI": 10000000,
                 "participantPremium": 100000,
                 "participantCommission": 10000,
-                "reinsurers": null
+                "reinsurers": [
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "Allianz Global",
+                        "sharePercent": 100,
+                        "participantRISI": 7000000,
+                        "participantPremium": 70000,
+                        "participantCommission": 1000,
+                        "reinsurers": null
+                    },
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "RGA Life Reinsurance Co of Canada",
+                        "sharePercent": 100,
+                        "participantRISI": 3000000,
+                        "participantPremium": 30000,
+                        "participantCommission": 1000,
+                        "reinsurers": null
+                    }
+                ]
             }
         ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 1",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 180000000,
+        "controlCessionSI": 20000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
     },
     {
         "blockSummaryRow": false,
         "participantRow": false,
         "blockNumber": "Block 2",
-        "treatyCode": "T21",
+        "treatyCode": "SBI Retention",
         "priorityOrder": 21,
         "balanceSI": 180000000,
         "controlCessionSI": 20000000,
@@ -85,7 +140,7 @@
                 "participantRISI": 10000000,
                 "participantPremium": 100000,
                 "participantCommission": 10000,
-                "reinsurers": null
+                "reinsurers": []
             }
         ]
     },
@@ -112,9 +167,36 @@
                 "participantRISI": 0,
                 "participantPremium": 0,
                 "participantCommission": 0,
-                "reinsurers": null
+                "reinsurers": [
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "Allianz Global",
+                        "sharePercent": 100,
+                        "participantRISI": 0,
+                        "participantPremium": 0,
+                        "participantCommission": 0,
+                        "reinsurers": null
+                    }
+                ]
             }
         ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 2",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 170000000,
+        "controlCessionSI": 30000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
     },
     {
         "blockSummaryRow": false,
@@ -139,7 +221,7 @@
                 "participantRISI": 4000000,
                 "participantPremium": 40000,
                 "participantCommission": 4000,
-                "reinsurers": null
+                "reinsurers": []
             },
             {
                 "participantType": "BROKER",
@@ -148,7 +230,26 @@
                 "participantRISI": 6000000,
                 "participantPremium": 60000,
                 "participantCommission": 6000,
-                "reinsurers": null
+                "reinsurers": [
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "Munich Re",
+                        "sharePercent": 30,
+                        "participantRISI": 3600000,
+                        "participantPremium": 36000,
+                        "participantCommission": 600,
+                        "reinsurers": null
+                    },
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "AXA France Vie",
+                        "sharePercent": 30,
+                        "participantRISI": 2400000,
+                        "participantPremium": 24000,
+                        "participantCommission": 600,
+                        "reinsurers": null
+                    }
+                ]
             },
             {
                 "participantType": "REINSURER",
@@ -157,7 +258,7 @@
                 "participantRISI": 10000000,
                 "participantPremium": 100000,
                 "participantCommission": 10000,
-                "reinsurers": null
+                "reinsurers": []
             }
         ]
     },
@@ -184,9 +285,26 @@
                 "participantRISI": 0,
                 "participantPremium": 0,
                 "participantCommission": 0,
-                "reinsurers": null
+                "reinsurers": []
             }
         ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 3",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
     },
     {
         "blockSummaryRow": false,
@@ -211,9 +329,26 @@
                 "participantRISI": 0,
                 "participantPremium": 0,
                 "participantCommission": 0,
-                "reinsurers": null
+                "reinsurers": []
             }
         ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 4",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
     },
     {
         "blockSummaryRow": false,
@@ -238,8 +373,44 @@
                 "participantRISI": 0,
                 "participantPremium": 0,
                 "participantCommission": 0,
-                "reinsurers": null
+                "reinsurers": [
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "Allianz Global",
+                        "sharePercent": 100,
+                        "participantRISI": 0,
+                        "participantPremium": 0,
+                        "participantCommission": 0,
+                        "reinsurers": null
+                    },
+                    {
+                        "participantType": "REINSURER",
+                        "participantName": "RGA Life Reinsurance Co of Canada",
+                        "sharePercent": 100,
+                        "participantRISI": 0,
+                        "participantPremium": 0,
+                        "participantCommission": 0,
+                        "reinsurers": null
+                    }
+                ]
             }
         ]
+    },
+    {
+        "blockSummaryRow": true,
+        "participantRow": false,
+        "blockNumber": "Block 5",
+        "treatyCode": null,
+        "priorityOrder": null,
+        "balanceSI": 150000000,
+        "controlCessionSI": 50000000,
+        "controlValue": null,
+        "earlierTreatySI": null,
+        "incrementalTreatySI": null,
+        "treatyCessionSI": null,
+        "treatyCessionPercent": null,
+        "treatyRIPremium": null,
+        "treatyCommision": null,
+        "participants": null
     }
 ]

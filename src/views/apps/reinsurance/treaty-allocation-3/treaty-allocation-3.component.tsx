@@ -10,17 +10,12 @@ import {
     Typography,
     Alert,
     CircularProgress,
-    Divider,
-    FormControl,
-    FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio
+    Divider
 } from '@mui/material';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 import treatyAllocationSampleData from '@/data/treaty-allocation-sample.json';
-import AllocationTable from './components/AllocationTable';
-import ParticipantTable from './components/ParticipantTable';
+import CombinedAllocationTable from './components/CombinedAllocationTable';
+import ImprovedAllocationTable from './components/ImprovedAllocationTable';
 
 const reinsuranceService = new ReinsuranceService();
 
@@ -73,8 +68,6 @@ export default function TreatyAllocation3Component() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [allocationData, setAllocationData] = useState<TreatyAllocationData[]>([]);
-    const [viewType, setViewType] = useState<'allocation' | 'participant'>('allocation');
-    const [hasSubmittedOnce, setHasSubmittedOnce] = useState<boolean>(false);
     const [formData, setFormData] = useState<AllocationPayload>({
         policy: 'P1',
         productCode: 'FIRE01',
@@ -92,34 +85,18 @@ export default function TreatyAllocation3Component() {
         ownSharePaidClaimOnThisLocation: 32000000
     });
 
-    // Refetch data when view type changes (only if data has been submitted at least once)
-    useEffect(() => {
-        if (hasSubmittedOnce && allocationData.length > 0) {
-            console.log(`View type changed to: ${viewType}. Refetching data...`);
-            fetchAllocationData();
-        }
-    }, [viewType]);
-
     const fetchAllocationData = async () => {
         setLoading(true);
         setError(null);
 
         try {
             // TODO: Replace with actual API call when ready
-            // Use different API endpoints based on view type
-            // if (viewType === 'allocation') {
-            //     const result = await reinsuranceService.getPortfolioTreatyAllocation(formData).toPromise();
-            //     setAllocationData(result);
-            // } else {
-            //     const result = await reinsuranceService.getPortfolioTreatyParticipant(formData).toPromise();
-            //     setAllocationData(result);
-            // }
+            // const result = await reinsuranceService.getPortfolioTreatyAllocation(formData).toPromise();
 
             // Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Use the same data for both views (for now)
-            // In a real implementation, you might want to fetch different data based on viewType
+            // Load the combined data
             setAllocationData(treatyAllocationSampleData as TreatyAllocationData[]);
         } catch (err: any) {
             console.error('Error processing allocation:', err);
@@ -137,7 +114,6 @@ export default function TreatyAllocation3Component() {
     };
 
     const handleSubmit = async () => {
-        setHasSubmittedOnce(true);
         await fetchAllocationData();
     };
 
@@ -146,44 +122,6 @@ export default function TreatyAllocation3Component() {
             <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 600, color: '#e91e63' }}>
                 Treaty Allocation 3
             </Typography>
-
-            {/* View Type Selection */}
-            <Box sx={{ mb: 4 }}>
-                <FormControl component="fieldset">
-                    <FormLabel component="legend" sx={{ fontWeight: 600, color: '#333', mb: 2 }}>
-                        View Type
-                    </FormLabel>
-                    <RadioGroup
-                        row
-                        value={viewType}
-                        onChange={(e) => setViewType(e.target.value as 'allocation' | 'participant')}
-                        sx={{ gap: 3 }}
-                    >
-                        <FormControlLabel
-                            value="allocation"
-                            control={<Radio sx={{ color: '#e91e63', '&.Mui-checked': { color: '#e91e63' } }} />}
-                            label="Allocation"
-                            sx={{
-                                '& .MuiFormControlLabel-label': {
-                                    fontWeight: 500,
-                                    fontSize: '1rem'
-                                }
-                            }}
-                        />
-                        <FormControlLabel
-                            value="participant"
-                            control={<Radio sx={{ color: '#e91e63', '&.Mui-checked': { color: '#e91e63' } }} />}
-                            label="Participant"
-                            sx={{
-                                '& .MuiFormControlLabel-label': {
-                                    fontWeight: 500,
-                                    fontSize: '1rem'
-                                }
-                            }}
-                        />
-                    </RadioGroup>
-                </FormControl>
-            </Box>
 
             <Grid container spacing={4}>
                 {/* Risk & Policy Data Section */}
@@ -409,7 +347,7 @@ export default function TreatyAllocation3Component() {
                         <Card sx={{ mt: 3, boxShadow: 3 }}>
                             <CardContent sx={{ p: 4 }}>
                                 <Typography variant="h6" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
-                                    {viewType === 'allocation' ? 'Treaty Allocation Results' : 'Treaty Participant Results'}
+                                    Treaty Allocation Results
                                     {loading && (
                                         <CircularProgress
                                             size={20}
@@ -422,13 +360,11 @@ export default function TreatyAllocation3Component() {
                                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
                                         <CircularProgress size={40} sx={{ color: '#e91e63' }} />
                                         <Typography sx={{ ml: 2, color: '#666' }}>
-                                            Loading {viewType === 'allocation' ? 'allocation' : 'participant'} data...
+                                            Loading allocation data...
                                         </Typography>
                                     </Box>
-                                ) : viewType === 'allocation' ? (
-                                    <AllocationTable data={allocationData} />
                                 ) : (
-                                    <ParticipantTable data={allocationData} />
+                                    <ImprovedAllocationTable data={allocationData} />
                                 )}
                             </CardContent>
                         </Card>
