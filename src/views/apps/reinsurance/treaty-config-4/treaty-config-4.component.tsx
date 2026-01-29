@@ -19,13 +19,20 @@ import {
     Collapse,
     IconButton,
     CircularProgress,
-    Chip
+    Chip,
+    Select,
+    MenuItem,
+    FormControl
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Edit from '@mui/icons-material/Edit';
 import Visibility from '@mui/icons-material/Visibility';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import LastPageIcon from '@mui/icons-material/LastPage';
 
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
@@ -49,16 +56,21 @@ const TreatyConfig4Component = () => {
     const [accordionData, setAccordionData] = useState<{ [key: string]: any }>({});
     const [accordionLoading, setAccordionLoading] = useState<string | null>(null);
 
+    // Pagination state
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalElements, setTotalElements] = useState(0);
+
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchData = () => {
         setLoading(true);
 
         const pageRequest = {
-            page: 0,
-            size: 10,
+            page: page,
+            size: rowsPerPage,
             summary: true,
             active: true
         };
@@ -66,8 +78,10 @@ const TreatyConfig4Component = () => {
         reinsuranceService.getAllPortfolioTreaties(pageRequest).subscribe({
             next: (response) => {
                 const content = response?.data?.content || [];
+                const totalElements = response?.data?.totalElements || 0;
 
                 setData(content);
+                setTotalElements(totalElements);
                 setLoading(false);
             },
             error: (error) => {
@@ -142,6 +156,18 @@ const TreatyConfig4Component = () => {
         if (s === 'EXPIRED') return { bg: '#f8d7da', color: '#721c24' };
 
         return { bg: '#e2e3e5', color: '#383d41' };
+    };
+
+    // Pagination handlers
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+        setExpandedRow(null); // Close any expanded rows when changing page
+    };
+
+    const handleChangeRowsPerPage = (event: any) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when changing rows per page
+        setExpandedRow(null); // Close any expanded rows
     };
 
     const renderAccordionContent = (portfolioId: string) => {
@@ -566,7 +592,7 @@ const TreatyConfig4Component = () => {
                             Treaty Portfolios
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#6c757d', mt: 0.5 }}>
-                            {data.length} portfolio{data.length !== 1 ? 's' : ''} found
+                            {loading ? 'Loading...' : `${totalElements} portfolio${totalElements !== 1 ? 's' : ''} found`}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -877,6 +903,240 @@ const TreatyConfig4Component = () => {
                         </TableContainer>
                     )}
                 </CardContent>
+
+                {/* Custom Pagination - Core Portal Style */}
+                {!loading && totalElements > 0 && (
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '8px 16px',
+                        borderTop: '1px solid #e0e0e0',
+                        backgroundColor: '#fff',
+                        minHeight: '48px'
+                    }}>
+                        {/* Left side - Rows per page */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" sx={{ color: '#666', fontSize: '13px' }}>
+                                Rows per page:
+                            </Typography>
+                            <FormControl size="small" sx={{ minWidth: 60 }}>
+                                <Select
+                                    value={rowsPerPage}
+                                    onChange={handleChangeRowsPerPage}
+                                    sx={{
+                                        fontSize: '13px',
+                                        height: '28px',
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px'
+                                        },
+                                        '& .MuiSelect-select': {
+                                            padding: '4px 32px 4px 12px !important',
+                                            minHeight: 'unset',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSelect-icon': {
+                                            right: '8px',
+                                            fontSize: '16px',
+                                            color: '#666'
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#999'
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#e91e63',
+                                            borderWidth: '1px'
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value={5} sx={{ fontSize: '13px', minHeight: '32px' }}>5</MenuItem>
+                                    <MenuItem value={10} sx={{ fontSize: '13px', minHeight: '32px' }}>10</MenuItem>
+                                    <MenuItem value={25} sx={{ fontSize: '13px', minHeight: '32px' }}>25</MenuItem>
+                                    <MenuItem value={50} sx={{ fontSize: '13px', minHeight: '32px' }}>50</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+
+                        {/* Right side - Go to page, range info, and navigation */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                            {/* Go to page section */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body2" sx={{ color: '#666', fontSize: '13px' }}>
+                                    Go to page:
+                                </Typography>
+                                <Box sx={{
+                                    width: '32px',
+                                    height: '20px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '3px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '13px',
+                                    backgroundColor: '#fff',
+                                    color: '#333'
+                                }}>
+                                    {page + 1}
+                                </Box>
+                                <Typography variant="body2" sx={{ color: '#666', fontSize: '13px' }}>
+                                    of {Math.ceil(totalElements / rowsPerPage)}
+                                </Typography>
+                            </Box>
+
+                            {/* Range info */}
+                            <Typography variant="body2" sx={{ color: '#666', fontSize: '13px' }}>
+                                {`${page * rowsPerPage + 1}-${Math.min((page + 1) * rowsPerPage, totalElements)} of ${totalElements}`}
+                            </Typography>
+
+                            {/* Navigation buttons */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                                {/* First page */}
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleChangePage(null, 0)}
+                                    disabled={page === 0}
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        color: page === 0 ? '#ddd' : '#666',
+                                        '&:hover': {
+                                            backgroundColor: page === 0 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: '#ddd'
+                                        }
+                                    }}
+                                >
+                                    <FirstPageIcon fontSize="small" />
+                                </IconButton>
+
+                                {/* Previous page */}
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleChangePage(null, page - 1)}
+                                    disabled={page === 0}
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        color: page === 0 ? '#ddd' : '#666',
+                                        '&:hover': {
+                                            backgroundColor: page === 0 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: '#ddd'
+                                        }
+                                    }}
+                                >
+                                    <ChevronLeftIcon fontSize="small" />
+                                </IconButton>
+
+                                {/* Page numbers */}
+                                {(() => {
+                                    const totalPages = Math.ceil(totalElements / rowsPerPage);
+                                    const currentPage = page + 1;
+                                    const pages = [];
+
+                                    // Show page numbers around current page (max 3 pages)
+                                    let startPage = Math.max(1, currentPage - 1);
+                                    let endPage = Math.min(totalPages, currentPage + 1);
+
+                                    // Ensure we show at least 3 pages if available
+                                    if (endPage - startPage < 2) {
+                                        if (startPage === 1) {
+                                            endPage = Math.min(totalPages, startPage + 2);
+                                        } else if (endPage === totalPages) {
+                                            startPage = Math.max(1, endPage - 2);
+                                        }
+                                    }
+
+                                    for (let i = startPage; i <= endPage; i++) {
+                                        pages.push(
+                                            <IconButton
+                                                key={i}
+                                                size="small"
+                                                onClick={() => handleChangePage(null, i - 1)}
+                                                sx={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    fontSize: '13px',
+                                                    fontWeight: i === currentPage ? 600 : 400,
+                                                    backgroundColor: i === currentPage ? '#e91e63' : 'transparent',
+                                                    color: i === currentPage ? '#fff' : '#666',
+                                                    minWidth: 'unset',
+                                                    borderRadius: '4px',
+                                                    '&:hover': {
+                                                        backgroundColor: i === currentPage ? '#c2185b' : 'rgba(0, 0, 0, 0.04)'
+                                                    }
+                                                }}
+                                            >
+                                                {i}
+                                            </IconButton>
+                                        );
+                                    }
+
+                                    return pages;
+                                })()}
+
+                                {/* Next page */}
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleChangePage(null, page + 1)}
+                                    disabled={page >= Math.ceil(totalElements / rowsPerPage) - 1}
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        color: page >= Math.ceil(totalElements / rowsPerPage) - 1 ? '#ddd' : '#666',
+                                        '&:hover': {
+                                            backgroundColor: page >= Math.ceil(totalElements / rowsPerPage) - 1 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: '#ddd'
+                                        }
+                                    }}
+                                >
+                                    <ChevronRightIcon fontSize="small" />
+                                </IconButton>
+
+                                {/* Last page */}
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleChangePage(null, Math.ceil(totalElements / rowsPerPage) - 1)}
+                                    disabled={page >= Math.ceil(totalElements / rowsPerPage) - 1}
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        color: page >= Math.ceil(totalElements / rowsPerPage) - 1 ? '#ddd' : '#666',
+                                        '&:hover': {
+                                            backgroundColor: page >= Math.ceil(totalElements / rowsPerPage) - 1 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: '#ddd'
+                                        }
+                                    }}
+                                >
+                                    <LastPageIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Loading state for pagination */}
+                {loading && (
+                    <Box sx={{
+                        borderTop: '1px solid #e0e0e0',
+                        backgroundColor: '#fff',
+                        height: '48px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <CircularProgress size={16} sx={{ color: '#6c757d' }} />
+                    </Box>
+                )}
             </Card>
         </Box>
     );
