@@ -329,4 +329,18 @@ export class ReinsuranceService {
             .patch<any>(`${this.COMMAND_CONTEXT}/portfolio-treaty/${id}`, payload)
             .pipe(map((response) => response.data));
     }
+
+    // Portfolio Treaty Allocation API (Treaty Allocation 3)
+    getPortfolioTreatyAllocation(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-allocation`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    // Portfolio Treaty Participant API (Treaty Allocation 3 - Participant View)
+    getPortfolioTreatyParticipant(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-participant`, payload)
+            .pipe(map((response) => response.data));
+    }
 }
