@@ -336,4 +336,11 @@ export class ReinsuranceService {
             .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-allocation`, payload)
             .pipe(map((response) => response.data));
     }
+
+    // Portfolio Treaty Participant API (Treaty Allocation 3 - Participant View)
+    getPortfolioTreatyParticipant(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-participant`, payload)
+            .pipe(map((response) => response.data));
+    }
 }

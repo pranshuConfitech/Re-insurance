@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Card,
     CardContent,
@@ -10,25 +10,17 @@ import {
     Typography,
     Alert,
     CircularProgress,
-    Paper,
     Divider,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Chip,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    List,
-    ListItem,
-    ListItemText
+    FormControl,
+    FormLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 import treatyAllocationSampleData from '@/data/treaty-allocation-sample.json';
+import AllocationTable from './components/AllocationTable';
+import ParticipantTable from './components/ParticipantTable';
 
 const reinsuranceService = new ReinsuranceService();
 
@@ -81,6 +73,8 @@ export default function TreatyAllocation3Component() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [allocationData, setAllocationData] = useState<TreatyAllocationData[]>([]);
+    const [viewType, setViewType] = useState<'allocation' | 'participant'>('allocation');
+    const [hasSubmittedOnce, setHasSubmittedOnce] = useState<boolean>(false);
     const [formData, setFormData] = useState<AllocationPayload>({
         policy: 'P1',
         productCode: 'FIRE01',
@@ -98,41 +92,34 @@ export default function TreatyAllocation3Component() {
         ownSharePaidClaimOnThisLocation: 32000000
     });
 
-    const handleInputChange = (field: keyof AllocationPayload, value: string | number) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+    // Refetch data when view type changes (only if data has been submitted at least once)
+    useEffect(() => {
+        if (hasSubmittedOnce && allocationData.length > 0) {
+            console.log(`View type changed to: ${viewType}. Refetching data...`);
+            fetchAllocationData();
+        }
+    }, [viewType]);
 
-    const formatCurrency = (amount: number | null) => {
-        if (amount === null || amount === undefined) return '-';
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
-    };
-
-    const formatPercentage = (percent: number | null) => {
-        if (percent === null || percent === undefined) return '-';
-        return `${percent}%`;
-    };
-
-    const handleSubmit = async () => {
+    const fetchAllocationData = async () => {
         setLoading(true);
         setError(null);
-        setAllocationData([]);
 
         try {
             // TODO: Replace with actual API call when ready
-            // const result = await reinsuranceService.getPortfolioTreatyAllocation(formData).toPromise();
+            // Use different API endpoints based on view type
+            // if (viewType === 'allocation') {
+            //     const result = await reinsuranceService.getPortfolioTreatyAllocation(formData).toPromise();
+            //     setAllocationData(result);
+            // } else {
+            //     const result = await reinsuranceService.getPortfolioTreatyParticipant(formData).toPromise();
+            //     setAllocationData(result);
+            // }
 
             // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Use data from JSON file
+            // Use the same data for both views (for now)
+            // In a real implementation, you might want to fetch different data based on viewType
             setAllocationData(treatyAllocationSampleData as TreatyAllocationData[]);
         } catch (err: any) {
             console.error('Error processing allocation:', err);
@@ -142,19 +129,61 @@ export default function TreatyAllocation3Component() {
         }
     };
 
-    const groupedData = allocationData.reduce((acc, item) => {
-        if (!acc[item.blockNumber]) {
-            acc[item.blockNumber] = [];
-        }
-        acc[item.blockNumber].push(item);
-        return acc;
-    }, {} as Record<string, TreatyAllocationData[]>);
+    const handleInputChange = (field: keyof AllocationPayload, value: string | number) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleSubmit = async () => {
+        setHasSubmittedOnce(true);
+        await fetchAllocationData();
+    };
 
     return (
         <Box sx={{ p: 4 }}>
             <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 600, color: '#e91e63' }}>
                 Treaty Allocation 3
             </Typography>
+
+            {/* View Type Selection */}
+            <Box sx={{ mb: 4 }}>
+                <FormControl component="fieldset">
+                    <FormLabel component="legend" sx={{ fontWeight: 600, color: '#333', mb: 2 }}>
+                        View Type
+                    </FormLabel>
+                    <RadioGroup
+                        row
+                        value={viewType}
+                        onChange={(e) => setViewType(e.target.value as 'allocation' | 'participant')}
+                        sx={{ gap: 3 }}
+                    >
+                        <FormControlLabel
+                            value="allocation"
+                            control={<Radio sx={{ color: '#e91e63', '&.Mui-checked': { color: '#e91e63' } }} />}
+                            label="Allocation"
+                            sx={{
+                                '& .MuiFormControlLabel-label': {
+                                    fontWeight: 500,
+                                    fontSize: '1rem'
+                                }
+                            }}
+                        />
+                        <FormControlLabel
+                            value="participant"
+                            control={<Radio sx={{ color: '#e91e63', '&.Mui-checked': { color: '#e91e63' } }} />}
+                            label="Participant"
+                            sx={{
+                                '& .MuiFormControlLabel-label': {
+                                    fontWeight: 500,
+                                    fontSize: '1rem'
+                                }
+                            }}
+                        />
+                    </RadioGroup>
+                </FormControl>
+            </Box>
 
             <Grid container spacing={4}>
                 {/* Risk & Policy Data Section */}
@@ -380,113 +409,27 @@ export default function TreatyAllocation3Component() {
                         <Card sx={{ mt: 3, boxShadow: 3 }}>
                             <CardContent sx={{ p: 4 }}>
                                 <Typography variant="h6" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
-                                    Treaty Allocation Results
+                                    {viewType === 'allocation' ? 'Treaty Allocation Results' : 'Treaty Participant Results'}
+                                    {loading && (
+                                        <CircularProgress
+                                            size={20}
+                                            sx={{ ml: 2, color: '#e91e63' }}
+                                        />
+                                    )}
                                 </Typography>
 
-                                {Object.entries(groupedData).map(([blockNumber, blockData]) => (
-                                    <Accordion key={blockNumber} defaultExpanded sx={{ mb: 2 }}>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            sx={{
-                                                backgroundColor: '#f5f5f5',
-                                                '&:hover': {
-                                                    backgroundColor: '#e91e63',
-                                                    color: 'white',
-                                                    '& .MuiAccordionSummary-expandIconWrapper': {
-                                                        color: 'white'
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                {blockNumber}
-                                            </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails sx={{ p: 0 }}>
-                                            <TableContainer component={Paper} elevation={0}>
-                                                <Table size="small">
-                                                    <TableHead>
-                                                        <TableRow sx={{ backgroundColor: '#fafafa' }}>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Treaty Code</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Balance SI</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Control Cession SI</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Treaty Cession %</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Treaty Premium</TableCell>
-                                                            <TableCell sx={{ fontWeight: 600 }}>Participants</TableCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {blockData.map((item, index) => (
-                                                            <TableRow
-                                                                key={index}
-                                                                sx={{
-                                                                    backgroundColor: item.blockSummaryRow ? '#e3f2fd' : 'inherit',
-                                                                    fontWeight: item.blockSummaryRow ? 600 : 'normal'
-                                                                }}
-                                                            >
-                                                                <TableCell>
-                                                                    {item.treatyCode ? (
-                                                                        <Chip
-                                                                            label={item.treatyCode}
-                                                                            size="small"
-                                                                            color="primary"
-                                                                            variant="outlined"
-                                                                        />
-                                                                    ) : (
-                                                                        item.blockSummaryRow ? (
-                                                                            <Chip
-                                                                                label="SUMMARY"
-                                                                                size="small"
-                                                                                color="secondary"
-                                                                            />
-                                                                        ) : '-'
-                                                                    )}
-                                                                </TableCell>
-                                                                <TableCell>{item.priorityOrder || '-'}</TableCell>
-                                                                <TableCell>{formatCurrency(item.balanceSI)}</TableCell>
-                                                                <TableCell>{formatCurrency(item.controlCessionSI)}</TableCell>
-                                                                <TableCell>{formatPercentage(item.treatyCessionPercent)}</TableCell>
-                                                                <TableCell>{formatCurrency(item.treatyRIPremium)}</TableCell>
-                                                                <TableCell>
-                                                                    {item.participants && item.participants.length > 0 ? (
-                                                                        <Box>
-                                                                            {item.participants.map((participant, pIndex) => (
-                                                                                <Box key={pIndex} sx={{ mb: 1 }}>
-                                                                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                                                                        {participant.participantName}
-                                                                                    </Typography>
-                                                                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 0.5 }}>
-                                                                                        <Chip
-                                                                                            label={participant.participantType}
-                                                                                            size="small"
-                                                                                            color={participant.participantType === 'REINSURER' ? 'success' : 'warning'}
-                                                                                            variant="outlined"
-                                                                                        />
-                                                                                        <Chip
-                                                                                            label={`${participant.sharePercent}%`}
-                                                                                            size="small"
-                                                                                            variant="outlined"
-                                                                                        />
-                                                                                        <Chip
-                                                                                            label={formatCurrency(participant.participantRISI)}
-                                                                                            size="small"
-                                                                                            variant="outlined"
-                                                                                        />
-                                                                                    </Box>
-                                                                                </Box>
-                                                                            ))}
-                                                                        </Box>
-                                                                    ) : '-'}
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        ))}
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                ))}
+                                {loading ? (
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+                                        <CircularProgress size={40} sx={{ color: '#e91e63' }} />
+                                        <Typography sx={{ ml: 2, color: '#666' }}>
+                                            Loading {viewType === 'allocation' ? 'allocation' : 'participant'} data...
+                                        </Typography>
+                                    </Box>
+                                ) : viewType === 'allocation' ? (
+                                    <AllocationTable data={allocationData} />
+                                ) : (
+                                    <ParticipantTable data={allocationData} />
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>

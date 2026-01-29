@@ -63,27 +63,10 @@
         ]
     },
     {
-        "blockSummaryRow": true,
-        "participantRow": false,
-        "blockNumber": "Block 1",
-        "treatyCode": null,
-        "priorityOrder": null,
-        "balanceSI": 180000000,
-        "controlCessionSI": 20000000,
-        "controlValue": null,
-        "earlierTreatySI": null,
-        "incrementalTreatySI": null,
-        "treatyCessionSI": null,
-        "treatyCessionPercent": null,
-        "treatyRIPremium": null,
-        "treatyCommision": null,
-        "participants": null
-    },
-    {
         "blockSummaryRow": false,
         "participantRow": false,
         "blockNumber": "Block 2",
-        "treatyCode": "21",
+        "treatyCode": "T21",
         "priorityOrder": 21,
         "balanceSI": 180000000,
         "controlCessionSI": 20000000,
@@ -132,23 +115,6 @@
                 "reinsurers": null
             }
         ]
-    },
-    {
-        "blockSummaryRow": true,
-        "participantRow": false,
-        "blockNumber": "Block 2",
-        "treatyCode": null,
-        "priorityOrder": null,
-        "balanceSI": 170000000,
-        "controlCessionSI": 30000000,
-        "controlValue": null,
-        "earlierTreatySI": null,
-        "incrementalTreatySI": null,
-        "treatyCessionSI": null,
-        "treatyCessionPercent": null,
-        "treatyRIPremium": null,
-        "treatyCommision": null,
-        "participants": null
     },
     {
         "blockSummaryRow": false,
@@ -223,23 +189,6 @@
         ]
     },
     {
-        "blockSummaryRow": true,
-        "participantRow": false,
-        "blockNumber": "Block 3",
-        "treatyCode": null,
-        "priorityOrder": null,
-        "balanceSI": 150000000,
-        "controlCessionSI": 50000000,
-        "controlValue": null,
-        "earlierTreatySI": null,
-        "incrementalTreatySI": null,
-        "treatyCessionSI": null,
-        "treatyCessionPercent": null,
-        "treatyRIPremium": null,
-        "treatyCommision": null,
-        "participants": null
-    },
-    {
         "blockSummaryRow": false,
         "participantRow": false,
         "blockNumber": "Block 4",
@@ -267,23 +216,6 @@
         ]
     },
     {
-        "blockSummaryRow": true,
-        "participantRow": false,
-        "blockNumber": "Block 4",
-        "treatyCode": null,
-        "priorityOrder": null,
-        "balanceSI": 150000000,
-        "controlCessionSI": 50000000,
-        "controlValue": null,
-        "earlierTreatySI": null,
-        "incrementalTreatySI": null,
-        "treatyCessionSI": null,
-        "treatyCessionPercent": null,
-        "treatyRIPremium": null,
-        "treatyCommision": null,
-        "participants": null
-    },
-    {
         "blockSummaryRow": false,
         "participantRow": false,
         "blockNumber": "Block 5",
@@ -309,22 +241,5 @@
                 "reinsurers": null
             }
         ]
-    },
-    {
-        "blockSummaryRow": true,
-        "participantRow": false,
-        "blockNumber": "Block 5",
-        "treatyCode": null,
-        "priorityOrder": null,
-        "balanceSI": 150000000,
-        "controlCessionSI": 50000000,
-        "controlValue": null,
-        "earlierTreatySI": null,
-        "incrementalTreatySI": null,
-        "treatyCessionSI": null,
-        "treatyCessionPercent": null,
-        "treatyRIPremium": null,
-        "treatyCommision": null,
-        "participants": null
     }
 ]
