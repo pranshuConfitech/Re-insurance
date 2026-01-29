@@ -13,12 +13,9 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Collapse,
-    IconButton
+    Collapse
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 interface Participant {
     participantType: string;
@@ -151,18 +148,7 @@ const ImprovedAllocationTable: React.FC<ImprovedAllocationTableProps> = ({ data 
                                                     }}
                                                 >
                                                     <TableCell>
-                                                        {hasParticipants && (
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => toggleRowExpansion(rowId)}
-                                                                sx={{
-                                                                    color: '#607d8b',
-                                                                    '&:hover': { backgroundColor: '#e3f2fd' }
-                                                                }}
-                                                            >
-                                                                {isExpanded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                                                            </IconButton>
-                                                        )}
+                                                        {/* Empty cell - no arrow needed */}
                                                     </TableCell>
                                                     <TableCell>
                                                         {item.treatyCode ? (
@@ -200,9 +186,17 @@ const ImprovedAllocationTable: React.FC<ImprovedAllocationTableProps> = ({ data 
                                                                         label={`${totalCount} Participant${totalCount > 1 ? 's' : ''}`}
                                                                         size="small"
                                                                         variant="outlined"
+                                                                        onClick={() => toggleRowExpansion(rowId)}
                                                                         sx={{
                                                                             color: '#607d8b',
-                                                                            borderColor: '#607d8b'
+                                                                            borderColor: '#607d8b',
+                                                                            cursor: 'pointer',
+                                                                            '&:hover': {
+                                                                                backgroundColor: '#e91e63',
+                                                                                color: 'black',
+                                                                                borderColor: '#e91e63'
+                                                                            },
+                                                                            transition: 'all 0.2s ease-in-out'
                                                                         }}
                                                                     />
                                                                 );
