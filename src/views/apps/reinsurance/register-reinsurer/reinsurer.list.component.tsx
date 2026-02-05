@@ -1,65 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FettleDataGrid } from '@/views/apps/shared-component/components/fettle.data.grid';
-import { http } from '../../../../services/remote-api/http.client';
 import { map } from 'rxjs/operators';
 import { Button, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
 
-interface ContactNo {
-    id: string | null;
-    contactNo: string;
-    contactType: 'PRIMARY' | 'SECONDARY';
-}
-
-interface Email {
-    id: string | null;
-    emailId: string;
-    contactType: 'PRIMARY' | 'SECONDARY';
-}
-
-interface ReinsurerData {
-    id: string;
-    reinsurerCode: string;
-    reinsurerName: string;
-    panNumber: string;
-    createdBy: string;
-    policeStation: string;
-    poBox: string;
-    logoFormat: string | null;
-    contactNos: ContactNo[];
-    emails: Email[];
-    faxs: any[];
-    logo: string | null;
-    contactPerson: string | null;
-}
-
-interface PageResponse<T> {
-    content: T[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-    pageable: {
-        pageNumber: number;
-        pageSize: number;
-        sort: any[];
-        offset: number;
-        paged: boolean;
-        unpaged: boolean;
-    };
-    last: boolean;
-    first: boolean;
-    numberOfElements: number;
-    empty: boolean;
-    sort: any[];
-}
+const reinsuranceService = new ReinsuranceService();
 
 export default function ReinsurerListComponent() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
 
-    const openEditSection = (reinsurer: ReinsurerData) => {
+    const openEditSection = (reinsurer: any) => {
         if (!reinsurer || !reinsurer.id) {
             console.error("Attempted to open edit section with invalid reinsurer data:", reinsurer);
             return;
@@ -149,24 +102,20 @@ export default function ReinsurerListComponent() {
     const $datasource = (params?: any) => {
         setError(null);
 
-        // Construct query parameters
-        const queryParams = new URLSearchParams({
-            page: params?.page || '0',
-            size: params?.pageSize || '10',
-            summary: 'true',
-            active: 'true'
-        });
+        // Use the consolidated reinsurance service
+        const serviceParams = {
+            page: params?.page || 0,
+            size: params?.pageSize || 10,
+            summary: true,
+            active: true,
+            searchKey: params?.search || ''
+        };
 
-        // Add search parameter if provided
-        if (params?.search) {
-            queryParams.append('search', params.search);
-        }
-
-        return http.get<PageResponse<ReinsurerData>>(`/reinsurance-query-service/v1/reinsurance?${queryParams.toString()}`)
+        return reinsuranceService.getReinsurers(serviceParams)
             .pipe(
                 map(response => {
                     // Transform the response to match the grid's expected format
-                    const content = response.data.content.map((item, index) => ({
+                    const content = response.content.map((item, index) => ({
                         ...item,
                         slNo: (params?.page || 0) * (params?.pageSize || 10) + index + 1,
                         phoneNo: item.contactNos?.[0]?.contactNo || '-',
@@ -175,10 +124,10 @@ export default function ReinsurerListComponent() {
 
                     return {
                         content,
-                        totalElements: response.data.totalElements,
-                        totalPages: response.data.totalPages,
-                        size: response.data.size,
-                        number: response.data.number
+                        totalElements: response.totalElements,
+                        totalPages: response.totalPages,
+                        size: response.size,
+                        number: response.number
                     };
                 })
             );

@@ -3,10 +3,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Button, Card, Grid, Step, StepLabel, Stepper, TextField, Typography, MenuItem, StepConnector, CircularProgress, Alert, styled } from '@mui/material';
 import { withStyles, makeStyles } from '@mui/styles';
 import clsx from 'clsx';
-import { http } from '../../../../services/remote-api/http.client';
 import { map } from 'rxjs/operators';
 import type { AxiosError } from 'axios';
 import { Image, Edit } from '@mui/icons-material';
+import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
+
+const reinsuranceService = new ReinsuranceService();
 
 const ColorlibConnector = withStyles((theme: any) => ({
     alternativeLabel: {
@@ -260,8 +262,7 @@ export default function RegisterReinsurerForm() {
         console.log("useEffect: mode=", mode, "reinsurerId=", reinsurerId);
         if (mode === 'edit' && reinsurerId) {
             setLoading(true);
-            http.get<any>(`/reinsurance-query-service/v1/reinsurance/${reinsurerId}`)
-                .pipe(map(response => response.data))
+            reinsuranceService.getReinsurerById(reinsurerId)
                 .subscribe({
                     next: (data) => {
                         console.log("API data fetched:", data);
@@ -445,8 +446,7 @@ export default function RegisterReinsurerForm() {
                 poBox: form.poBox,
             };
 
-            http.post<Record<string, any>>('/reinsurance-command-service/v1/reinsurance', payload)
-                .pipe(map(response => response.data))
+            reinsuranceService.saveReinsurer(payload)
                 .subscribe({
                     next: (data) => {
                         console.log("Step 1 API response data:", data);
@@ -547,8 +547,7 @@ export default function RegisterReinsurerForm() {
         };
 
         if (reinsurerIdState) { // Use reinsurerIdState for update operation
-            http.patch<Record<string, any>>(`/reinsurance-command-service/v1/reinsurance/${reinsurerIdState}?step=2`, payload)
-                .pipe(map(response => response.data))
+            reinsuranceService.updateReinsurer(reinsurerIdState, { ...payload, step: 2 })
                 .subscribe({
                     next: () => {
                         router.replace('/reinsurance/register-reinsurer?mode=viewList');
