@@ -7,33 +7,102 @@ import type { PageRequest } from '../../models/page.request'; // Assuming PageRe
 
 // Define the type for broker data if you have a specific model, otherwise use any
 interface Broker {
-    id: number;
-    slNo: number;
+    id: string;
+    slNo?: number;
     brokerName: string;
     brokerCode: string;
-    contactPerson: string;
-    phoneNo: string;
-    email: string;
-    // Add other broker properties here
+    panNumber: string;
+    createdBy: string;
+    policeStation: string;
+    poBox: string;
+    logoFormat: string | null;
+    contactNos: Array<{
+        id: string | null;
+        contactNo: string;
+        contactType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    emails: Array<{
+        id: string | null;
+        emailId: string;
+        contactType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    faxs: Array<{
+        id: string | null;
+        faxNo: string;
+        faxType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    logo: string | null;
+    contactPerson: {
+        prefix: string;
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        contactPhoneNo: string;
+        contactMobileNo: string;
+        contactEmail: string;
+    } | null;
+    address: {
+        address1: string;
+        address2: string;
+        country: string;
+        county: string;
+        city: string;
+        pinCode: string;
+        policeStation: string;
+        poBox: string;
+    } | null;
 }
 
 // Define the type for reinsurer data if you have a specific model, otherwise use any
 interface Reinsurer {
-    id: number;
-    slNo: number;
+    id: string;
+    slNo?: number;
     reinsurerName: string;
     reinsurerCode: string;
-    contactPerson: string;
-    phoneNo: string;
-    email: string;
-    // Add other reinsurer properties here
+    panNumber: string;
+    createdBy: string;
+    policeStation: string;
+    poBox: string;
+    logoFormat: string | null;
+    contactNos: Array<{
+        id: string | null;
+        contactNo: string;
+        contactType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    emails: Array<{
+        id: string | null;
+        emailId: string;
+        contactType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    faxs: Array<{
+        id: string | null;
+        faxNo: string;
+        faxType: 'PRIMARY' | 'SECONDARY';
+    }>;
+    logo: string | null;
+    contactPerson: {
+        prefix: string;
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        contactPhoneNo: string;
+        contactMobileNo: string;
+        contactEmail: string;
+    } | null;
+    address: {
+        address1: string;
+        address2: string;
+        country: string;
+        county: string;
+        city: string;
+        pinCode: string;
+        policeStation: string;
+        poBox: string;
+    } | null;
 }
 
 export class ReinsuranceService {
-    readonly BROKER_QUERY_CONTEXT = `/reinsurance-query-service/v1/reinsurance-broker`; // Updated context name
-    readonly REINSURER_QUERY_CONTEXT = `/reinsurance-query-service/v1/reinsurance`; // New context for reinsurers
-    readonly COMMAND_CONTEXT = `/reinsurance-command-service/v1`; // New context for reinsurers
-    readonly QUERY_CONTEXT = `reinsurance-query-service/v1`; // New context for reinsurers
+    readonly BASE_CONTEXT = `/reinsurance-service/v1`; // Consolidated service context
 
     getBrokers(params?: any): Observable<Page<Broker>> {
         // Use the http client to make the GET request
@@ -43,7 +112,7 @@ export class ReinsuranceService {
         const summary = params?.summary || true; // Default summary
         const active = params?.active || true; // Default active
         const searchKey = params?.searchKey || ''; // Get search key
-        let apiUrl = `${this.BROKER_QUERY_CONTEXT}?page=${page}&size=${size}&summary=${summary}&active=${active}`;
+        let apiUrl = `${this.BASE_CONTEXT}/reinsurance-broker?page=${page}&size=${size}&summary=${summary}&active=${active}`;
 
         if (searchKey) {
             apiUrl += `&searchKey=${encodeURIComponent(searchKey)}`;
@@ -51,6 +120,12 @@ export class ReinsuranceService {
         return http
             .get<Page<Broker>>(apiUrl)
             .pipe(map(response => response.data)); // Extract the data from the AxiosResponse
+    }
+
+    getBrokerById(id: string): Observable<Broker> {
+        return http
+            .get<Broker>(`${this.BASE_CONTEXT}/reinsurance-broker/${id}`)
+            .pipe(map(response => response.data));
     }
 
     getReinsurers(params?: any): Observable<Page<Reinsurer>> {
@@ -61,7 +136,7 @@ export class ReinsuranceService {
         const active = params?.active || true; // Default active
         const searchKey = params?.searchKey || ''; // Get search key
 
-        let apiUrl = `${this.REINSURER_QUERY_CONTEXT}?page=${page}&size=${size}&summary=${summary}&active=${active}`;
+        let apiUrl = `${this.BASE_CONTEXT}/reinsurance?page=${page}&size=${size}&summary=${summary}&active=${active}`;
 
         if (searchKey) {
             apiUrl += `&searchKey=${encodeURIComponent(searchKey)}`;
@@ -74,24 +149,56 @@ export class ReinsuranceService {
             .pipe(map(response => response.data)); // Extract the data from the AxiosResponse
     }
 
-    // /reinsurance-command-service/v1/treaty
+    getReinsurerById(id: string): Observable<Reinsurer> {
+        return http
+            .get<Reinsurer>(`${this.BASE_CONTEXT}/reinsurance/${id}`)
+            .pipe(map(response => response.data));
+    }
+
+    // Broker CRUD operations
+    saveBroker(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/reinsurance-broker`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    updateBroker(id: string, payload: any): Observable<any> {
+        return http
+            .patch<any>(`${this.BASE_CONTEXT}/reinsurance-broker/${id}`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    // Reinsurer CRUD operations
+    saveReinsurer(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/reinsurance`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    updateReinsurer(id: string, payload: any): Observable<any> {
+        return http
+            .patch<any>(`${this.BASE_CONTEXT}/reinsurance/${id}`, payload)
+            .pipe(map((response) => response.data));
+    }
+
+    // /reinsurance-service/v1/treaty
     saveTreaty(payload: any): Observable<Map<string, any>> {
         return http
-            .post<Map<string, any>>(`${this.COMMAND_CONTEXT}/treaty`, payload)
+            .post<Map<string, any>>(`${this.BASE_CONTEXT}/treaty`, payload)
             .pipe(map((response) => response.data));
     }
     updateTreaty(id: any, payload: any): Observable<Map<string, any>> {
         return http
-            .patch<Map<string, any>>(`${this.COMMAND_CONTEXT}/treaty/${id}`, payload)
+            .patch<Map<string, any>>(`${this.BASE_CONTEXT}/treaty/${id}`, payload)
             .pipe(map((response) => response.data));
     }
-    // /reinsurance-query-service/v1/treaty?page=0&size=10&summary=true&active=true
+    // /reinsurance-service/v1/treaty?page=0&size=10&summary=true&active=true
     getAllTreaty(
         pageRequest: any
     ): Observable<any> {
         // ): Observable<Page<PreAuth>> {
         return http
-            .get<Page<any>>(`${this.QUERY_CONTEXT}/treaty`, { params: pageRequest })
+            .get<Page<any>>(`${this.BASE_CONTEXT}/treaty`, { params: pageRequest })
             .pipe(map((response) => response));
     }
     getTreatyById(
@@ -99,7 +206,7 @@ export class ReinsuranceService {
     ): Observable<any> {
         // ): Observable<Page<PreAuth>> {
         return http
-            .get<Page<any>>(`${this.QUERY_CONTEXT}/treaty/${id}`)
+            .get<Page<any>>(`${this.BASE_CONTEXT}/treaty/${id}`)
             .pipe(map((response) => response));
     }
 
@@ -108,7 +215,7 @@ export class ReinsuranceService {
         pageRequest: any
     ): Observable<any> {
         return http
-            .get<Page<any>>(`${this.QUERY_CONTEXT}/treaty-configuration`, { params: pageRequest })
+            .get<Page<any>>(`${this.BASE_CONTEXT}/treaty-configuration`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
@@ -116,53 +223,53 @@ export class ReinsuranceService {
         id: any
     ): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-configuration/${id}`)
+            .get<any>(`${this.BASE_CONTEXT}/treaty-configuration/${id}`)
             .pipe(map((response) => response));
     }
 
     // Save treaty configuration
     saveTreatyConfiguration(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/treaty-configuration`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/treaty-configuration`, payload)
             .pipe(map((response) => response.data));
     }
 
     // Surplus Participant APIs
     getAllSurplusParticipants(pageRequest: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant`, { params: pageRequest })
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
     getSurplusParticipantById(id: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant/${id}`)
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant/${id}`)
             .pipe(map((response) => response));
     }
 
     saveSurplusParticipant(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/surplus-participant`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/surplus-participant`, payload)
             .pipe(map((response) => response.data));
     }
 
     updateSurplusParticipant(id: any, payload: any): Observable<any> {
         return http
-            .patch<any>(`${this.COMMAND_CONTEXT}/surplus-participant/${id}`, payload)
+            .patch<any>(`${this.BASE_CONTEXT}/surplus-participant/${id}`, payload)
             .pipe(map((response) => response.data));
     }
 
     // Treaty Allocation API
     getTreatyAllocation(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-allocation?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/treaty-allocation?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // Treaty Allocation Excel Download
     downloadTreatyAllocationExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-allocation?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/treaty-allocation?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -171,14 +278,14 @@ export class ReinsuranceService {
     // Surplus Participant Allocation API
     getSurplusParticipantAllocation(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // Surplus Participant Allocation Excel Download
     downloadSurplusParticipantAllocationExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -187,14 +294,14 @@ export class ReinsuranceService {
     // Proportional Allocations on Claim API
     getProportionalAllocationsOnClaim(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-allocation/proportional-allocations-on-claim?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/treaty-allocation/proportional-allocations-on-claim?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // Proportional Allocations on Claim Excel Download
     downloadProportionalAllocationsOnClaimExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-allocation/proportional-allocations-on-claim?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/treaty-allocation/proportional-allocations-on-claim?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -203,14 +310,14 @@ export class ReinsuranceService {
     // Surplus Participant Allocation Paid Claims API
     getSurplusParticipantAllocationPaidClaims(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation/paid-claims?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation/paid-claims?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // Surplus Participant Allocation Paid Claims Excel Download
     downloadSurplusParticipantAllocationPaidClaimsExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation/paid-claims?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation/paid-claims?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -219,14 +326,14 @@ export class ReinsuranceService {
     // Surplus Participant Allocation Outstanding Claims API
     getSurplusParticipantAllocationOutstandingClaims(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation/outstanding-claims?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation/outstanding-claims?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // Surplus Participant Allocation Outstanding Claims Excel Download
     downloadSurplusParticipantAllocationOutstandingClaimsExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/surplus-participant-allocation/outstanding-claims?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/surplus-participant-allocation/outstanding-claims?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -235,52 +342,52 @@ export class ReinsuranceService {
     // XOL Treaty Master APIs
     getAllXolTreatyMaster(pageRequest: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/xol-treaty-master`, { params: pageRequest })
+            .get<any>(`${this.BASE_CONTEXT}/xol-treaty-master`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
     getXolTreatyMasterById(id: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/xol-treaty-master/${id}`)
+            .get<any>(`${this.BASE_CONTEXT}/xol-treaty-master/${id}`)
             .pipe(map((response) => response));
     }
 
     saveXolTreatyMaster(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/xol-treaty-master`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/xol-treaty-master`, payload)
             .pipe(map((response) => response.data));
     }
 
     updateXolTreatyMaster(id: any, payload: any): Observable<any> {
         return http
-            .patch<any>(`${this.COMMAND_CONTEXT}/xol-treaty-master/${id}`, payload)
+            .patch<any>(`${this.BASE_CONTEXT}/xol-treaty-master/${id}`, payload)
             .pipe(map((response) => response.data));
     }
 
     // XOL Treaty APIs
     saveXolTreaty(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/xol-treaty`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/xol-treaty`, payload)
             .pipe(map((response) => response.data));
     }
 
     getAllXolTreaties(pageRequest: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/xol-treaty`, { params: pageRequest })
+            .get<any>(`${this.BASE_CONTEXT}/xol-treaty`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
     // XOL Treaty Definition Allocation API
     getXolTreatyDefinitionAllocation(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/xol-treaty-definition-allocation?responseType=JSON`)
+            .get<any>(`${this.BASE_CONTEXT}/xol-treaty-definition-allocation?responseType=JSON`)
             .pipe(map((response) => response.data));
     }
 
     // XOL Treaty Definition Allocation Excel Download
     downloadXolTreatyDefinitionAllocationExcel(): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/xol-treaty-definition-allocation?responseType=EXCEL`, {
+            .get<any>(`${this.BASE_CONTEXT}/xol-treaty-definition-allocation?responseType=EXCEL`, {
                 responseType: 'blob' as 'json'
             })
             .pipe(map((response) => response.data));
@@ -289,58 +396,58 @@ export class ReinsuranceService {
     // Treaty Definition APIs (Treaty Config 3)
     saveTreatyDefinition(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/treaty-definition`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/treaty-definition`, payload)
             .pipe(map((response) => response.data));
     }
 
     getAllTreatyDefinitions(pageRequest: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-definition`, { params: pageRequest })
+            .get<any>(`${this.BASE_CONTEXT}/treaty-definition`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
     getTreatyDefinitionById(id: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/treaty-definition/${id}`)
+            .get<any>(`${this.BASE_CONTEXT}/treaty-definition/${id}`)
             .pipe(map((response) => response));
     }
 
     // Portfolio Treaty APIs (Treaty Config 4)
     savePortfolioTreaty(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.COMMAND_CONTEXT}/portfolio-treaty`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty`, payload)
             .pipe(map((response) => response.data));
     }
 
     getAllPortfolioTreaties(pageRequest: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/portfolio-treaty`, { params: pageRequest })
+            .get<any>(`${this.BASE_CONTEXT}/portfolio-treaty`, { params: pageRequest })
             .pipe(map((response) => response));
     }
 
     getPortfolioTreatyById(id: any): Observable<any> {
         return http
-            .get<any>(`${this.QUERY_CONTEXT}/portfolio-treaty/${id}`)
+            .get<any>(`${this.BASE_CONTEXT}/portfolio-treaty/${id}`)
             .pipe(map((response) => response));
     }
 
     updatePortfolioTreaty(id: any, payload: any): Observable<any> {
         return http
-            .patch<any>(`${this.COMMAND_CONTEXT}/portfolio-treaty/${id}`, payload)
+            .patch<any>(`${this.BASE_CONTEXT}/portfolio-treaty/${id}`, payload)
             .pipe(map((response) => response.data));
     }
 
     // Portfolio Treaty Allocation API (Treaty Allocation 3)
     getPortfolioTreatyAllocation(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-allocation`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty-allocation`, payload)
             .pipe(map((response) => response.data));
     }
 
     // Portfolio Treaty Participant API (Treaty Allocation 3 - Participant View)
     getPortfolioTreatyParticipant(payload: any): Observable<any> {
         return http
-            .post<any>(`${this.QUERY_CONTEXT}/portfolio-treaty-participant`, payload)
+            .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty-participant`, payload)
             .pipe(map((response) => response.data));
     }
 }

@@ -3,10 +3,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Button, Card, Grid, Step, StepLabel, Stepper, TextField, Typography, MenuItem, StepConnector, CircularProgress, Alert, styled } from '@mui/material';
 import { withStyles, makeStyles } from '@mui/styles';
 import clsx from 'clsx';
-import { http } from '../../../../services/remote-api/http.client';
 import { map } from 'rxjs/operators';
 import type { AxiosError } from 'axios';
 import { Image, Edit } from '@mui/icons-material';
+import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
+
+const reinsuranceService = new ReinsuranceService();
 
 const ColorlibConnector = withStyles((theme: any) => ({
     alternativeLabel: {
@@ -263,44 +265,45 @@ export default function RegisterBrokerForm() {
         console.log("useEffect: mode=", mode, "brokerId=", brokerId);
         if (mode === 'edit' && brokerId) {
             setLoading(true);
-            http.get<any>(`/reinsurance-query-service/v1/reinsurance-broker/${brokerId}`)
-                .pipe(map(response => response.data))
+            reinsuranceService.getBrokerById(brokerId)
                 .subscribe({
                     next: (data) => {
                         console.log("API data fetched:", data);
-                        setForm(prev => ({
-                            ...prev,
-                            brokerCode: data.brokerCode || '',
-                            brokerName: data.brokerName || '',
-                            panNo: data.panNumber || '',
-                            // Primary Phone No
-                            phoneNo: data.contactNos?.find((c: any) => c.contactType === 'PRIMARY')?.contactNo || '',
-                            // Alternative Phone No
-                            altPhoneNo: data.contactNos?.find((c: any) => c.contactType === 'SECONDARY')?.contactNo || '',
-                            // Primary Fax No
-                            faxNo: data.faxs?.find((f: any) => f.faxType === 'PRIMARY')?.faxNo || '',
-                            // Alternative Fax No
-                            altFaxNo: data.faxs?.find((f: any) => f.faxType === 'SECONDARY')?.faxNo || '',
-                            // Primary Email
-                            email: data.emails?.find((e: any) => e.contactType === 'PRIMARY')?.emailId || '',
-                            // Alternative Email
-                            altEmail: data.emails?.find((e: any) => e.contactType === 'SECONDARY')?.emailId || '',
-                            address1: data.address?.address1 || '',
-                            address2: data.address?.address2 || '',
-                            country: data.address?.country || '',
-                            county: data.address?.county || '',
-                            city: data.address?.city || '',
-                            pinCode: data.address?.pinCode || '',
-                            policeStation: data.address?.policeStation || '',
-                            poBox: data.address?.poBox || '',
-                            prefix: data.contactPerson?.prefix || '',
-                            firstName: data.contactPerson?.firstName || '',
-                            middleName: data.contactPerson?.middleName || '',
-                            lastName: data.contactPerson?.lastName || '',
-                            contactPhoneNo: data.contactPerson?.contactPhoneNo || '',
-                            contactMobileNo: data.contactPerson?.contactMobileNo || '',
-                            contactEmail: data.contactPerson?.contactEmail || '',
-                        }));
+                        if (data) {
+                            setForm(prev => ({
+                                ...prev,
+                                brokerCode: data.brokerCode || '',
+                                brokerName: data.brokerName || '',
+                                panNo: data.panNumber || '',
+                                // Primary Phone No
+                                phoneNo: data.contactNos?.find((c: any) => c.contactType === 'PRIMARY')?.contactNo || '',
+                                // Alternative Phone No
+                                altPhoneNo: data.contactNos?.find((c: any) => c.contactType === 'SECONDARY')?.contactNo || '',
+                                // Primary Fax No
+                                faxNo: data.faxs?.find((f: any) => f.faxType === 'PRIMARY')?.faxNo || '',
+                                // Alternative Fax No
+                                altFaxNo: data.faxs?.find((f: any) => f.faxType === 'SECONDARY')?.faxNo || '',
+                                // Primary Email
+                                email: data.emails?.find((e: any) => e.contactType === 'PRIMARY')?.emailId || '',
+                                // Alternative Email
+                                altEmail: data.emails?.find((e: any) => e.contactType === 'SECONDARY')?.emailId || '',
+                                address1: data.address?.address1 || '',
+                                address2: data.address?.address2 || '',
+                                country: data.address?.country || '',
+                                county: data.address?.county || '',
+                                city: data.address?.city || '',
+                                pinCode: data.address?.pinCode || '',
+                                policeStation: data.address?.policeStation || '',
+                                poBox: data.address?.poBox || '',
+                                prefix: data.contactPerson?.prefix || '',
+                                firstName: data.contactPerson?.firstName || '',
+                                middleName: data.contactPerson?.middleName || '',
+                                lastName: data.contactPerson?.lastName || '',
+                                contactPhoneNo: data.contactPerson?.contactPhoneNo || '',
+                                contactMobileNo: data.contactPerson?.contactMobileNo || '',
+                                contactEmail: data.contactPerson?.contactEmail || '',
+                            }));
+                        }
                         setLoading(false);
                     },
                     error: (err: AxiosError<ErrorResponse>) => {
@@ -441,8 +444,7 @@ export default function RegisterBrokerForm() {
                 poBox: form.poBox,
             };
 
-            http.post<Record<string, any>>('/reinsurance-command-service/v1/reinsurance-broker', payload)
-                .pipe(map(response => response.data))
+            reinsuranceService.saveBroker(payload)
                 .subscribe({
                     next: (data) => {
                         console.log("Step 1 API response data:", data);
@@ -565,8 +567,7 @@ export default function RegisterBrokerForm() {
         };
 
         if (brokerIdState) { // Use brokerIdState for update operation
-            http.patch<Record<string, any>>(`/reinsurance-command-service/v1/reinsurance-broker/${brokerIdState}?step=2`, payload)
-                .pipe(map(response => response.data))
+            reinsuranceService.updateBroker(brokerIdState, { ...payload, step: 2 })
                 .subscribe({
                     next: () => {
                         router.replace('/reinsurance/register-broker?mode=viewList');

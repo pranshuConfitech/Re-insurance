@@ -121,7 +121,7 @@
         "blockSummaryRow": false,
         "participantRow": false,
         "blockNumber": "Block 2",
-        "treatyCode": "SBI Retention",
+        "treatyCode": "T21",
         "priorityOrder": 21,
         "balanceSI": 180000000,
         "controlCessionSI": 20000000,
