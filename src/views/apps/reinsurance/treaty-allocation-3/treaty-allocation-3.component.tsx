@@ -49,13 +49,17 @@ interface TreatyAllocationData {
 
 interface AllocationPayload {
     policy: string;
+    companyUIN: string;
+    operatingUnitUIN: string;
+    productLOB: string;
     productCode: string;
     riskGrade: number;
     accountingLOB: string;
     riskCategory: string;
     ownSharePMLRISI: number;
-    gwp: number;
+    policyPremium: number;
     riskStartDate: string;
+    endrNo: string;
     incurredClaimOnThisLocation: number;
     outstandingClaimOnThisLocation: number;
     paidClaimOnThisLocation: number;
@@ -70,13 +74,17 @@ export default function TreatyAllocation3Component() {
     const [allocationData, setAllocationData] = useState<TreatyAllocationData[]>([]);
     const [formData, setFormData] = useState<AllocationPayload>({
         policy: 'P1',
-        productCode: 'FIRE01',
+        companyUIN: 'INS-IND-001',
+        operatingUnitUIN: 'INDIA',
+        productLOB: 'MOTOR',
+        productCode: 'MOT0991',
         riskGrade: 1,
-        accountingLOB: 'Fire',
-        riskCategory: 'Fire',
-        ownSharePMLRISI: 200000000,
-        gwp: 2000000,
-        riskStartDate: '2020-04-01',
+        accountingLOB: 'FIRE',
+        riskCategory: 'STD',
+        ownSharePMLRISI: 400000000,
+        policyPremium: 4000000,
+        riskStartDate: '2026-02-24',
+        endrNo: 'e1',
         incurredClaimOnThisLocation: 100000000,
         outstandingClaimOnThisLocation: 60000000,
         paidClaimOnThisLocation: 40000000,
@@ -120,7 +128,7 @@ export default function TreatyAllocation3Component() {
     return (
         <Box sx={{ p: 4 }}>
             <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 600, color: '#e91e63' }}>
-                Treaty Allocation 3
+                Premium Allocation
             </Typography>
 
             <Grid container spacing={4}>
@@ -138,6 +146,36 @@ export default function TreatyAllocation3Component() {
                                         label="Policy"
                                         value={formData.policy}
                                         onChange={(e) => handleInputChange('policy', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Company UIN"
+                                        value={formData.companyUIN}
+                                        onChange={(e) => handleInputChange('companyUIN', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Operating Unit UIN"
+                                        value={formData.operatingUnitUIN}
+                                        onChange={(e) => handleInputChange('operatingUnitUIN', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Product LOB"
+                                        value={formData.productLOB}
+                                        onChange={(e) => handleInputChange('productLOB', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                     />
@@ -171,6 +209,9 @@ export default function TreatyAllocation3Component() {
                                         onChange={(e) => handleInputChange('accountingLOB', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
@@ -181,6 +222,9 @@ export default function TreatyAllocation3Component() {
                                         onChange={(e) => handleInputChange('riskCategory', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
@@ -197,10 +241,10 @@ export default function TreatyAllocation3Component() {
                                 <Grid item xs={12} sm={6} md={3}>
                                     <TextField
                                         fullWidth
-                                        label="GWP"
+                                        label="Policy Premium"
                                         type="number"
-                                        value={formData.gwp}
-                                        onChange={(e) => handleInputChange('gwp', parseFloat(e.target.value) || 0)}
+                                        value={formData.policyPremium}
+                                        onChange={(e) => handleInputChange('policyPremium', parseFloat(e.target.value) || 0)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                     />
@@ -219,9 +263,20 @@ export default function TreatyAllocation3Component() {
                                         }}
                                     />
                                 </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Endorsement No"
+                                        value={formData.endrNo}
+                                        onChange={(e) => handleInputChange('endrNo', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
                             </Grid>
 
-                            <Divider sx={{ my: 4 }} />
+                            {/* Claim Figures Section - Commented Out */}
+                            {/* <Divider sx={{ my: 4 }} />
 
                             <Typography variant="h6" gutterBottom sx={{ mb: 4, fontWeight: 600 }}>
                                 Claim Figures
@@ -293,7 +348,7 @@ export default function TreatyAllocation3Component() {
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
-                            </Grid>
+                            </Grid> */}
                         </CardContent>
                     </Card>
                 </Grid>
