@@ -21,7 +21,6 @@ import {
     Chip
 } from '@mui/material';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
-import claimAllocationSampleData from '@/data/claim-allocation-sample.json';
 
 const reinsuranceService = new ReinsuranceService();
 
@@ -34,10 +33,11 @@ interface ClaimAllocationPayload {
     accountingLOB: string;
     riskCategory: string;
     riskGrade: string;
-    claimNo: string;
+    subClaimNo: string;
     ownShareIncurredClaim: number | string;
     ownShareOutstandingClaim: number | string;
     ownSharePaidClaim: number | string;
+    riskStartDate: string;
     dateOfLoss: string;
     claimReserveTypeInvolved: string;
 }
@@ -55,10 +55,11 @@ export default function ClaimAllocationComponent() {
         accountingLOB: '',
         riskCategory: '',
         riskGrade: '',
-        claimNo: '',
+        subClaimNo: '',
         ownShareIncurredClaim: '',
         ownShareOutstandingClaim: '',
         ownSharePaidClaim: '',
+        riskStartDate: '',
         dateOfLoss: '',
         claimReserveTypeInvolved: ''
     });
@@ -68,17 +69,14 @@ export default function ClaimAllocationComponent() {
         setError(null);
 
         try {
-            // TODO: Replace with actual Claim Allocation API when available
-            // const result = await reinsuranceService.getClaimAllocation(formData).toPromise();
+            // Call the actual Claim Recovery API
+            const result = await reinsuranceService.getClaimRecovery(formData).toPromise();
 
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Load sample data for now
-            setAllocationData(claimAllocationSampleData);
+            // Set the allocation data from API response
+            setAllocationData(result || []);
         } catch (err: any) {
-            console.error('Error processing claim allocation:', err);
-            setError(err?.message || 'An error occurred while processing claim allocation data');
+            console.error('Error processing claim recovery:', err);
+            setError(err?.message || 'An error occurred while processing claim recovery data');
         } finally {
             setLoading(false);
         }
@@ -190,6 +188,20 @@ export default function ClaimAllocationComponent() {
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Risk Start Date"
+                                        type="date"
+                                        value={formData.riskStartDate}
+                                        onChange={(e) => handleInputChange('riskStartDate', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                </Grid>
                             </Grid>
 
                             <Divider sx={{ my: 4 }} />
@@ -202,8 +214,8 @@ export default function ClaimAllocationComponent() {
                                     <TextField
                                         fullWidth
                                         label="Claim No"
-                                        value={formData.claimNo}
-                                        onChange={(e) => handleInputChange('claimNo', e.target.value)}
+                                        value={formData.subClaimNo}
+                                        onChange={(e) => handleInputChange('subClaimNo', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                     />

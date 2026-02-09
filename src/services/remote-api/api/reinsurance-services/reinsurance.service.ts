@@ -457,4 +457,11 @@ export class ReinsuranceService {
             .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty/PremiumAllocation?responseType=JSON`, payload)
             .pipe(map((response) => response.data));
     }
+
+    // Claim Recovery API (Proportional Allocation Claim)
+    getClaimRecovery(payload: any): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty/ProportionalAllocationClaim?responseType=JSON`, payload)
+            .pipe(map((response) => response.data));
+    }
 }
