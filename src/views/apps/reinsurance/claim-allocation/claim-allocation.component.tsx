@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Card,
     CardContent,
@@ -10,46 +10,23 @@ import {
     Typography,
     Alert,
     CircularProgress,
-    Divider
+    Divider,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Chip
 } from '@mui/material';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
-import treatyAllocationSampleData from '@/data/treaty-allocation-sample.json';
-import CombinedAllocationTable from './components/CombinedAllocationTable';
-import ImprovedAllocationTable from './components/ImprovedAllocationTable';
+import claimAllocationSampleData from '@/data/claim-allocation-sample.json';
 
 const reinsuranceService = new ReinsuranceService();
 
-interface Participant {
-    participantType: string;
-    participantName: string;
-    sharePercent: number;
-    participantRISI: number;
-    participantPremium: number;
-    participantCommission: number;
-    reinsurers: any;
-}
-
-interface TreatyAllocationData {
-    blockSummaryRow: boolean;
-    participantRow: boolean;
-    blockNumber: string;
-    treatyCode: string | null;
-    priorityOrder: number | null;
-    balanceSI: number;
-    controlCessionSI: number;
-    controlValue: number | null;
-    earlierTreatySI: number | null;
-    incrementalTreatySI: number | null;
-    treatyCessionSI: number | null;
-    treatyCessionPercent: number | null;
-    treatyRIPremium: number | null;
-    treatyCommision: number | null;
-    participants: Participant[] | null;
-}
-
-interface AllocationPayload {
+interface ClaimAllocationPayload {
     policyNo: string;
-    endrNo: string;
     companyUIN: string;
     operatingUnitUIN: string;
     productLOB: string;
@@ -57,18 +34,20 @@ interface AllocationPayload {
     accountingLOB: string;
     riskCategory: string;
     riskGrade: string;
-    riskStartDate: string;
-    updateRISI: number;
-    policyPremium: number;
+    claimNo: string;
+    ownShareIncurredClaim: number | string;
+    ownShareOutstandingClaim: number | string;
+    ownSharePaidClaim: number | string;
+    dateOfLoss: string;
+    claimReserveTypeInvolved: string;
 }
 
-export default function TreatyAllocation3Component() {
+export default function ClaimAllocationComponent() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [allocationData, setAllocationData] = useState<TreatyAllocationData[]>([]);
-    const [formData, setFormData] = useState<AllocationPayload>({
+    const [allocationData, setAllocationData] = useState<any[]>([]);
+    const [formData, setFormData] = useState<ClaimAllocationPayload>({
         policyNo: '',
-        endrNo: '',
         companyUIN: '',
         operatingUnitUIN: '',
         productLOB: '',
@@ -76,9 +55,12 @@ export default function TreatyAllocation3Component() {
         accountingLOB: '',
         riskCategory: '',
         riskGrade: '',
-        riskStartDate: '',
-        updateRISI: '' as any,
-        policyPremium: '' as any
+        claimNo: '',
+        ownShareIncurredClaim: '',
+        ownShareOutstandingClaim: '',
+        ownSharePaidClaim: '',
+        dateOfLoss: '',
+        claimReserveTypeInvolved: ''
     });
 
     const fetchAllocationData = async () => {
@@ -86,23 +68,23 @@ export default function TreatyAllocation3Component() {
         setError(null);
 
         try {
-            // Call the actual Premium Allocation API
-            const result = await reinsuranceService.getPremiumAllocation(formData).toPromise();
+            // TODO: Replace with actual Claim Allocation API when available
+            // const result = await reinsuranceService.getClaimAllocation(formData).toPromise();
 
-            // Set the allocation data from API response
-            setAllocationData(result || []);
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Load sample data for now
+            setAllocationData(claimAllocationSampleData);
         } catch (err: any) {
-            console.error('Error processing allocation:', err);
-            setError(err?.message || 'An error occurred while processing allocation data');
-
-            // Optionally load sample data as fallback
-            // setAllocationData(treatyAllocationSampleData as TreatyAllocationData[]);
+            console.error('Error processing claim allocation:', err);
+            setError(err?.message || 'An error occurred while processing claim allocation data');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleInputChange = (field: keyof AllocationPayload, value: string | number) => {
+    const handleInputChange = (field: keyof ClaimAllocationPayload, value: string | number) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -116,7 +98,7 @@ export default function TreatyAllocation3Component() {
     return (
         <Box sx={{ p: 4 }}>
             <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 600, color: '#e91e63' }}>
-                Premium Allocation
+                Claim Recovery
             </Typography>
 
             <Grid container spacing={4}>
@@ -134,16 +116,6 @@ export default function TreatyAllocation3Component() {
                                         label="Policy No"
                                         value={formData.policyNo}
                                         onChange={(e) => handleInputChange('policyNo', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Endorsement No"
-                                        value={formData.endrNo}
-                                        onChange={(e) => handleInputChange('endrNo', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                     />
@@ -218,13 +190,64 @@ export default function TreatyAllocation3Component() {
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
+                            </Grid>
+
+                            <Divider sx={{ my: 4 }} />
+
+                            <Typography variant="h6" gutterBottom sx={{ mb: 4, fontWeight: 600 }}>
+                                Claim Figures
+                            </Typography>
+                            <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6} md={3}>
                                     <TextField
                                         fullWidth
-                                        label="Risk Start Date"
+                                        label="Claim No"
+                                        value={formData.claimNo}
+                                        onChange={(e) => handleInputChange('claimNo', e.target.value)}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Own Share Incurred Claim"
+                                        type="number"
+                                        value={formData.ownShareIncurredClaim}
+                                        onChange={(e) => handleInputChange('ownShareIncurredClaim', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Own Share Outstanding Claim"
+                                        type="number"
+                                        value={formData.ownShareOutstandingClaim}
+                                        onChange={(e) => handleInputChange('ownShareOutstandingClaim', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Own Share Paid Claim"
+                                        type="number"
+                                        value={formData.ownSharePaidClaim}
+                                        onChange={(e) => handleInputChange('ownSharePaidClaim', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                        variant="outlined"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Date of Loss"
                                         type="date"
-                                        value={formData.riskStartDate}
-                                        onChange={(e) => handleInputChange('riskStartDate', e.target.value)}
+                                        value={formData.dateOfLoss}
+                                        onChange={(e) => handleInputChange('dateOfLoss', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                         InputLabelProps={{
@@ -235,101 +258,14 @@ export default function TreatyAllocation3Component() {
                                 <Grid item xs={12} sm={6} md={3}>
                                     <TextField
                                         fullWidth
-                                        label="Update RISI"
-                                        type="number"
-                                        value={formData.updateRISI}
-                                        onChange={(e) => handleInputChange('updateRISI', e.target.value === '' ? '' : parseFloat(e.target.value))}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Policy Premium"
-                                        type="number"
-                                        value={formData.policyPremium}
-                                        onChange={(e) => handleInputChange('policyPremium', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                        label="Claim Reserve Type Involved"
+                                        value={formData.claimReserveTypeInvolved}
+                                        onChange={(e) => handleInputChange('claimReserveTypeInvolved', e.target.value)}
                                         variant="outlined"
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
                             </Grid>
-
-                            {/* Claim Figures Section - Commented Out */}
-                            {/* <Divider sx={{ my: 4 }} />
-
-                            <Typography variant="h6" gutterBottom sx={{ mb: 4, fontWeight: 600 }}>
-                                Claim Figures
-                            </Typography>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Incurred Claim On This Location"
-                                        type="number"
-                                        value={formData.incurredClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('incurredClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Outstanding Claim On This Location"
-                                        type="number"
-                                        value={formData.outstandingClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('outstandingClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Paid Claim On This Location"
-                                        type="number"
-                                        value={formData.paidClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('paidClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Own Share Incurred Claim On This Location"
-                                        type="number"
-                                        value={formData.ownShareIncurredClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('ownShareIncurredClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Own Share Outstanding Claim On This Location"
-                                        type="number"
-                                        value={formData.ownShareOutstandingClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('ownShareOutstandingClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="Own Share Paid Claim On This Location"
-                                        type="number"
-                                        value={formData.ownSharePaidClaimOnThisLocation}
-                                        onChange={(e) => handleInputChange('ownSharePaidClaimOnThisLocation', parseFloat(e.target.value) || 0)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid> */}
                         </CardContent>
                     </Card>
                 </Grid>
@@ -377,31 +313,90 @@ export default function TreatyAllocation3Component() {
                     </Grid>
                 )}
 
-                {/* Treaty Allocation Results */}
+                {/* Claim Allocation Results */}
                 {allocationData.length > 0 && (
                     <Grid item xs={12}>
                         <Card sx={{ mt: 3, boxShadow: 3 }}>
                             <CardContent sx={{ p: 4 }}>
                                 <Typography variant="h6" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
-                                    Treaty Allocation Results
-                                    {loading && (
-                                        <CircularProgress
-                                            size={20}
-                                            sx={{ ml: 2, color: '#e91e63' }}
-                                        />
-                                    )}
+                                    Claim Recovery Results
                                 </Typography>
-
-                                {loading ? (
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-                                        <CircularProgress size={40} sx={{ color: '#e91e63' }} />
-                                        <Typography sx={{ ml: 2, color: '#666' }}>
-                                            Loading allocation data...
-                                        </Typography>
-                                    </Box>
-                                ) : (
-                                    <ImprovedAllocationTable data={allocationData} />
-                                )}
+                                <TableContainer component={Paper} elevation={0}>
+                                    <Table size="small">
+                                        <TableHead>
+                                            <TableRow sx={{ backgroundColor: '#fafafa' }}>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Treaty Code</TableCell>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Treaty Cession %</TableCell>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Treaty Incurred Claim</TableCell>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Treaty Outstanding Claim</TableCell>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Treaty Paid Claim</TableCell>
+                                                <TableCell sx={{ fontWeight: 600, padding: '12px 16px' }}>Claim No</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {allocationData.map((row: any, index: number) => (
+                                                <TableRow
+                                                    key={index}
+                                                    sx={{
+                                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa',
+                                                        '&:hover': {
+                                                            backgroundColor: '#e3f2fd'
+                                                        },
+                                                        '& .MuiTableCell-root': {
+                                                            borderBottom: '1px solid #e9ecef',
+                                                            padding: '12px 16px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <TableCell>
+                                                        <Chip
+                                                            label={row.treatyCode}
+                                                            size="small"
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Chip
+                                                            label={`${row.treatyCessionPercent}%`}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            sx={{
+                                                                color: '#607d8b',
+                                                                borderColor: '#607d8b'
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat('en-IN', {
+                                                            style: 'currency',
+                                                            currency: 'INR',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 0
+                                                        }).format(row.treatyIncurredClaim)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat('en-IN', {
+                                                            style: 'currency',
+                                                            currency: 'INR',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 0
+                                                        }).format(row.treatyOutstandingClaim)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat('en-IN', {
+                                                            style: 'currency',
+                                                            currency: 'INR',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 0
+                                                        }).format(row.treatyPaidClaim)}
+                                                    </TableCell>
+                                                    <TableCell>{row.subClaimNo}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </CardContent>
                         </Card>
                     </Grid>
