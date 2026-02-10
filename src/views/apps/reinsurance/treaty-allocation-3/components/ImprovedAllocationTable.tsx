@@ -116,6 +116,7 @@ const ImprovedAllocationTable: React.FC<ImprovedAllocationTableProps> = ({ data 
                                         <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
                                         <TableCell sx={{ fontWeight: 600 }}>Balance SI</TableCell>
                                         <TableCell sx={{ fontWeight: 600 }}>Control Cession SI</TableCell>
+                                        <TableCell sx={{ fontWeight: 600 }}>Control Value</TableCell>
                                         <TableCell sx={{ fontWeight: 600 }}>Treaty Cession %</TableCell>
                                         <TableCell sx={{ fontWeight: 600 }}>Treaty Premium</TableCell>
                                         <TableCell sx={{ fontWeight: 600 }}>Participants</TableCell>
@@ -171,6 +172,7 @@ const ImprovedAllocationTable: React.FC<ImprovedAllocationTableProps> = ({ data 
                                                     <TableCell>{item.priorityOrder || '-'}</TableCell>
                                                     <TableCell>{formatCurrency(item.balanceSI)}</TableCell>
                                                     <TableCell>{formatCurrency(item.controlCessionSI)}</TableCell>
+                                                    <TableCell>{formatCurrency(item.controlValue)}</TableCell>
                                                     <TableCell>{formatPercentage(item.treatyCessionPercent)}</TableCell>
                                                     <TableCell>{formatCurrency(item.treatyRIPremium)}</TableCell>
                                                     <TableCell>
@@ -209,7 +211,7 @@ const ImprovedAllocationTable: React.FC<ImprovedAllocationTableProps> = ({ data 
                                                 {hasParticipants && (
                                                     <TableRow>
                                                         <TableCell
-                                                            colSpan={8}
+                                                            colSpan={9}
                                                             sx={{
                                                                 padding: 0,
                                                                 borderBottom: isExpanded ? '1px solid #e9ecef' : 'none'
