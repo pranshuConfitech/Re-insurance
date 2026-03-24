@@ -104,9 +104,15 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
 
     // State for API dropdown data
     const [riGradedOptions, setRiGradedOptions] = useState<any[]>([]);
+    const [priorityOptions, setPriorityOptions] = useState<any[]>([]);
+    const [treatyTypeOptions, setTreatyTypeOptions] = useState<any[]>([]);
+    const [treatyCategoryOptions, setTreatyCategoryOptions] = useState<any[]>([]);
     const [installmentOptions, setInstallmentOptions] = useState<any[]>([]);
     const [processingMethodOptions, setProcessingMethodOptions] = useState<any[]>([]);
     const [loadingRiGraded, setLoadingRiGraded] = useState(false);
+    const [loadingPriorityOptions, setLoadingPriorityOptions] = useState(false);
+    const [loadingTreatyTypeOptions, setLoadingTreatyTypeOptions] = useState(false);
+    const [loadingTreatyCategoryOptions, setLoadingTreatyCategoryOptions] = useState(false);
     const [loadingInstallment, setLoadingInstallment] = useState(false);
     const [loadingProcessingMethod, setLoadingProcessingMethod] = useState(false);
 
@@ -127,6 +133,84 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                 setRiGradedOptions([
                     { commonCode: 'No', commonDesc: 'No' },
                     { commonCode: 'Yes', commonDesc: 'Yes' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Treaty Category options from API
+    useEffect(() => {
+        setLoadingTreatyCategoryOptions(true);
+        commonMastersService.getTreatyCategoryOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setTreatyCategoryOptions(response.content);
+                }
+                setLoadingTreatyCategoryOptions(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Treaty Category options:', error);
+                setLoadingTreatyCategoryOptions(false);
+                // Fallback to hardcoded values
+                setTreatyCategoryOptions([
+                    { commonCode: 'M', commonDesc: 'M' },
+                    { commonCode: 'F', commonDesc: 'F' },
+                    { commonCode: 'PROPERTY', commonDesc: 'PROPERTY' },
+                    { commonCode: 'CASUALTY', commonDesc: 'CASUALTY' },
+                    { commonCode: 'MARINE', commonDesc: 'MARINE' },
+                    { commonCode: 'PROPORTIONAL', commonDesc: 'PROPORTIONAL' },
+                    { commonCode: 'NON_PROP', commonDesc: 'NON_PROP' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Treaty Type options from API
+    useEffect(() => {
+        setLoadingTreatyTypeOptions(true);
+        commonMastersService.getTreatyTypeOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setTreatyTypeOptions(response.content);
+                }
+                setLoadingTreatyTypeOptions(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Treaty Type options:', error);
+                setLoadingTreatyTypeOptions(false);
+                // Fallback to hardcoded values
+                setTreatyTypeOptions([
+                    { commonCode: 'Quota Share', commonDesc: 'Quota Share' },
+                    { commonCode: 'Surplus', commonDesc: 'Surplus' },
+                    { commonCode: 'Facultative', commonDesc: 'Facultative' }
+                ]);
+            }
+        });
+    }, []);
+
+    // Fetch Priority options from API
+    useEffect(() => {
+        setLoadingPriorityOptions(true);
+        commonMastersService.getPriorityTypeOptions().subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setPriorityOptions(response.content);
+                }
+                setLoadingPriorityOptions(false);
+            },
+            error: (error) => {
+                console.error('Error fetching Priority options:', error);
+                setLoadingPriorityOptions(false);
+                // Fallback to hardcoded values
+                setPriorityOptions([
+                    { commonCode: 'PRIMARY', commonDesc: 'PRIMARY' },
+                    { commonCode: 'SECONDARY', commonDesc: 'SECONDARY' },
+                    { commonCode: 'HIGH', commonDesc: 'HIGH' },
+                    { commonCode: 'MEDIUM', commonDesc: 'MEDIUM' },
+                    { commonCode: 'LOW', commonDesc: 'LOW' },
+                    { commonCode: '1', commonDesc: '1' },
+                    { commonCode: '2', commonDesc: '2' },
+                    { commonCode: '3', commonDesc: '3' }
                 ]);
             }
         });
@@ -210,17 +294,19 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="Priority"
                         value={treaty.priority}
                         onChange={(e) => handleChange('priority', e.target.value)}
+                        disabled={loadingPriorityOptions}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="PRIMARY">PRIMARY</MenuItem>
-                        <MenuItem value="SECONDARY">SECONDARY</MenuItem>
-                        <MenuItem value="HIGH">HIGH</MenuItem>
-                        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
-                        <MenuItem value="LOW">LOW</MenuItem>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        {treaty.priority && !['', 'PRIMARY', 'SECONDARY', 'HIGH', 'MEDIUM', 'LOW', '1', '2', '3'].includes(treaty.priority) && (
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingPriorityOptions ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {priorityOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
+                        {treaty.priority && !priorityOptions.some((option) => (option.commonCode || option.commonDesc) === treaty.priority) && (
                             <MenuItem value={treaty.priority}>{treaty.priority}</MenuItem>
                         )}
                     </Select>
@@ -236,10 +322,21 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="Treaty Type"
                         value={treaty.treatyType}
                         onChange={(e) => handleChange('treatyType', e.target.value)}
+                        disabled={loadingTreatyTypeOptions}
                     >
-                        <MenuItem value="Quota Share">Quota Share</MenuItem>
-                        <MenuItem value="Surplus">Surplus</MenuItem>
-                        <MenuItem value="Facultative">Facultative</MenuItem>
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingTreatyTypeOptions ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {treatyTypeOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
+                        {treaty.treatyType && !treatyTypeOptions.some((option) => (option.commonCode || option.commonDesc) === treaty.treatyType) && (
+                            <MenuItem value={treaty.treatyType}>{treaty.treatyType}</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
             </Grid>
@@ -313,16 +410,19 @@ export const TreatyFormFields = ({ treaty, blockId, onTreatyChange }: TreatyForm
                         label="Treaty Category"
                         value={treaty.treatyCategory}
                         onChange={(e) => handleChange('treatyCategory', e.target.value)}
+                        disabled={loadingTreatyCategoryOptions}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="M">M</MenuItem>
-                        <MenuItem value="F">F</MenuItem>
-                        <MenuItem value="PROPERTY">PROPERTY</MenuItem>
-                        <MenuItem value="CASUALTY">CASUALTY</MenuItem>
-                        <MenuItem value="MARINE">MARINE</MenuItem>
-                        <MenuItem value="PROPORTIONAL">PROPORTIONAL</MenuItem>
-                        <MenuItem value="NON_PROP">NON_PROP</MenuItem>
-                        {treaty.treatyCategory && !['', 'M', 'F', 'PROPERTY', 'CASUALTY', 'MARINE', 'PROPORTIONAL', 'NON_PROP'].includes(treaty.treatyCategory) && (
+                        <MenuItem value="">
+                            <em style={{ color: '#6c757d' }}>
+                                {loadingTreatyCategoryOptions ? 'Loading options...' : 'Select...'}
+                            </em>
+                        </MenuItem>
+                        {treatyCategoryOptions.map((option) => (
+                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
+                                {option.commonDesc || option.commonCode}
+                            </MenuItem>
+                        ))}
+                        {treaty.treatyCategory && !treatyCategoryOptions.some((option) => (option.commonCode || option.commonDesc) === treaty.treatyCategory) && (
                             <MenuItem value={treaty.treatyCategory}>{treaty.treatyCategory}</MenuItem>
                         )}
                     </Select>

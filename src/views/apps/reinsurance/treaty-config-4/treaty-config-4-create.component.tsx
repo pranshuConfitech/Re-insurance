@@ -98,11 +98,11 @@ function createEmptyRiskLimitLine(id: string): RiskLimitLine {
 }
 
 function createEmptyReinsurer(id: string): Reinsurer {
-    return { id, reinsurer: '', reinsurerCode: '', share: '' };
+    return { id, reinsurer: '', reinsurerCode: '', share: '', commission: '' };
 }
 
 function createEmptyBroker(id: string): Broker {
-    return { id, broker: '', brokerCode: '', share: '', reinsurers: [] };
+    return { id, broker: '', brokerCode: '', share: '', commission: '', reinsurers: [] };
 }
 
 function createEmptyNonProportionalTreaty(id: string): NonProportionalTreaty {
@@ -151,6 +151,7 @@ interface Reinsurer {
     reinsurer: string;
     reinsurerCode?: string;
     share: string;
+    commission?: string;
 }
 
 interface Broker {
@@ -158,6 +159,7 @@ interface Broker {
     broker: string;
     brokerCode?: string;
     share: string;
+    commission?: string;
     reinsurers: Reinsurer[];
 }
 
@@ -417,7 +419,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                         treatyType: mapTreatyType(treaty.treatyType),
                         treatyName: treaty.treatyName || '',
                         businessTreatyReferenceNumber: treaty.refNumber || '',
-                        riGradedRet: treaty.gradedRetention ? 'Yes' : 'No',
+                        riGradedRet: mapRiGradedRetention(treaty.gradedRetention),
                         formerTreatyCode: treaty.formerTreatyCode || '',
                         treatyCategory: treaty.treatyCategory || '',
                         installment: mapInstallmentType(treaty.propTreatyAttribute?.installmentType),
@@ -514,7 +516,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             'SURPLUS': 'Surplus',
             'XOL': 'XOL'
         };
-        return typeMap[type] || type || 'Quota Share';
+        return typeMap[type] || type || '';
     };
 
     const mapInstallmentType = (type: string): string => {
@@ -538,6 +540,19 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
             'CLEAN_CUT': 'Clean Cut'
         };
         return methodMap[method] || method || 'Clean Cut';
+    };
+
+    const mapRiGradedRetention = (value: any): string => {
+        // API returns boolean in many existing records; dropdown now uses RI_GRADED codes.
+        if (typeof value === 'boolean') {
+            return value ? 'TABLE_A' : 'NONE';
+        }
+
+        const normalized = String(value || '').trim().toUpperCase();
+        if (!normalized) return '';
+        if (normalized === 'TRUE' || normalized === 'YES') return 'TABLE_A';
+        if (normalized === 'FALSE' || normalized === 'NO' || normalized === 'NONE') return 'NONE';
+        return String(value);
     };
 
     const mapRiskLimitLines = (riskDetails: any[]): RiskLimitLine[] => {
@@ -647,7 +662,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 id: String(alloc.id || index + 1),
                 reinsurer: alloc.participantName || '',
                 reinsurerCode: alloc.participantCode || '',
-                share: String(alloc.sharePercent ?? '')
+                share: String(alloc.sharePercent ?? ''),
+                commission: String(alloc.commision ?? alloc.participantCommission ?? '')
             }));
 
         console.log('Mapped reinsurers:', reinsurers);
@@ -666,6 +682,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     broker: bd.reinsurerName || '',
                     brokerCode: '', // Broker breakdowns don't have codes in this structure
                     share: String(bd.sharePercent ?? ''),
+                    commission: '',
                     reinsurers: []
                 }))
             );
@@ -678,6 +695,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                 broker: alloc.participantName || '',
                 brokerCode: alloc.participantCode || '',
                 share: String(alloc.sharePercent ?? ''),
+                commission: String(alloc.commision ?? alloc.participantCommission ?? ''),
                 reinsurers: (alloc.brokerBreakdowns || []).map((bd: any, bdIndex: number) => ({
                     id: String(bd.id || bdIndex + 1),
                     reinsurer: bd.reinsurerName || '',
@@ -1440,10 +1458,14 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                     ...(isEditMode && { blockId: block.id }),
                     treatyCode: treaty.treatyCode,
                     priority: treaty.priority || 'PRIMARY',
-                    treatyType: treaty.treatyType === 'Quota Share' ? 'QUOTA_SHARE' : treaty.treatyType === 'Surplus' ? 'SURPLUS' : treaty.treatyType.toUpperCase().replace(/\s+/g, '_'),
+                    treatyType: treaty.treatyType === 'Quota Share'
+                        ? 'QUOTA_SHARE'
+                        : treaty.treatyType === 'Surplus'
+                            ? 'SURPLUS'
+                            : (treaty.treatyType || ''),
                     treatyName: treaty.treatyName,
                     refNumber: treaty.businessTreatyReferenceNumber,
-                    gradedRetention: treaty.riGradedRet === 'Yes',
+                    gradedRetention: !['', 'NONE', 'NO', 'FALSE', '0'].includes(String(treaty.riGradedRet || '').trim().toUpperCase()),
                     xolAttachmentType: null,
                     formerTreatyCode: treaty.formerTreatyCode || null,
                     treatyCategory: treaty.treatyCategory || 'PROPORTIONAL',
@@ -1492,13 +1514,17 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                             participantType: 'REINSURER',
                             participantName: r.reinsurer,
                             participantCode: getParticipantCode(r.reinsurer, 'REINSURER'),
-                            sharePercent: parseFloat(r.share) || 0
+                            sharePercent: parseFloat(r.share) || 0,
+                            participantCommission: parseFloat(r.commission || '0') || 0,
+                            commision: parseFloat(r.commission || '0') || 0
                         })),
                         ...treaty.brokers.map((b, bIndex) => ({
                             participantType: 'BROKER',
                             participantName: b.broker,
                             participantCode: getParticipantCode(b.broker, 'BROKER'),
                             sharePercent: parseFloat(b.share) || 0,
+                            participantCommission: parseFloat(b.commission || '0') || 0,
+                            commision: parseFloat(b.commission || '0') || 0,
                             brokerBreakdowns: b.reinsurers.map((br, brIndex) => ({
                                 reinsurerName: br.reinsurer,
                                 sharePercent: parseFloat(br.share) || 0
@@ -1596,7 +1622,9 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                     participantType: 'REINSURER',
                                     participantName: r.reinsurer,
                                     participantCode: getParticipantCode(r.reinsurer, 'REINSURER'),
-                                    sharePercent: parseFloat(r.share) || 0
+                                    sharePercent: parseFloat(r.share) || 0,
+                                    participantCommission: parseFloat(r.commission || '0') || 0,
+                                    commision: parseFloat(r.commission || '0') || 0
                                 }))
                         ),
                         // Add brokers from layer allocations (brokers with reinsurers under them)
@@ -1608,6 +1636,8 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                     participantName: b.broker,
                                     participantCode: getParticipantCode(b.broker, 'BROKER'),
                                     sharePercent: parseFloat(b.share) || 0,
+                                    participantCommission: parseFloat(b.commission || '0') || 0,
+                                    commision: parseFloat(b.commission || '0') || 0,
                                     brokerBreakdowns: (b.reinsurers || [])
                                         .filter(br => br.reinsurer && br.reinsurer.trim() !== '')
                                         .map((br, brIndex) => ({
@@ -2083,6 +2113,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                             brokers={treaty.brokers}
                                                             blockId={block.id}
                                                             treatyId={treaty.id}
+                                                            showCommission={true}
                                                             onAddReinsurer={(blockId, treatyId) => handleAddReinsurer(blockId, treatyId)}
                                                             onDeleteReinsurer={(blockId, treatyId, reinsurerId) => handleDeleteReinsurer(blockId, treatyId, reinsurerId)}
                                                             onReinsurerChange={(blockId, treatyId, reinsurerId, field, value) => handleReinsurerChange(blockId, treatyId, reinsurerId, field, value)}
@@ -2153,6 +2184,7 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
                                                             brokers={layer.brokers}
                                                             blockId={block.id}
                                                             lineId={layer.id}
+                                                            showCommission={true}
                                                             onAddReinsurer={(blockId, _) => handleAddNPReinsurer(blockId, layer.id)}
                                                             onDeleteReinsurer={(blockId, _, reinsurerId) => handleDeleteNPReinsurer(blockId, layer.id, reinsurerId)}
                                                             onReinsurerChange={(blockId, _, reinsurerId, field, value) => handleNPReinsurerChange(blockId, layer.id, reinsurerId, field, value)}

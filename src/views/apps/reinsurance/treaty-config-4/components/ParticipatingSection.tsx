@@ -12,6 +12,7 @@ interface Reinsurer {
     reinsurer: string;
     reinsurerCode?: string;
     share: string;
+    commission?: string;
 }
 
 interface Broker {
@@ -19,6 +20,7 @@ interface Broker {
     broker: string;
     brokerCode?: string;
     share: string;
+    commission?: string;
     reinsurers: Reinsurer[];
 }
 
@@ -37,6 +39,7 @@ interface ParticipatingSectionProps {
     onAddBrokerReinsurer: (blockId: string, treatyId: string | undefined, brokerId: string) => void;
     onDeleteBrokerReinsurer: (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string) => void;
     onBrokerReinsurerChange: (blockId: string, treatyId: string | undefined, brokerId: string, reinsurerId: string, field: string, value: string) => void;
+    showCommission?: boolean;
 }
 
 const useStyles = makeStyles((theme: any) => ({
@@ -86,7 +89,8 @@ export const ParticipatingSection = ({
     reinsurers, brokers, blockId, treatyId, lineId,
     onAddReinsurer, onDeleteReinsurer, onReinsurerChange,
     onAddBroker, onDeleteBroker, onBrokerChange,
-    onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange
+    onAddBrokerReinsurer, onDeleteBrokerReinsurer, onBrokerReinsurerChange,
+    showCommission = false
 }: ParticipatingSectionProps) => {
     const classes = useStyles();
 
@@ -407,7 +411,7 @@ export const ParticipatingSection = ({
                                 RI
                             </Box>
                             <Grid container spacing={2} sx={{ flex: 1 }}>
-                                <Grid item xs={12} sm={8}>
+                                <Grid item xs={12} sm={showCommission ? 6 : 8}>
                                     <FormControl className={classes.formControl} fullWidth>
                                         <InputLabel id={`reinsurer-label-${reinsurer.id}`}>Reinsurer</InputLabel>
                                         <Select
@@ -432,7 +436,7 @@ export const ParticipatingSection = ({
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid item xs={12} sm={showCommission ? 3 : 4}>
                                     <TextField
                                         id={`reinsurerShare-${reinsurer.id}`}
                                         name="share"
@@ -443,6 +447,19 @@ export const ParticipatingSection = ({
                                         className={classes.textField}
                                     />
                                 </Grid>
+                                {showCommission && (
+                                    <Grid item xs={12} sm={3}>
+                                        <TextField
+                                            id={`reinsurerCommission-${reinsurer.id}`}
+                                            name="commission"
+                                            label="Commission (%)"
+                                            fullWidth
+                                            value={reinsurer.commission || ''}
+                                            onChange={(e) => onReinsurerChange(blockId, effectiveId, reinsurer.id, 'commission', e.target.value)}
+                                            className={classes.textField}
+                                        />
+                                    </Grid>
+                                )}
                             </Grid>
                             <IconButton
                                 size="small"
@@ -481,7 +498,7 @@ export const ParticipatingSection = ({
                                 BR
                             </Box>
                             <Grid container spacing={2} sx={{ flex: 1 }}>
-                                <Grid item xs={12} sm={8}>
+                                <Grid item xs={12} sm={showCommission ? 6 : 8}>
                                     <FormControl className={classes.formControl} fullWidth>
                                         <InputLabel id={`broker-label-${broker.id}`}>Broker</InputLabel>
                                         <Select
@@ -506,7 +523,7 @@ export const ParticipatingSection = ({
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid item xs={12} sm={showCommission ? 3 : 4}>
                                     <TextField
                                         id={`brokerShare-${broker.id}`}
                                         name="share"
@@ -517,6 +534,19 @@ export const ParticipatingSection = ({
                                         className={classes.textField}
                                     />
                                 </Grid>
+                                {showCommission && (
+                                    <Grid item xs={12} sm={3}>
+                                        <TextField
+                                            id={`brokerCommission-${broker.id}`}
+                                            name="commission"
+                                            label="Commission (%)"
+                                            fullWidth
+                                            value={broker.commission || ''}
+                                            onChange={(e) => onBrokerChange(blockId, effectiveId, broker.id, 'commission', e.target.value)}
+                                            className={classes.textField}
+                                        />
+                                    </Grid>
+                                )}
                             </Grid>
                             <IconButton
                                 size="small"

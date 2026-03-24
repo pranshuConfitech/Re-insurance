@@ -97,8 +97,10 @@ export const TopFormSection = ({
 
     // State for API dropdown data
     const [currencies, setCurrencies] = useState<any[]>([]);
+    const [companyUINOptions, setCompanyUINOptions] = useState<any[]>([]);
     const [operatingUnits, setOperatingUnits] = useState<any[]>([]);
     const [loadingCurrencies, setLoadingCurrencies] = useState(false);
+    const [loadingCompanyUINOptions, setLoadingCompanyUINOptions] = useState(false);
     const [loadingOperatingUnits, setLoadingOperatingUnits] = useState(false);
 
     // Fetch currencies from API
@@ -121,6 +123,24 @@ export const TopFormSection = ({
                     { commonCode: 'GBP', commonDesc: 'GBP' },
                     { commonCode: 'INR', commonDesc: 'INR' }
                 ]);
+            }
+        });
+    }, []);
+
+    // Fetch company UIN options from API
+    useEffect(() => {
+        setLoadingCompanyUINOptions(true);
+        commonMastersService.getCompanyUINOptions({ parent: false }).subscribe({
+            next: (response) => {
+                if (response && response.content) {
+                    setCompanyUINOptions(response.content);
+                }
+                setLoadingCompanyUINOptions(false);
+            },
+            error: (error) => {
+                console.error('Error fetching company UIN options:', error);
+                setLoadingCompanyUINOptions(false);
+                setCompanyUINOptions([]);
             }
         });
     }, []);
@@ -283,15 +303,19 @@ export const TopFormSection = ({
                             label="Company"
                             value={companyUIN}
                             onChange={(e) => onCompanyUINChange(e.target.value)}
+                            disabled={loadingCompanyUINOptions}
                         >
-                            <MenuItem value="">Select Company...</MenuItem>
-                            <MenuItem value="UIN-1001">UIN-1001</MenuItem>
-                            <MenuItem value="UIN-1002">UIN-1002</MenuItem>
-                            <MenuItem value="UIN-1003">UIN-1003</MenuItem>
-                            <MenuItem value="INS-RE-002">INS-RE-002</MenuItem>
-                            <MenuItem value="INS-RE-003">INS-RE-003</MenuItem>
-                            <MenuItem value="INS-1001">INS-1001</MenuItem>
-                            {companyUIN && !['', 'UIN-1001', 'UIN-1002', 'UIN-1003', 'INS-RE-002', 'INS-RE-003', 'INS-1001'].includes(companyUIN) && (
+                            <MenuItem value="">
+                                <em style={{ color: '#6c757d' }}>
+                                    {loadingCompanyUINOptions ? 'Loading companies...' : 'Select Company...'}
+                                </em>
+                            </MenuItem>
+                            {companyUINOptions.map((company) => (
+                                <MenuItem key={company.commonCode || company.commonDesc} value={company.commonCode || company.commonDesc}>
+                                    {company.commonDesc || company.commonCode}
+                                </MenuItem>
+                            ))}
+                            {companyUIN && !companyUINOptions.some((company) => (company.commonCode || company.commonDesc) === companyUIN) && (
                                 <MenuItem value={companyUIN}>{companyUIN}</MenuItem>
                             )}
                         </Select>
