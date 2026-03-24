@@ -110,7 +110,7 @@ export const RiskLimitsSection = ({
     // Fetch Product LOB options from API
     useEffect(() => {
         setLoadingProductLob(true);
-        commonMastersService.getProductLobOptions().subscribe({
+        commonMastersService.getProductLobOptions({ parent: false }).subscribe({
             next: (response) => {
                 if (response && response.content) {
                     setProductLobOptions(response.content);
@@ -160,7 +160,7 @@ export const RiskLimitsSection = ({
     // Fetch Risk Category options from API
     useEffect(() => {
         setLoadingRiskCategory(true);
-        commonMastersService.getRiskCategoryOptions().subscribe({
+        commonMastersService.getRiskCategoryOptions({ parent: false }).subscribe({
             next: (response) => {
                 if (response && response.content) {
                     setRiskCategoryOptions(response.content);

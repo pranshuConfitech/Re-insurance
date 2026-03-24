@@ -24,6 +24,8 @@ export interface CommonMasterParams {
     parent?: boolean;
 }
 
+type CommonMasterQueryParams = Omit<CommonMasterParams, 'commonTypeDesc'>;
+
 export class CommonMastersService {
     readonly COMMAND_CONTEXT = `/master-data-service/v1/commonmasters`;
     readonly QUERY_CONTEXT = `/master-data-service/v1/commonmasters`;
@@ -53,7 +55,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getCurrencies(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getCurrencies(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'CURRENCY',
             ...pageRequest
@@ -65,9 +67,58 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getOperatingUnits(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getOperatingUnits(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'OP_UNIT',
+            ...pageRequest
+        });
+    }
+
+    /**
+     * Get company UIN options from common masters
+     * @param pageRequest - Optional page request parameters
+     * @returns Observable<Page<CommonMaster>>
+     */
+    getCompanyUINOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({
+            commonTypeDesc: 'COMPANY_UIN',
+            parent: false,
+            ...pageRequest
+        });
+    }
+
+    /**
+     * Get priority type options from common masters
+     * @param pageRequest - Optional page request parameters
+     * @returns Observable<Page<CommonMaster>>
+     */
+    getPriorityTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({
+            commonTypeDesc: 'PRIORITY_TYPE',
+            ...pageRequest
+        });
+    }
+
+    /**
+     * Get treaty type options from common masters
+     * @param pageRequest - Optional page request parameters
+     * @returns Observable<Page<CommonMaster>>
+     */
+    getTreatyTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({
+            commonTypeDesc: 'TREATY_TYPE',
+            ...pageRequest
+        });
+    }
+
+    /**
+     * Get treaty category options from common masters
+     * @param pageRequest - Optional page request parameters
+     * @returns Observable<Page<CommonMaster>>
+     */
+    getTreatyCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({
+            commonTypeDesc: 'TREATY_CAT',
             ...pageRequest
         });
     }
@@ -77,7 +128,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getRiGradedOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getRiGradedOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'RI_GRADED',
             ...pageRequest
@@ -89,7 +140,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getInstallmentOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getInstallmentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'INSTALLMENT',
             ...pageRequest
@@ -101,7 +152,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getProcessingMethodOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getProcessingMethodOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'PROC_METHOD',
             ...pageRequest
@@ -113,7 +164,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getProductLobOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getProductLobOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'PROD_LOB',
             ...pageRequest
@@ -125,7 +176,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getAccountingLobOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getAccountingLobOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'ACC_LOB',
             ...pageRequest
@@ -137,7 +188,7 @@ export class CommonMastersService {
      * @param pageRequest - Optional page request parameters
      * @returns Observable<Page<CommonMaster>>
      */
-    getRiskCategoryOptions(pageRequest: Partial<PageRequest> = {}): Observable<Page<CommonMaster>> {
+    getRiskCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'RISK_CAT',
             ...pageRequest
