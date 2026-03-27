@@ -88,58 +88,43 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
     const classes = useStyles();
 
     // State for API dropdown data
+    const [treatyTypeOptions, setTreatyTypeOptions] = useState<any[]>([]);
+    const [priorityOptions, setPriorityOptions] = useState<any[]>([]);
+    const [treatyCategoryOptions, setTreatyCategoryOptions] = useState<any[]>([]);
+    const [treatyStatusOptions, setTreatyStatusOptions] = useState<any[]>([]);
     const [currencies, setCurrencies] = useState<any[]>([]);
+    const [processingOptions, setProcessingOptions] = useState<any[]>([]);
+    const [proRateAmountOptions, setProRateAmountOptions] = useState<any[]>([]);
+    const [proRateTimeOptions, setProRateTimeOptions] = useState<any[]>([]);
+    const [premPaymentOptions, setPremPaymentOptions] = useState<any[]>([]);
     const [processingMethodOptions, setProcessingMethodOptions] = useState<any[]>([]);
-    const [loadingCurrencies, setLoadingCurrencies] = useState(false);
-    const [loadingProcessingMethod, setLoadingProcessingMethod] = useState(false);
+    const [basisOfAttachmentOptions, setBasisOfAttachmentOptions] = useState<any[]>([]);
 
-    // Fetch currencies from API
-    useEffect(() => {
-        setLoadingCurrencies(true);
-        commonMastersService.getCurrencies().subscribe({
-            next: (response) => {
-                if (response && response.content) {
-                    setCurrencies(response.content);
-                }
-                setLoadingCurrencies(false);
+    const fetchDropdown = (
+        fetcher: () => any,
+        setter: (data: any[]) => void,
+        label: string
+    ) => {
+        fetcher().subscribe({
+            next: (response: any) => {
+                if (response?.content) setter(response.content);
             },
-            error: (error) => {
-                console.error('Error fetching currencies:', error);
-                setLoadingCurrencies(false);
-                // Fallback to hardcoded values
-                setCurrencies([
-                    { commonCode: 'USD', commonDesc: 'USD' },
-                    { commonCode: 'EUR', commonDesc: 'EUR' },
-                    { commonCode: 'GBP', commonDesc: 'GBP' },
-                    { commonCode: 'JPY', commonDesc: 'JPY' }
-                ]);
-            }
+            error: (err: any) => console.error(`Error fetching ${label}:`, err)
         });
-    }, []);
+    };
 
-    // Fetch Processing Method options from API
     useEffect(() => {
-        setLoadingProcessingMethod(true);
-        commonMastersService.getProcessingMethodOptions().subscribe({
-            next: (response) => {
-                if (response && response.content) {
-                    setProcessingMethodOptions(response.content);
-                }
-                setLoadingProcessingMethod(false);
-            },
-            error: (error) => {
-                console.error('Error fetching Processing Method options:', error);
-                setLoadingProcessingMethod(false);
-                // Fallback to hardcoded values
-                setProcessingMethodOptions([
-                    { commonCode: 'Clean Cut', commonDesc: 'Clean Cut' },
-                    { commonCode: 'Run Off', commonDesc: 'Run Off' },
-                    { commonCode: 'AUTO', commonDesc: 'Clean Cut' },
-                    { commonCode: 'SYSTEM', commonDesc: 'Clean Cut' },
-                    { commonCode: 'STANDARD', commonDesc: 'Clean Cut' }
-                ]);
-            }
-        });
+        fetchDropdown(() => commonMastersService.getNonPropTreatyTypeOptions(), setTreatyTypeOptions, 'treaty type');
+        fetchDropdown(() => commonMastersService.getNonPropPriorityTypeOptions(), setPriorityOptions, 'priority');
+        fetchDropdown(() => commonMastersService.getNonPropTreatyCategoryOptions(), setTreatyCategoryOptions, 'treaty category');
+        fetchDropdown(() => commonMastersService.getNonPropTreatyStatusOptions(), setTreatyStatusOptions, 'treaty status');
+        fetchDropdown(() => commonMastersService.getCurrencies(), setCurrencies, 'currencies');
+        fetchDropdown(() => commonMastersService.getNonPropProcessingOptions(), setProcessingOptions, 'processing');
+        fetchDropdown(() => commonMastersService.getNonPropProRateAmountOptions(), setProRateAmountOptions, 'pro rate amount');
+        fetchDropdown(() => commonMastersService.getProRateTimeOptions(), setProRateTimeOptions, 'pro rate time');
+        fetchDropdown(() => commonMastersService.getNonPropPaymentOptions(), setPremPaymentOptions, 'prem payment warranty');
+        fetchDropdown(() => commonMastersService.getNonPropProcessingMethodOptions(), setProcessingMethodOptions, 'processing method');
+        fetchDropdown(() => commonMastersService.getBasisOfAttachmentOptions(), setBasisOfAttachmentOptions, 'basis of attachment');
     }, []);
 
     const handleChange = (field: string, value: string) => {
@@ -171,16 +156,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.priority}
                         onChange={(e) => handleChange('priority', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="PRIMARY">Primary</MenuItem>
-                        <MenuItem value="SECONDARY">Secondary</MenuItem>
-                        <MenuItem value="TERTIARY">Tertiary</MenuItem>
-                        <MenuItem value="HIGH">High</MenuItem>
-                        <MenuItem value="MEDIUM">Medium</MenuItem>
-                        <MenuItem value="LOW">Low</MenuItem>
-                        {treaty.priority && !['', 'PRIMARY', 'SECONDARY', 'TERTIARY', 'HIGH', 'MEDIUM', 'LOW'].includes(treaty.priority) && (
-                            <MenuItem value={treaty.priority}>{treaty.priority}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {priorityOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -195,9 +174,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.treatyType}
                         onChange={(e) => handleChange('treatyType', e.target.value)}
                     >
-                        <MenuItem value="XOL">XOL</MenuItem>
-                        <MenuItem value="Stop Loss">Stop Loss</MenuItem>
-                        <MenuItem value="Cat XOL">Cat XOL</MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {treatyTypeOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -269,17 +249,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.treatyCategory}
                         onChange={(e) => handleChange('treatyCategory', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="PROPERTY">Property</MenuItem>
-                        <MenuItem value="CASUALTY">Casualty</MenuItem>
-                        <MenuItem value="MARINE">Marine</MenuItem>
-                        <MenuItem value="AVIATION">Aviation</MenuItem>
-                        <MenuItem value="NON_PROP">Non-Proportional</MenuItem>
-                        <MenuItem value="M">M</MenuItem>
-                        <MenuItem value="F">F</MenuItem>
-                        {treaty.treatyCategory && !['', 'PROPERTY', 'CASUALTY', 'MARINE', 'AVIATION', 'NON_PROP', 'M', 'F'].includes(treaty.treatyCategory) && (
-                            <MenuItem value={treaty.treatyCategory}>{treaty.treatyCategory}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {treatyCategoryOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -296,16 +269,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.treatyStatus}
                         onChange={(e) => handleChange('treatyStatus', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="ACTIVE">Active</MenuItem>
-                        <MenuItem value="INACTIVE">Inactive</MenuItem>
-                        <MenuItem value="PENDING">Pending</MenuItem>
-                        <MenuItem value="Active">Active</MenuItem>
-                        <MenuItem value="Inactive">Inactive</MenuItem>
-                        <MenuItem value="Pending">Pending</MenuItem>
-                        {treaty.treatyStatus && !['', 'ACTIVE', 'INACTIVE', 'PENDING', 'Active', 'Inactive', 'Pending'].includes(treaty.treatyStatus) && (
-                            <MenuItem value={treaty.treatyStatus}>{treaty.treatyStatus}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {treatyStatusOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -319,17 +286,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         label="Treaty Currency"
                         value={treaty.treatyCurrency}
                         onChange={(e) => handleChange('treatyCurrency', e.target.value)}
-                        disabled={loadingCurrencies}
                     >
-                        <MenuItem value="">
-                            <em style={{ color: '#6c757d' }}>
-                                {loadingCurrencies ? 'Loading currencies...' : 'Select Currency...'}
-                            </em>
-                        </MenuItem>
-                        {currencies.map((curr) => (
-                            <MenuItem key={curr.commonCode || curr.commonDesc} value={curr.commonCode || curr.commonDesc}>
-                                {curr.commonDesc || curr.commonCode}
-                            </MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {currencies.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -345,9 +305,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.processing}
                         onChange={(e) => handleChange('processing', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Clean Cut">Clean Cut</MenuItem>
-                        <MenuItem value="Run Off">Run Off</MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {processingOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -450,9 +411,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.proRateToAmount}
                         onChange={(e) => handleChange('proRateToAmount', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Yes">Yes</MenuItem>
-                        <MenuItem value="No">No</MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {proRateAmountOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -467,9 +429,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.proRateToTime}
                         onChange={(e) => handleChange('proRateToTime', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Yes">Yes</MenuItem>
-                        <MenuItem value="No">No</MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {proRateTimeOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -509,24 +472,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.premPaymentWarranty}
                         onChange={(e) => handleChange('premPaymentWarranty', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Within 30 Days">Within 30 Days</MenuItem>
-                        <MenuItem value="Within 45 Days">Within 45 Days</MenuItem>
-                        <MenuItem value="Within 60 Days">Within 60 Days</MenuItem>
-                        <MenuItem value="Within 90 Days">Within 90 Days</MenuItem>
-                        <MenuItem value="Quarterly">Quarterly</MenuItem>
-                        <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
-                        <MenuItem value="Annual">Annual</MenuItem>
-                        <MenuItem value="WITHIN_30_DAYS">Within 30 Days</MenuItem>
-                        <MenuItem value="WITHIN_45_DAYS">Within 45 Days</MenuItem>
-                        <MenuItem value="WITHIN_60_DAYS">Within 60 Days</MenuItem>
-                        <MenuItem value="WITHIN_90_DAYS">Within 90 Days</MenuItem>
-                        <MenuItem value="QUARTERLY">Quarterly</MenuItem>
-                        <MenuItem value="SEMI_ANNUAL">Semi-Annual</MenuItem>
-                        <MenuItem value="ANNUAL">Annual</MenuItem>
-                        {treaty.premPaymentWarranty && !['', 'Within 30 Days', 'Within 45 Days', 'Within 60 Days', 'Within 90 Days', 'Quarterly', 'Semi-Annual', 'Annual', 'WITHIN_30_DAYS', 'WITHIN_45_DAYS', 'WITHIN_60_DAYS', 'WITHIN_90_DAYS', 'QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL'].includes(treaty.premPaymentWarranty) && (
-                            <MenuItem value={treaty.premPaymentWarranty}>{treaty.premPaymentWarranty}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {premPaymentOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
@@ -566,41 +515,29 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         label="Processing Portfolio Method"
                         value={treaty.processingPortfolioMethod}
                         onChange={(e) => handleChange('processingPortfolioMethod', e.target.value)}
-                        disabled={loadingProcessingMethod}
                     >
-                        <MenuItem value="">
-                            <em style={{ color: '#6c757d' }}>
-                                {loadingProcessingMethod ? 'Loading options...' : 'Select...'}
-                            </em>
-                        </MenuItem>
-                        {processingMethodOptions.map((option) => (
-                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
-                                {option.commonDesc || option.commonCode}
-                            </MenuItem>
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {processingMethodOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
                 <FormControl className={classes.formControl} fullWidth>
-                    <InputLabel id={`basisOfAttachment-label-${blockId}`}>Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss</InputLabel>
+                    <InputLabel id={`basisOfAttachment-label-${blockId}`}>Basis of Attachment</InputLabel>
                     <Select
                         labelId={`basisOfAttachment-label-${blockId}`}
                         id={`basisOfAttachment-${blockId}`}
                         name="basisOfAttachment"
-                        label="Basis of Attachment/Drop Down Values are Risk Attaching Basis/Loss"
+                        label="Basis of Attachment"
                         value={treaty.basisOfAttachment}
                         onChange={(e) => handleChange('basisOfAttachment', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Risk Attaching Basis">Risk Attaching Basis</MenuItem>
-                        <MenuItem value="Loss">Loss</MenuItem>
-                        <MenuItem value="LOSS_OCCURRING">Loss Occurring</MenuItem>
-                        <MenuItem value="RISK_ATTACHING">Risk Attaching</MenuItem>
-                        <MenuItem value="OCCURRENCE">Occurrence</MenuItem>
-                        {treaty.basisOfAttachment && !['', 'Risk Attaching Basis', 'Loss', 'LOSS_OCCURRING', 'RISK_ATTACHING', 'OCCURRENCE'].includes(treaty.basisOfAttachment) && (
-                            <MenuItem value={treaty.basisOfAttachment}>{treaty.basisOfAttachment}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {basisOfAttachmentOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
