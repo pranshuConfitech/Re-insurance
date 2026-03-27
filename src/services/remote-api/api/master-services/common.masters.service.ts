@@ -199,6 +199,10 @@ export class CommonMastersService {
         return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TREATY_TYPE', ...pageRequest });
     }
 
+    getXolTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'XOL_TYPE', ...pageRequest });
+    }
+
     getNonPropPriorityTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PRIORITY_TYPE', ...pageRequest });
     }
