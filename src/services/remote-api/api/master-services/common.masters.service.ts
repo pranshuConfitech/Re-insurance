@@ -195,6 +195,46 @@ export class CommonMastersService {
         });
     }
 
+    getNonPropTreatyTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TREATY_TYPE', ...pageRequest });
+    }
+
+    getNonPropPriorityTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PRIORITY_TYPE', ...pageRequest });
+    }
+
+    getNonPropTreatyCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TRTY_CAT', ...pageRequest });
+    }
+
+    getNonPropTreatyStatusOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_TRTY_STATUS', ...pageRequest });
+    }
+
+    getNonPropProcessingOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROCESSING', ...pageRequest });
+    }
+
+    getNonPropProRateAmountOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PRO_AMT', ...pageRequest });
+    }
+
+    getProRateTimeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'PRO_RATE_TIME', ...pageRequest });
+    }
+
+    getNonPropPaymentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PAYMENT', ...pageRequest });
+    }
+
+    getNonPropProcessingMethodOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PROCESSING_METHOD', ...pageRequest });
+    }
+
+    getBasisOfAttachmentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'BASIS_ATTACHMENT', ...pageRequest });
+    }
+
     /**
      * Save a new common master
      * @param payload - Common master data to save

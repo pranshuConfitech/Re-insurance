@@ -106,7 +106,7 @@ export const TopFormSection = ({
     // Fetch currencies from API
     useEffect(() => {
         setLoadingCurrencies(true);
-        commonMastersService.getCurrencies().subscribe({
+        commonMastersService.getCurrencies({ parent: false }).subscribe({
             next: (response) => {
                 if (response && response.content) {
                     setCurrencies(response.content);
@@ -148,7 +148,7 @@ export const TopFormSection = ({
     // Fetch operating units from API
     useEffect(() => {
         setLoadingOperatingUnits(true);
-        commonMastersService.getOperatingUnits().subscribe({
+        commonMastersService.getOperatingUnits({ parent: false }).subscribe({
             next: (response) => {
                 if (response && response.content) {
                     setOperatingUnits(response.content);

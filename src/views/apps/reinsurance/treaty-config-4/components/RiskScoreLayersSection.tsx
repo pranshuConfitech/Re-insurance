@@ -101,91 +101,18 @@ export const RiskScoreLayersSection = ({
     const [productLobOptions, setProductLobOptions] = useState<any[]>([]);
     const [accountingLobOptions, setAccountingLobOptions] = useState<any[]>([]);
     const [riskCategoryOptions, setRiskCategoryOptions] = useState<any[]>([]);
-    const [loadingProductLob, setLoadingProductLob] = useState(false);
-    const [loadingAccountingLob, setLoadingAccountingLob] = useState(false);
-    const [loadingRiskCategory, setLoadingRiskCategory] = useState(false);
 
-    // Fetch Product LOB options from API
-    useEffect(() => {
-        setLoadingProductLob(true);
-        commonMastersService.getProductLobOptions().subscribe({
-            next: (response) => {
-                if (response && response.content) {
-                    setProductLobOptions(response.content);
-                }
-                setLoadingProductLob(false);
-            },
-            error: (error) => {
-                console.error('Error fetching Product LOB options:', error);
-                setLoadingProductLob(false);
-                // Fallback to hardcoded values
-                setProductLobOptions([
-                    { commonCode: 'PROPERTY', commonDesc: 'Property' },
-                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
-                    { commonCode: 'MARINE', commonDesc: 'Marine' },
-                    { commonCode: 'AVIATION', commonDesc: 'Aviation' },
-                    { commonCode: 'FIRE', commonDesc: 'Fire' },
-                    { commonCode: 'Fire', commonDesc: 'Fire' },
-                    { commonCode: 'Marine', commonDesc: 'Marine' },
-                    { commonCode: 'Motor', commonDesc: 'Motor' }
-                ]);
-            }
+    const fetchDropdown = (fetcher: () => any, setter: (data: any[]) => void, label: string) => {
+        fetcher().subscribe({
+            next: (response: any) => { if (response?.content) setter(response.content); },
+            error: (err: any) => console.error(`Error fetching ${label}:`, err)
         });
-    }, []);
+    };
 
-    // Fetch Accounting LOB options from API
     useEffect(() => {
-        setLoadingAccountingLob(true);
-        commonMastersService.getAccountingLobOptions().subscribe({
-            next: (response) => {
-                if (response && response.content) {
-                    setAccountingLobOptions(response.content);
-                }
-                setLoadingAccountingLob(false);
-            },
-            error: (error) => {
-                console.error('Error fetching Accounting LOB options:', error);
-                setLoadingAccountingLob(false);
-                // Fallback to hardcoded values
-                setAccountingLobOptions([
-                    { commonCode: 'PROP', commonDesc: 'Property' },
-                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
-                    { commonCode: 'MARINE', commonDesc: 'Marine' },
-                    { commonCode: 'AVIATION', commonDesc: 'Aviation' },
-                    { commonCode: 'FIRE', commonDesc: 'Fire' },
-                    { commonCode: 'Fire', commonDesc: 'Fire' },
-                    { commonCode: 'Marine', commonDesc: 'Marine' }
-                ]);
-            }
-        });
-    }, []);
-
-    // Fetch Risk Category options from API
-    useEffect(() => {
-        setLoadingRiskCategory(true);
-        commonMastersService.getRiskCategoryOptions().subscribe({
-            next: (response) => {
-                if (response && response.content) {
-                    setRiskCategoryOptions(response.content);
-                }
-                setLoadingRiskCategory(false);
-            },
-            error: (error) => {
-                console.error('Error fetching Risk Category options:', error);
-                setLoadingRiskCategory(false);
-                // Fallback to hardcoded values
-                setRiskCategoryOptions([
-                    { commonCode: 'HIGH', commonDesc: 'High' },
-                    { commonCode: 'MEDIUM', commonDesc: 'Medium' },
-                    { commonCode: 'LOW', commonDesc: 'Low' },
-                    { commonCode: 'PROPERTY', commonDesc: 'Property' },
-                    { commonCode: 'CASUALTY', commonDesc: 'Casualty' },
-                    { commonCode: 'CAT', commonDesc: 'Catastrophe' },
-                    { commonCode: 'Comm', commonDesc: 'Commercial' },
-                    { commonCode: 'Residential', commonDesc: 'Residential' }
-                ]);
-            }
-        });
+        fetchDropdown(() => commonMastersService.getProductLobOptions(), setProductLobOptions, 'product LOB');
+        fetchDropdown(() => commonMastersService.getAccountingLobOptions(), setAccountingLobOptions, 'accounting LOB');
+        fetchDropdown(() => commonMastersService.getRiskCategoryOptions(), setRiskCategoryOptions, 'risk category');
     }, []);
     return (
         <Box sx={{
@@ -281,17 +208,10 @@ export const RiskScoreLayersSection = ({
                                         label="Product LOB"
                                         value={layer.productLOB}
                                         onChange={(e) => onLayerChange(blockId, layer.id, 'productLOB', e.target.value)}
-                                        disabled={loadingProductLob}
                                     >
-                                        <MenuItem value="">
-                                            <em style={{ color: '#6c757d' }}>
-                                                {loadingProductLob ? 'Loading options...' : 'Select...'}
-                                            </em>
-                                        </MenuItem>
-                                        {productLobOptions.map((option) => (
-                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
-                                                {option.commonDesc || option.commonCode}
-                                            </MenuItem>
+                                        <MenuItem value=""><em>Select...</em></MenuItem>
+                                        {productLobOptions.map((opt) => (
+                                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
@@ -317,17 +237,10 @@ export const RiskScoreLayersSection = ({
                                         label="Accounting LOB"
                                         value={layer.accountingLOB}
                                         onChange={(e) => onLayerChange(blockId, layer.id, 'accountingLOB', e.target.value)}
-                                        disabled={loadingAccountingLob}
                                     >
-                                        <MenuItem value="">
-                                            <em style={{ color: '#6c757d' }}>
-                                                {loadingAccountingLob ? 'Loading options...' : 'Select...'}
-                                            </em>
-                                        </MenuItem>
-                                        {accountingLobOptions.map((option) => (
-                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
-                                                {option.commonDesc || option.commonCode}
-                                            </MenuItem>
+                                        <MenuItem value=""><em>Select...</em></MenuItem>
+                                        {accountingLobOptions.map((opt) => (
+                                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
@@ -342,17 +255,10 @@ export const RiskScoreLayersSection = ({
                                         label="Risk Category"
                                         value={layer.riskCategory}
                                         onChange={(e) => onLayerChange(blockId, layer.id, 'riskCategory', e.target.value)}
-                                        disabled={loadingRiskCategory}
                                     >
-                                        <MenuItem value="">
-                                            <em style={{ color: '#6c757d' }}>
-                                                {loadingRiskCategory ? 'Loading options...' : 'Select...'}
-                                            </em>
-                                        </MenuItem>
-                                        {riskCategoryOptions.map((option) => (
-                                            <MenuItem key={option.commonCode || option.commonDesc} value={option.commonCode || option.commonDesc}>
-                                                {option.commonDesc || option.commonCode}
-                                            </MenuItem>
+                                        <MenuItem value=""><em>Select...</em></MenuItem>
+                                        {riskCategoryOptions.map((opt) => (
+                                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
