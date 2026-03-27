@@ -89,6 +89,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
 
     // State for API dropdown data
     const [treatyTypeOptions, setTreatyTypeOptions] = useState<any[]>([]);
+    const [xolTypeOptions, setXolTypeOptions] = useState<any[]>([]);
     const [priorityOptions, setPriorityOptions] = useState<any[]>([]);
     const [treatyCategoryOptions, setTreatyCategoryOptions] = useState<any[]>([]);
     const [treatyStatusOptions, setTreatyStatusOptions] = useState<any[]>([]);
@@ -115,6 +116,7 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
 
     useEffect(() => {
         fetchDropdown(() => commonMastersService.getNonPropTreatyTypeOptions(), setTreatyTypeOptions, 'treaty type');
+        fetchDropdown(() => commonMastersService.getXolTypeOptions(), setXolTypeOptions, 'xol type');
         fetchDropdown(() => commonMastersService.getNonPropPriorityTypeOptions(), setPriorityOptions, 'priority');
         fetchDropdown(() => commonMastersService.getNonPropTreatyCategoryOptions(), setTreatyCategoryOptions, 'treaty category');
         fetchDropdown(() => commonMastersService.getNonPropTreatyStatusOptions(), setTreatyStatusOptions, 'treaty status');
@@ -216,14 +218,10 @@ export const NonProportionalTreatyFields = ({ treaty, blockId, onTreatyChange }:
                         value={treaty.xolType}
                         onChange={(e) => handleChange('xolType', e.target.value)}
                     >
-                        <MenuItem value="">Select...</MenuItem>
-                        <MenuItem value="Risk Attaching">Risk Attaching</MenuItem>
-                        <MenuItem value="Loss Occurring">Loss Occurring</MenuItem>
-                        <MenuItem value="RISK_ATTACHING">Risk Attaching</MenuItem>
-                        <MenuItem value="LOSS_OCCURRING">Loss Occurring</MenuItem>
-                        {treaty.xolType && !['', 'Risk Attaching', 'Loss Occurring', 'RISK_ATTACHING', 'LOSS_OCCURRING'].includes(treaty.xolType) && (
-                            <MenuItem value={treaty.xolType}>{treaty.xolType}</MenuItem>
-                        )}
+                        <MenuItem value=""><em>Select...</em></MenuItem>
+                        {xolTypeOptions.map((opt) => (
+                            <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Grid>
