@@ -543,16 +543,19 @@ const TreatyConfig4CreateComponent: React.FC<TreatyConfig4CreateComponentProps> 
     };
 
     const mapRiGradedRetention = (value: any): string => {
-        // API returns boolean in many existing records; dropdown now uses RI_GRADED codes.
+        console.log('mapRiGradedRetention input:', value, 'type:', typeof value);
+        // API dropdown expects lowercase string "true"/"false" to match commonCode values
         if (typeof value === 'boolean') {
-            return value ? 'TABLE_A' : 'NONE';
+            const mapped = value ? 'true' : 'false';
+            console.log('mapRiGradedRetention boolean mapped to:', mapped);
+            return mapped;
         }
 
-        const normalized = String(value || '').trim().toUpperCase();
+        const normalized = String(value || '').trim();
         if (!normalized) return '';
-        if (normalized === 'TRUE' || normalized === 'YES') return 'TABLE_A';
-        if (normalized === 'FALSE' || normalized === 'NO' || normalized === 'NONE') return 'NONE';
-        return String(value);
+
+        console.log('mapRiGradedRetention string mapped to:', normalized);
+        return normalized;
     };
 
     const mapRiskLimitLines = (riskDetails: any[]): RiskLimitLine[] => {
