@@ -58,6 +58,7 @@ export class CommonMastersService {
     getCurrencies(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'CURRENCY',
+            parent: false,
             ...pageRequest
         });
     }
@@ -70,6 +71,7 @@ export class CommonMastersService {
     getOperatingUnits(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'OP_UNIT',
+            parent: false,
             ...pageRequest
         });
     }
@@ -95,6 +97,7 @@ export class CommonMastersService {
     getPriorityTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'PRIORITY_TYPE',
+            parent: false,
             ...pageRequest
         });
     }
@@ -107,6 +110,7 @@ export class CommonMastersService {
     getTreatyTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'TREATY_TYPE',
+            parent: false,
             ...pageRequest
         });
     }
@@ -119,6 +123,7 @@ export class CommonMastersService {
     getTreatyCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'TREATY_CAT',
+            parent: false,
             ...pageRequest
         });
     }
@@ -131,6 +136,7 @@ export class CommonMastersService {
     getRiGradedOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'RI_GRADED',
+            parent: false,
             ...pageRequest
         });
     }
@@ -143,6 +149,7 @@ export class CommonMastersService {
     getInstallmentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'INSTALLMENT',
+            parent: false,
             ...pageRequest
         });
     }
@@ -155,6 +162,7 @@ export class CommonMastersService {
     getProcessingMethodOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'PROC_METHOD',
+            parent: false,
             ...pageRequest
         });
     }
@@ -167,6 +175,7 @@ export class CommonMastersService {
     getProductLobOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'PROD_LOB',
+            parent: false,
             ...pageRequest
         });
     }
@@ -179,6 +188,7 @@ export class CommonMastersService {
     getAccountingLobOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'ACC_LOB',
+            parent: false,
             ...pageRequest
         });
     }
@@ -191,52 +201,53 @@ export class CommonMastersService {
     getRiskCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
         return this.getCommonMasters({
             commonTypeDesc: 'RISK_CAT',
+            parent: false,
             ...pageRequest
         });
     }
 
     getNonPropTreatyTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TREATY_TYPE', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TREATY_TYPE', parent: false, ...pageRequest });
     }
 
     getXolTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'XOL_TYPE', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'XOL_TYPE', parent: false, ...pageRequest });
     }
 
     getNonPropPriorityTypeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PRIORITY_TYPE', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PRIORITY_TYPE', parent: false, ...pageRequest });
     }
 
     getNonPropTreatyCategoryOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TRTY_CAT', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_TRTY_CAT', parent: false, ...pageRequest });
     }
 
     getNonPropTreatyStatusOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_TRTY_STATUS', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_TRTY_STATUS', parent: false, ...pageRequest });
     }
 
     getNonPropProcessingOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROCESSING', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROCESSING', parent: false, ...pageRequest });
     }
 
     getNonPropProRateAmountOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PRO_AMT', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PRO_AMT', parent: false, ...pageRequest });
     }
 
     getProRateTimeOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'PRO_RATE_TIME', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'PRO_RATE_TIME', parent: false, ...pageRequest });
     }
 
     getNonPropPaymentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PAYMENT', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PAYMENT', parent: false, ...pageRequest });
     }
 
     getNonPropProcessingMethodOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PROCESSING_METHOD', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'NON_PROP_PROCESSING_METHOD', parent: false, ...pageRequest });
     }
 
     getBasisOfAttachmentOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
-        return this.getCommonMasters({ commonTypeDesc: 'BASIS_ATTACHMENT', ...pageRequest });
+        return this.getCommonMasters({ commonTypeDesc: 'BASIS_ATTACHMENT', parent: false, ...pageRequest });
     }
 
     /**
