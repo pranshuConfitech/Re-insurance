@@ -10,14 +10,20 @@ import {
     Typography,
     Alert,
     CircularProgress,
-    Divider
+    Divider,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import { ReinsuranceService } from '@/services/remote-api/api/reinsurance-services/reinsurance.service';
+import { CommonMastersService } from '@/services/remote-api/api/master-services/common.masters.service';
 import treatyAllocationSampleData from '@/data/treaty-allocation-sample.json';
 import CombinedAllocationTable from './components/CombinedAllocationTable';
 import ImprovedAllocationTable from './components/ImprovedAllocationTable';
 
 const reinsuranceService = new ReinsuranceService();
+const commonMastersService = new CommonMastersService();
 
 interface Participant {
     participantType: string;
@@ -80,6 +86,27 @@ export default function TreatyAllocation3Component() {
         updateRISI: '' as any,
         policyPremium: '' as any
     });
+
+    const [companyUINOptions, setCompanyUINOptions] = useState<any[]>([]);
+    const [operatingUnitOptions, setOperatingUnitOptions] = useState<any[]>([]);
+    const [productLobOptions, setProductLobOptions] = useState<any[]>([]);
+    const [accountingLobOptions, setAccountingLobOptions] = useState<any[]>([]);
+    const [riskCategoryOptions, setRiskCategoryOptions] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchDropdown = (fetcher: () => any, setter: (data: any[]) => void) => {
+            fetcher().subscribe({
+                next: (response: any) => { if (response?.content) setter(response.content); },
+                error: (err: any) => console.error('Error fetching dropdown:', err)
+            });
+        };
+
+        fetchDropdown(() => commonMastersService.getCompanyUINOptions(), setCompanyUINOptions);
+        fetchDropdown(() => commonMastersService.getOperatingUnits(), setOperatingUnitOptions);
+        fetchDropdown(() => commonMastersService.getProductLobOptions(), setProductLobOptions);
+        fetchDropdown(() => commonMastersService.getAccountingLobOptions(), setAccountingLobOptions);
+        fetchDropdown(() => commonMastersService.getRiskCategoryOptions(), setRiskCategoryOptions);
+    }, []);
 
     const fetchAllocationData = async () => {
         setLoading(true);
@@ -149,34 +176,49 @@ export default function TreatyAllocation3Component() {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Company UIN"
-                                        value={formData.companyUIN}
-                                        onChange={(e) => handleInputChange('companyUIN', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
+                                    <FormControl fullWidth>
+                                        <InputLabel>Company UIN</InputLabel>
+                                        <Select
+                                            label="Company UIN"
+                                            value={formData.companyUIN}
+                                            onChange={(e) => handleInputChange('companyUIN', e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>Select...</em></MenuItem>
+                                            {companyUINOptions.map((opt) => (
+                                                <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Operating Unit UIN"
-                                        value={formData.operatingUnitUIN}
-                                        onChange={(e) => handleInputChange('operatingUnitUIN', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
+                                    <FormControl fullWidth>
+                                        <InputLabel>Operating Unit UIN</InputLabel>
+                                        <Select
+                                            label="Operating Unit UIN"
+                                            value={formData.operatingUnitUIN}
+                                            onChange={(e) => handleInputChange('operatingUnitUIN', e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>Select...</em></MenuItem>
+                                            {operatingUnitOptions.map((opt) => (
+                                                <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Product LOB"
-                                        value={formData.productLOB}
-                                        onChange={(e) => handleInputChange('productLOB', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
+                                    <FormControl fullWidth>
+                                        <InputLabel>Product LOB</InputLabel>
+                                        <Select
+                                            label="Product LOB"
+                                            value={formData.productLOB}
+                                            onChange={(e) => handleInputChange('productLOB', e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>Select...</em></MenuItem>
+                                            {productLobOptions.map((opt) => (
+                                                <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
                                     <TextField
@@ -189,24 +231,34 @@ export default function TreatyAllocation3Component() {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Accounting LOB"
-                                        value={formData.accountingLOB}
-                                        onChange={(e) => handleInputChange('accountingLOB', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
+                                    <FormControl fullWidth>
+                                        <InputLabel>Accounting LOB</InputLabel>
+                                        <Select
+                                            label="Accounting LOB"
+                                            value={formData.accountingLOB}
+                                            onChange={(e) => handleInputChange('accountingLOB', e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>Select...</em></MenuItem>
+                                            {accountingLobOptions.map((opt) => (
+                                                <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Risk Category"
-                                        value={formData.riskCategory}
-                                        onChange={(e) => handleInputChange('riskCategory', e.target.value)}
-                                        variant="outlined"
-                                        sx={{ mb: 2 }}
-                                    />
+                                    <FormControl fullWidth>
+                                        <InputLabel>Risk Category</InputLabel>
+                                        <Select
+                                            label="Risk Category"
+                                            value={formData.riskCategory}
+                                            onChange={(e) => handleInputChange('riskCategory', e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>Select...</em></MenuItem>
+                                            {riskCategoryOptions.map((opt) => (
+                                                <MenuItem key={opt.commonCode} value={opt.commonCode}>{opt.commonDesc}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={3}>
                                     <TextField
