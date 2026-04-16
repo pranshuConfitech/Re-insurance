@@ -100,6 +100,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href="/reinsurance/treaty-allocation-3">Premium Allocation</MenuItem>
           <MenuItem href="/reinsurance/claim-allocation">Claim Recovery</MenuItem>
           <MenuItem href="/reinsurance/reinstate-treaty">Reinstate Treaty</MenuItem>
+          <MenuItem href="/reinsurance/bordeaux-report">Bordeaux Report</MenuItem>
           <MenuItem href="/reinsurance/reports">Reports</MenuItem>
         </SubMenu>
       </Menu>
