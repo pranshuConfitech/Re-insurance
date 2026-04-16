@@ -58,6 +58,11 @@ export default function BordeauxReportComponent() {
                 treatyCode: treatyCode.trim() || undefined
             }).toPromise();
 
+            if (!result) {
+                setError('No data returned from search');
+                return;
+            }
+
             setSearchData(result);
             // Auto-expand all groups
             const expanded: Record<string, boolean> = {};
@@ -85,6 +90,11 @@ export default function BordeauxReportComponent() {
                 toDate,
                 treatyCode: treatyCode.trim() || undefined
             }).toPromise();
+
+            if (!result) {
+                setError('No data returned from generate');
+                return;
+            }
 
             // Ensure count is set from rows length if not provided
             const normalizedResult = {
