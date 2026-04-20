@@ -30,8 +30,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useRouter } from 'next/navigation';
 import { BordeauxService, type BordeauxSearchResponse } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
 
@@ -43,13 +41,17 @@ export default function BordeauxReportComponent() {
     const [toDate, setToDate] = useState('2026-04-30');
     const [treatyCode, setTreatyCode] = useState('');
     const [searchData, setSearchData] = useState<BordeauxSearchResponse | null>(null);
+    const [generatedData, setGeneratedData] = useState<BordeauxSearchResponse | null>(null);
     const [loading, setLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
     const handleSearch = async () => {
         setLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         try {
             const result = await bordeauxService.searchBordeauxByRiDate({
@@ -64,6 +66,7 @@ export default function BordeauxReportComponent() {
             }
 
             setSearchData(result);
+            setGeneratedData(null);
             // Auto-expand all groups
             const expanded: Record<string, boolean> = {};
             result.rows.forEach(row => {
@@ -83,6 +86,7 @@ export default function BordeauxReportComponent() {
 
         setLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         try {
             const result = await bordeauxService.generateBordeauxHeader({
@@ -102,8 +106,8 @@ export default function BordeauxReportComponent() {
                 count: result.count || result.rows?.length || 0
             };
 
-            // Replace search data with generated data
-            setSearchData(normalizedResult);
+            // Keep generated preview data separate
+            setGeneratedData(normalizedResult);
 
             // Auto-expand all groups with new data
             const expanded: Record<string, boolean> = {};
@@ -119,6 +123,28 @@ export default function BordeauxReportComponent() {
         }
     };
 
+    const handleSubmitGenerated = async () => {
+        if (!generatedData) return;
+
+        setSubmitLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+        try {
+            await bordeauxService.confirmGeneratedHeader({
+                fromDate,
+                toDate
+            }).toPromise();
+            setSuccessMessage('Generated Bordeaux headers submitted successfully.');
+            setGeneratedData(null);
+            await handleSearch();
+        } catch (err: any) {
+            console.error('Submit generated header error:', err);
+            setError(err?.message || 'Failed to submit generated headers');
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
     const handleCreate = () => {
         router.push('/reinsurance/bordeaux-report/create');
     };
@@ -130,29 +156,104 @@ export default function BordeauxReportComponent() {
         }));
     };
 
-    // Group data by bordeauxStatementNumber
-    const groupedData = searchData?.rows.reduce((acc, row) => {
-        const key = row.bordeauxStatementNumber;
-        if (!acc[key]) {
-            acc[key] = [];
+    // Field mapping for display labels
+    const fieldLabels: Record<string, string> = {
+        gcLoadDate: 'GC Load date',
+        transactionDate: 'TRANSACTION DATE',
+        uniqueInternalId: 'Unique INTERNAL ID',
+        treatyCode: 'TREATY CODE',
+        brokerCode: 'BROKER CODE',
+        reinsurerCode: 'REINSURER CODE',
+        feeCode: 'FEE CODE',
+        riDate: 'RI DATE',
+        cessionType: 'OUT/RETROO CESSION',
+        policyNumber: 'POLICY NUMBER',
+        endtNumber: 'ENDT NUMBER',
+        policyHolderName: 'POLICY HOLDER NAME',
+        policyIssueDate: 'Policy Issue Date',
+        policyStartDate: 'POLICY START DATE',
+        policyEndDate: 'POLICY END DATE',
+        endrStartDate: 'ENDR START DATE',
+        sectionLob: 'Section LOB',
+        gwpAmountSection: 'GWP AMOUNT SECTION',
+        risiAmountSection: 'RISI Amount Section',
+        participantRiAmount: 'PARTICIPANT RI Amount',
+        claimNumber: 'Claim Number',
+        claimantName: 'Claimant name',
+        claimLossDate: 'Claim Loss date',
+        claimReportingDate: 'Claim reporting Date',
+        policyStatus: 'Policy status',
+        claimStatus: 'Claim status',
+        indemnityIncurredClaimAmount: 'Indemnity Incurred Claim amount',
+        indemnityIncurredClaimPaid: 'Indemnity Incurred Claim Paid',
+        indemnityIncurredClaimOs: 'Indemnity Incurred Claim OS',
+        expenseClaimPaidAmount: 'Expense Claim Paid Amount',
+        expenseClaimOsAmount: 'Expense Claim OS Amount',
+        participantRiIndemnityRecoveryAmount: 'PARTICIPANT RI Indemnity Recovery Amount',
+        participantRiExpenseRecoveryAmount: 'PARTICIPANT RI Expense Recovery Amount',
+        statementType: 'Statement Type'
+    };
+
+    // Header fields to display in accordion header
+    const headerFields = [
+        'treatyCode',
+        'brokerCode',
+        'reinsurerCode',
+        'feeCode',
+        'riDate',
+        'policyNumber',
+        'endtNumber',
+        'participantRiAmount'
+    ];
+    const accordionDetailFields = [
+        'gcLoadDate',
+        'transactionDate',
+        'uniqueInternalId',
+        'treatyCode',
+        'brokerCode',
+        'reinsurerCode',
+        'feeCode',
+        'riDate',
+        'cessionType',
+        'policyNumber',
+        'endtNumber',
+        'policyHolderName',
+        'policyIssueDate',
+        'policyStartDate',
+        'policyEndDate',
+        'endrStartDate',
+        'sectionLob',
+        'gwpAmountSection',
+        'risiAmountSection',
+        'participantRiAmount',
+        'claimNumber',
+        'claimantName',
+        'claimLossDate',
+        'claimReportingDate',
+        'policyStatus',
+        'claimStatus',
+        'indemnityIncurredClaimAmount',
+        'indemnityIncurredClaimPaid',
+        'indemnityIncurredClaimOs',
+        'expenseClaimPaidAmount',
+        'expenseClaimOsAmount',
+        'participantRiIndemnityRecoveryAmount',
+        'participantRiExpenseRecoveryAmount',
+        'statementType'
+    ];
+
+    const formatValue = (value: any) => {
+        if (value === null || value === undefined) return '-';
+        if (typeof value === 'number') {
+            return new Intl.NumberFormat('en-IN').format(value);
         }
-        acc[key].push(row);
-        return acc;
-    }, {} as Record<string, typeof searchData.rows>);
+        if (typeof value === 'boolean') {
+            return value ? 'Yes' : 'No';
+        }
+        return String(value);
+    };
 
     const renderField = (label: string, value: any) => {
-        if (value === null || value === undefined) return null;
-
-        // Format the value
-        let displayValue = value;
-        if (typeof value === 'number') {
-            displayValue = new Intl.NumberFormat('en-IN').format(value);
-        } else if (typeof value === 'boolean') {
-            displayValue = value ? 'Yes' : 'No';
-        } else {
-            displayValue = String(value);
-        }
-
         return (
             <Grid item xs={12} sm={6} md={4} lg={3} key={label}>
                 <Box sx={{
@@ -184,7 +285,7 @@ export default function BordeauxReportComponent() {
                             wordBreak: 'break-word'
                         }}
                     >
-                        {displayValue}
+                        {formatValue(value)}
                     </Typography>
                 </Box>
             </Grid>
@@ -402,11 +503,110 @@ export default function BordeauxReportComponent() {
                             {error}
                         </Alert>
                     )}
+                    {successMessage && (
+                        <Alert severity="success" sx={{ mt: 2, fontSize: '13px' }}>
+                            {successMessage}
+                        </Alert>
+                    )}
                 </CardContent>
             </Card>
 
-            {/* Results Section */}
-            {searchData && groupedData && (
+            {/* Generated Preview Section */}
+            {generatedData && generatedData.rows && (
+                <Box sx={{ mb: 3 }}>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                        p: 2,
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '8px'
+                    }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '14px', color: '#2c3e50' }}>
+                            Generated Preview
+                        </Typography>
+                        <Chip
+                            label={`${generatedData.count} records generated`}
+                            sx={{
+                                backgroundColor: '#fff3e0',
+                                color: '#ef6c00',
+                                fontWeight: 600,
+                                fontSize: '12px'
+                            }}
+                        />
+                    </Box>
+
+                    <Card sx={{ borderRadius: '8px', boxShadow: 'none', border: '1px solid #dee2e6', overflow: 'hidden' }}>
+                        <TableContainer component={Paper} elevation={0}>
+                            <Table stickyHeader size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Treaty Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Broker Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Reinsurer Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Section LOB</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Statement Number</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>From Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>To Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Statement Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Fee 9001</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Fee 9002</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Fee 9003</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Fee 1001</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Posted To Finance</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Report Generated</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {generatedData.rows.map((row, idx) => (
+                                        <TableRow key={`generated-${idx}`} sx={{ '&:hover': { backgroundColor: '#f8fafc' } }}>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.treatyCode)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.brokerCode)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.reinsurerCode)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.sectionLob)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.bordeauxStatementNumber)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.bordeauxFromDate)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.bordeauxToDate)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.bordeauxStatementDate)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.statementStatus)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.sumFee9001)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.sumFee9002)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.sumFee9003)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.sumFee1001)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.postedToFinance)}</TableCell>
+                                            <TableCell sx={{ fontSize: '12px' }}>{formatValue(row.reportGenerated)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Card>
+
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            variant="contained"
+                            onClick={handleSubmitGenerated}
+                            disabled={submitLoading || loading}
+                            sx={{
+                                backgroundColor: '#28a745',
+                                color: '#fff',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                minWidth: '130px',
+                                '&:hover': { backgroundColor: '#218838' },
+                                '&:disabled': { backgroundColor: '#e0e0e0', color: '#9e9e9e' }
+                            }}
+                        >
+                            {submitLoading ? <CircularProgress size={18} sx={{ color: 'white' }} /> : 'Submit'}
+                        </Button>
+                    </Box>
+                </Box>
+            )}
+
+            {/* Search Results Section */}
+            {!generatedData && searchData && searchData.rows && (
                 <Box>
                     <Box sx={{
                         display: 'flex',
@@ -431,81 +631,121 @@ export default function BordeauxReportComponent() {
                         />
                     </Box>
 
-                    {Object.entries(groupedData).map(([statementNumber, rows]) => (
-                        <Card
-                            key={statementNumber}
-                            sx={{
-                                mb: 2,
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                borderRadius: '8px',
-                                border: '1px solid #e0e0e0',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    p: 2,
-                                    backgroundColor: '#f8f9fa',
-                                    cursor: 'pointer',
-                                    borderBottom: expandedGroups[statementNumber] ? '1px solid #e0e0e0' : 'none',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        backgroundColor: '#e9ecef'
-                                    }
-                                }}
-                                onClick={() => toggleGroup(statementNumber)}
-                            >
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <DescriptionIcon sx={{ color: '#1976d2', fontSize: 22 }} />
-                                    <Box>
-                                        <Typography sx={{ fontWeight: 600, fontSize: '13px', color: '#2c3e50' }}>
-                                            {statementNumber}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: '11px', color: '#6c757d', mt: 0.3 }}>
-                                            {rows.length} {rows.length === 1 ? 'record' : 'records'}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <IconButton size="small" sx={{ color: '#6c757d' }}>
-                                    {expandedGroups[statementNumber] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                                </IconButton>
-                            </Box>
+                    <Card sx={{ borderRadius: '8px', boxShadow: 'none', border: '1px solid #dee2e6', overflow: 'hidden' }}>
+                        <TableContainer component={Paper} elevation={0}>
+                            <Table sx={{ tableLayout: 'fixed' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell sx={{ width: '6%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', py: 1.5, borderBottom: '1px solid #dee2e6' }} />
+                                        <TableCell sx={{ width: '22%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Treaty Code
+                                        </TableCell>
+                                        <TableCell sx={{ width: '9%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Broker Code
+                                        </TableCell>
+                                        <TableCell sx={{ width: '10%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Reinsurer Code
+                                        </TableCell>
+                                        <TableCell sx={{ width: '8%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Fee Code
+                                        </TableCell>
+                                        <TableCell sx={{ width: '10%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            RI Date
+                                        </TableCell>
+                                        <TableCell sx={{ width: '9%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Policy Number
+                                        </TableCell>
+                                        <TableCell sx={{ width: '7%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Endt Number
+                                        </TableCell>
+                                        <TableCell sx={{ width: '13%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
+                                            Participant RI Amount
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {searchData.rows.map((row, idx) => {
+                                        const recordKey = `record-${row.id || idx}`;
+                                        const isExpanded = expandedGroups[recordKey] || false;
 
-                            <Collapse in={expandedGroups[statementNumber]}>
-                                <Box sx={{ p: 0 }}>
-                                    {rows.map((row, idx) => (
-                                        <Box
-                                            key={row.key || idx}
-                                            sx={{
-                                                borderBottom: idx < rows.length - 1 ? '2px solid #dee2e6' : 'none'
-                                            }}
-                                        >
-                                            <Box sx={{
-                                                p: 3,
-                                                backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa'
-                                            }}>
-                                                <Grid container spacing={2}>
-                                                    {Object.entries(row).map(([key, value]) => {
-                                                        if (key === 'id' || key === 'key') return null;
+                                        return (
+                                            <React.Fragment key={recordKey}>
+                                                <TableRow
+                                                    onClick={() => toggleGroup(recordKey)}
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        '&:hover': { backgroundColor: '#f8fafc' },
+                                                        borderBottom: '1px solid #e9ecef'
+                                                    }}
+                                                >
+                                                    <TableCell sx={{ py: 1.25, textAlign: 'center' }}>
+                                                        <IconButton size="small" sx={{ color: '#6c757d' }}>
+                                                            {isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ py: 1.25 }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                                            <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#28a745', mt: 0.7 }} />
+                                                            <Box>
+                                                                <Typography sx={{ fontSize: '12px', fontWeight: 700, color: '#2c3e50', lineHeight: 1.2 }}>
+                                                                    {formatValue(row.treatyCode)}
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: '9px', color: '#6c757d', textTransform: 'uppercase', lineHeight: 1.2, mt: 0.3 }}>
+                                                                    Participant RI Indemnity Recovery Amount
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: '10px', fontWeight: 600, color: '#2c3e50', lineHeight: 1.2 }}>
+                                                                    {formatValue(row.participantRiIndemnityRecoveryAmount)}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.brokerCode)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.reinsurerCode)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.feeCode)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.riDate)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.policyNumber)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.endtNumber)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 700, color: '#2c3e50', py: 1.25 }}>
+                                                        {formatValue(row.participantRiAmount)}
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell colSpan={9} sx={{ py: 0, borderBottom: isExpanded ? '1px solid #dee2e6' : 'none' }}>
+                                                        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                                            <Box sx={{ p: 2.5, backgroundColor: '#fafbfc' }}>
+                                                                <Grid container spacing={2}>
+                                                                    {accordionDetailFields.map((field) => {
+                                                                        const label = fieldLabels[field] || field
+                                                                            .replace(/([A-Z])/g, ' $1')
+                                                                            .replace(/^./, str => str.toUpperCase())
+                                                                            .trim();
 
-                                                        const label = key
-                                                            .replace(/([A-Z])/g, ' $1')
-                                                            .replace(/^./, str => str.toUpperCase())
-                                                            .trim();
-
-                                                        return renderField(label, value);
-                                                    })}
-                                                </Grid>
-                                            </Box>
-                                        </Box>
-                                    ))}
-                                </Box>
-                            </Collapse>
-                        </Card>
-                    ))}
+                                                                        return renderField(label, row[field]);
+                                                                    })}
+                                                                </Grid>
+                                                            </Box>
+                                                        </Collapse>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </React.Fragment>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Card>
                 </Box>
             )}
         </Box>

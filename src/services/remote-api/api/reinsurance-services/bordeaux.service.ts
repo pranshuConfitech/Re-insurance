@@ -102,4 +102,20 @@ export class BordeauxService {
             })
             .pipe(map((response) => response.data));
     }
+
+    /**
+     * Confirm generated Bordeaux header rows
+     * @param params - confirm parameters
+     * @returns Observable<any>
+     */
+    confirmGeneratedHeader(params: Pick<BordeauxSearchParams, 'fromDate' | 'toDate'>): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/portfolio-treaty/premium-stagging-bordeaux/confirm-generated-header`, null, {
+                params: {
+                    fromDate: params.fromDate,
+                    toDate: params.toDate
+                }
+            })
+            .pipe(map((response) => response.data));
+    }
 }
