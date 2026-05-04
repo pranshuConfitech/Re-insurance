@@ -41,21 +41,31 @@ export default function BordeauxReportCreateComponent() {
     };
 
     const handleProcessUpload = async () => {
-        if (!uploadedFile) return;
+        if (!uploadedFile) {
+            setError('Please select a file to upload');
+            return;
+        }
 
         setLoading(true);
         setError(null);
         setSuccess(false);
 
         try {
-            await bordeauxService.uploadBordeauxStaging(uploadedFile).toPromise();
+            const result = await bordeauxService.uploadBordeauxStaging(uploadedFile).toPromise();
+
+            if (!result) {
+                setError('Upload completed but no response received from server');
+                return;
+            }
+
             setSuccess(true);
             setTimeout(() => {
                 router.push('/reinsurance/bordeaux-report');
             }, 2000);
         } catch (err: any) {
             console.error('Upload error:', err);
-            setError(err?.message || 'Failed to upload file. Please try again.');
+            const errorMessage = err?.response?.data?.message || err?.message || 'Failed to upload file. Please check the file format and try again.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

@@ -20,6 +20,11 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "types": [],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
     "plugins": [
       {
         "name": "next"
@@ -53,20 +58,20 @@
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
-    "build/types/**/*.ts",
     "next-env.d.ts",
     "next.config.mjs",
-    "src/services/utility/role/index.tsx",
-    "src/utils/@jambo-utils/IntlMessages.tsx",
-    "src/views/apps/shared-component/components/fettle-rich-text-editor/sample.base.js",
     "tailwind.config.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    ".next",
+    "build",
+    "apps",
+    "pages"
   ]
 }

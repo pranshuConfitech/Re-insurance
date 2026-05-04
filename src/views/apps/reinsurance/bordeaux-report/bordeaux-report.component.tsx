@@ -62,6 +62,13 @@ export default function BordeauxReportComponent() {
 
             if (!result) {
                 setError('No data returned from search');
+                setSearchData(null);
+                return;
+            }
+
+            if (!result.rows || result.rows.length === 0) {
+                setError('No records found for the selected date range and treaty code');
+                setSearchData(null);
                 return;
             }
 
@@ -73,16 +80,21 @@ export default function BordeauxReportComponent() {
                 expanded[row.bordeauxStatementNumber] = false;
             });
             setExpandedGroups(expanded);
+            setSuccessMessage(`Found ${result.count || result.rows.length} records`);
         } catch (err: any) {
             console.error('Search error:', err);
-            setError(err?.message || 'Failed to search data');
+            setSearchData(null);
+            setError(err?.response?.data?.message || err?.message || 'Failed to search data. Please check your connection and try again.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleGenerate = async () => {
-        if (!searchData) return;
+        if (!searchData) {
+            setError('Please search for data first before generating');
+            return;
+        }
 
         setLoading(true);
         setError(null);
@@ -97,6 +109,13 @@ export default function BordeauxReportComponent() {
 
             if (!result) {
                 setError('No data returned from generate');
+                setGeneratedData(null);
+                return;
+            }
+
+            if (!result.rows || result.rows.length === 0) {
+                setError('No headers generated. Please verify the data and try again.');
+                setGeneratedData(null);
                 return;
             }
 
@@ -115,16 +134,21 @@ export default function BordeauxReportComponent() {
                 expanded[row.bordeauxStatementNumber] = false;
             });
             setExpandedGroups(expanded);
+            setSuccessMessage(`Successfully generated ${normalizedResult.count} header records`);
         } catch (err: any) {
             console.error('Generate error:', err);
-            setError(err?.message || 'Failed to generate report');
+            setGeneratedData(null);
+            setError(err?.response?.data?.message || err?.message || 'Failed to generate report. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleSubmitGenerated = async () => {
-        if (!generatedData) return;
+        if (!generatedData) {
+            setError('No generated data to confirm');
+            return;
+        }
 
         setSubmitLoading(true);
         setError(null);
@@ -132,14 +156,21 @@ export default function BordeauxReportComponent() {
         try {
             await bordeauxService.confirmGeneratedHeader({
                 fromDate,
-                toDate
+                toDate,
+                treatyCode: treatyCode.trim() || undefined
             }).toPromise();
-            setSuccessMessage('Generated Bordeaux headers submitted successfully.');
-            setGeneratedData(null);
-            await handleSearch();
+
+            // Navigate to report headers page with query parameters
+            const queryParams = new URLSearchParams({
+                fromDate,
+                toDate,
+                ...(treatyCode.trim() && { treatyCode: treatyCode.trim() })
+            });
+
+            router.push(`/reinsurance/bordeaux-report/headers?${queryParams.toString()}`);
         } catch (err: any) {
             console.error('Submit generated header error:', err);
-            setError(err?.message || 'Failed to submit generated headers');
+            setError(err?.response?.data?.message || err?.message || 'Failed to confirm generated headers. Please try again.');
         } finally {
             setSubmitLoading(false);
         }
