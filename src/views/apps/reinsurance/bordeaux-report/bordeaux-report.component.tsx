@@ -160,14 +160,9 @@ export default function BordeauxReportComponent() {
                 treatyCode: treatyCode.trim() || undefined
             }).toPromise();
 
-            // Navigate to report headers page with query parameters
-            const queryParams = new URLSearchParams({
-                fromDate,
-                toDate,
-                ...(treatyCode.trim() && { treatyCode: treatyCode.trim() })
-            });
-
-            router.push(`/reinsurance/bordeaux-report/headers?${queryParams.toString()}`);
+            // Navigate to Bordeaux Invoice Generation page without query parameters
+            // Users will input their own search criteria on that page
+            router.push('/reinsurance/bordeaux-invoice-generation');
         } catch (err: any) {
             console.error('Submit generated header error:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to confirm generated headers. Please try again.');
