@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
     Box,
     Card,
@@ -28,23 +28,19 @@ const bordeauxService = new BordeauxService();
 
 export default function BordeauxReportHeadersComponent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
 
-    // Initialize state from URL query parameters
-    const [fromDate, setFromDate] = useState(searchParams.get('fromDate') || '2026-04-01');
-    const [toDate, setToDate] = useState(searchParams.get('toDate') || '2026-04-30');
-    const [treatyCode, setTreatyCode] = useState(searchParams.get('treatyCode') || '');
+    // Initialize state with default dates - users will input their own
+    const [fromDate, setFromDate] = useState('2026-04-01');
+    const [toDate, setToDate] = useState('2026-04-30');
+    const [treatyCode, setTreatyCode] = useState('');
     const [reportHeaders, setReportHeaders] = useState<BordeauxReportHeader[]>([]);
     const [loading, setLoading] = useState(false);
     const [invoiceLoading, setInvoiceLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Auto-search when component mounts if query parameters are present
-    useEffect(() => {
-        if (searchParams.get('fromDate') && searchParams.get('toDate')) {
-            handleSearchHeaders();
-        }
-    }, []); // Empty dependency array - only run once on mount
+    // No auto-search - users will manually search with their own dates
 
     const handleSearchHeaders = async () => {
         setLoading(true);
@@ -90,9 +86,9 @@ export default function BordeauxReportHeadersComponent() {
                 return;
             }
 
-            setSuccessMessage(`Invoice generated successfully for header ID: ${headerId}`);
-            // Refresh the headers list
-            await handleSearchHeaders();
+            // Navigate to invoice details page with the response data
+            const invoiceData = encodeURIComponent(JSON.stringify(result));
+            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details?data=${invoiceData}`);
         } catch (err: any) {
             console.error('Generate invoice error:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to generate invoice. Please try again.');
