@@ -239,4 +239,19 @@ export class BordeauxService {
             .post<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/finance-settlement-journal`, data)
             .pipe(map((response) => response.data));
     }
+
+    /**
+     * View invoice by consolidated ID
+     * @param consolidatedId - Consolidated ID
+     * @returns Observable<any>
+     */
+    viewInvoiceByConsolidatedId(consolidatedId: number): Observable<any> {
+        return http
+            .get<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/invoices/by-consolidated-id`, {
+                params: {
+                    consolidatedId
+                }
+            })
+            .pipe(map((response) => response.data));
+    }
 }

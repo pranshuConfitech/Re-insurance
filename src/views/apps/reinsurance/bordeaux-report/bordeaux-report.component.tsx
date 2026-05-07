@@ -37,8 +37,15 @@ const bordeauxService = new BordeauxService();
 
 export default function BordeauxReportComponent() {
     const router = useRouter();
-    const [fromDate, setFromDate] = useState('2026-04-01');
-    const [toDate, setToDate] = useState('2026-04-30');
+
+    // Get current date in YYYY-MM-DD format
+    const getCurrentDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    const [fromDate, setFromDate] = useState(getCurrentDate());
+    const [toDate, setToDate] = useState(getCurrentDate());
     const [treatyCode, setTreatyCode] = useState('');
     const [searchData, setSearchData] = useState<BordeauxSearchResponse | null>(null);
     const [generatedData, setGeneratedData] = useState<BordeauxSearchResponse | null>(null);
