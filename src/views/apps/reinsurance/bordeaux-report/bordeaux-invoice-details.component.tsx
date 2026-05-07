@@ -75,14 +75,28 @@ export default function BordeauxInvoiceDetailsComponent() {
     });
 
     useEffect(() => {
-        // Get invoice data from URL parameters
-        const data = searchParams.get('data');
-        if (data) {
+        // Try to get invoice data from sessionStorage first (cleaner approach)
+        const sessionData = sessionStorage.getItem('bordeauxInvoiceData');
+        if (sessionData) {
             try {
-                const parsedData = JSON.parse(decodeURIComponent(data));
+                const parsedData = JSON.parse(sessionData);
+                setInvoiceData(parsedData);
+                // Clear sessionStorage after reading to prevent stale data
+                sessionStorage.removeItem('bordeauxInvoiceData');
+                return;
+            } catch (error) {
+                console.error('Error parsing session storage data:', error);
+            }
+        }
+
+        // Fallback to URL parameters for backward compatibility
+        const urlData = searchParams.get('data');
+        if (urlData) {
+            try {
+                const parsedData = JSON.parse(decodeURIComponent(urlData));
                 setInvoiceData(parsedData);
             } catch (error) {
-                console.error('Error parsing invoice data:', error);
+                console.error('Error parsing URL data:', error);
             }
         }
     }, [searchParams]);

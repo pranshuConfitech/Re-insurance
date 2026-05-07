@@ -95,10 +95,12 @@ export default function BordeauxReportHeadersComponent() {
                 return;
             }
 
-            // Add flag to indicate this is a newly generated invoice
+            // Store invoice data in sessionStorage for cleaner URL
             const invoiceDataWithFlag = { ...result, isNewlyGenerated: true };
-            const invoiceData = encodeURIComponent(JSON.stringify(invoiceDataWithFlag));
-            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details?data=${invoiceData}`);
+            sessionStorage.setItem('bordeauxInvoiceData', JSON.stringify(invoiceDataWithFlag));
+
+            // Navigate with clean URL
+            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details`);
         } catch (err: any) {
             console.error('Generate invoice error:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to generate invoice. Please try again.');
@@ -120,10 +122,12 @@ export default function BordeauxReportHeadersComponent() {
                 return;
             }
 
-            // Add flag to indicate this is an existing invoice (view mode)
+            // Store invoice data in sessionStorage for cleaner URL
             const invoiceDataWithFlag = { ...result, isNewlyGenerated: false };
-            const invoiceData = encodeURIComponent(JSON.stringify(invoiceDataWithFlag));
-            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details?data=${invoiceData}`);
+            sessionStorage.setItem('bordeauxInvoiceData', JSON.stringify(invoiceDataWithFlag));
+
+            // Navigate with clean URL
+            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details`);
         } catch (err: any) {
             console.error('View invoice error:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to view invoice. Please try again.');
