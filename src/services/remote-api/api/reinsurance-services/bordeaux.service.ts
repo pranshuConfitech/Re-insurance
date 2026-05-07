@@ -254,4 +254,29 @@ export class BordeauxService {
             })
             .pipe(map((response) => response.data));
     }
+
+    /**
+     * Search ledger by date range and/or bordeaux statement number
+     * @param params - Search parameters (fromDate, toDate, bordeauxStatementNumber)
+     * @returns Observable<any>
+     */
+    searchLedger(params: { fromDate?: string; toDate?: string; bordeauxStatementNumber?: string }): Observable<any> {
+        const queryParams: any = {};
+
+        if (params.fromDate) {
+            queryParams.fromDate = params.fromDate;
+        }
+        if (params.toDate) {
+            queryParams.toDate = params.toDate;
+        }
+        if (params.bordeauxStatementNumber) {
+            queryParams.bordeauxStatementNumber = params.bordeauxStatementNumber;
+        }
+
+        return http
+            .get<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/ledger`, {
+                params: queryParams
+            })
+            .pipe(map((response) => response.data));
+    }
 }
