@@ -18,10 +18,13 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Chip
+    Chip,
+    IconButton,
+    Tooltip
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { BordeauxService, type BordeauxReportHeader } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
 
 const bordeauxService = new BordeauxService();
@@ -30,9 +33,15 @@ export default function BordeauxReportHeadersComponent() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    // Initialize state with default dates - users will input their own
-    const [fromDate, setFromDate] = useState('2026-04-01');
-    const [toDate, setToDate] = useState('2026-04-30');
+    // Get current date in YYYY-MM-DD format
+    const getCurrentDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    // Initialize state with current date as default
+    const [fromDate, setFromDate] = useState(getCurrentDate());
+    const [toDate, setToDate] = useState(getCurrentDate());
     const [treatyCode, setTreatyCode] = useState('');
     const [reportHeaders, setReportHeaders] = useState<BordeauxReportHeader[]>([]);
     const [loading, setLoading] = useState(false);
@@ -86,12 +95,42 @@ export default function BordeauxReportHeadersComponent() {
                 return;
             }
 
-            // Navigate to invoice details page with the response data
-            const invoiceData = encodeURIComponent(JSON.stringify(result));
-            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details?data=${invoiceData}`);
+            // Store invoice data in sessionStorage for cleaner URL
+            const invoiceDataWithFlag = { ...result, isNewlyGenerated: true };
+            sessionStorage.setItem('bordeauxInvoiceData', JSON.stringify(invoiceDataWithFlag));
+
+            // Navigate with clean URL
+            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details`);
         } catch (err: any) {
             console.error('Generate invoice error:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to generate invoice. Please try again.');
+        } finally {
+            setInvoiceLoading(false);
+        }
+    };
+
+    const handleViewInvoiceForRow = async (headerId: number) => {
+        setInvoiceLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            const result = await bordeauxService.viewInvoiceByConsolidatedId(headerId).toPromise();
+
+            if (!result) {
+                setError('No invoice data found');
+                return;
+            }
+
+            // Store invoice data in sessionStorage for cleaner URL
+            const invoiceDataWithFlag = { ...result, isNewlyGenerated: false };
+            sessionStorage.setItem('bordeauxInvoiceData', JSON.stringify(invoiceDataWithFlag));
+
+            // Navigate with clean URL
+            router.push(`/reinsurance/bordeaux-invoice-generation/invoice-details`);
+        } catch (err: any) {
+            console.error('View invoice error:', err);
+            setError(err?.response?.data?.message || err?.message || 'Failed to view invoice. Please try again.');
         } finally {
             setInvoiceLoading(false);
         }
@@ -252,23 +291,51 @@ export default function BordeauxReportHeadersComponent() {
                                             <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee9003)}</TableCell>
                                             <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee1001)}</TableCell>
                                             <TableCell sx={{ fontSize: '11px', position: 'sticky', right: 0, backgroundColor: '#fff', zIndex: 1 }}>
-                                                <Button
-                                                    size="small"
-                                                    variant="contained"
-                                                    startIcon={<ReceiptIcon />}
-                                                    onClick={() => handleGenerateInvoiceForRow(header.id)}
-                                                    disabled={invoiceLoading}
-                                                    sx={{
-                                                        backgroundColor: '#28a745',
-                                                        textTransform: 'none',
-                                                        fontSize: '10px',
-                                                        py: 0.5,
-                                                        px: 1.5,
-                                                        '&:hover': { backgroundColor: '#218838' }
-                                                    }}
-                                                >
-                                                    Generate Invoice
-                                                </Button>
+                                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                                    {/* View Invoice Icon - Always visible */}
+                                                    <Tooltip title={header.postedToFinance === 'Yes' ? 'View Invoice' : 'No invoice generated yet'}>
+                                                        <span>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleViewInvoiceForRow(header.id)}
+                                                                disabled={header.postedToFinance !== 'Yes' || invoiceLoading}
+                                                                sx={{
+                                                                    color: header.postedToFinance === 'Yes' ? '#17a2b8' : '#ccc',
+                                                                    '&:hover': {
+                                                                        backgroundColor: header.postedToFinance === 'Yes' ? 'rgba(23, 162, 184, 0.1)' : 'transparent'
+                                                                    },
+                                                                    '&.Mui-disabled': {
+                                                                        color: '#ccc'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <VisibilityIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </span>
+                                                    </Tooltip>
+
+                                                    {/* Generate Invoice Icon - Always visible */}
+                                                    <Tooltip title={header.postedToFinance === 'Yes' ? 'Invoice already generated' : 'Generate Invoice'}>
+                                                        <span>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleGenerateInvoiceForRow(header.id)}
+                                                                disabled={header.postedToFinance === 'Yes' || invoiceLoading}
+                                                                sx={{
+                                                                    color: header.postedToFinance === 'No' ? '#28a745' : '#ccc',
+                                                                    '&:hover': {
+                                                                        backgroundColor: header.postedToFinance === 'No' ? 'rgba(40, 167, 69, 0.1)' : 'transparent'
+                                                                    },
+                                                                    '&.Mui-disabled': {
+                                                                        color: '#ccc'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <ReceiptIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </span>
+                                                    </Tooltip>
+                                                </Box>
                                             </TableCell>
                                         </TableRow>
                                     ))}

@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 import {
     Box,
     Card,
@@ -17,7 +18,15 @@ import {
     Button,
     Grid,
     Divider,
-    Stack
+    Stack,
+    IconButton,
+    Tooltip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    CircularProgress
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -26,6 +35,10 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AddIcon from '@mui/icons-material/Add';
+import { BordeauxService, type BordeauxFinanceSettlementJournal } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
+
+const bordeauxService = new BordeauxService();
 
 interface InvoiceItem {
     invoiceTotal: number;
@@ -43,22 +56,47 @@ interface InvoiceDetails {
     financePostingDate: string;
     consolidatedIds: number[];
     invoiceCreated: boolean;
+    isNewlyGenerated?: boolean; // Flag to distinguish between new and existing invoices
 }
 
 export default function BordeauxInvoiceDetailsComponent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [invoiceData, setInvoiceData] = useState<InvoiceDetails | null>(null);
+    const [openJournalDialog, setOpenJournalDialog] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState<InvoiceItem | null>(null);
+    const [journalLoading, setJournalLoading] = useState(false);
+    const [journalFormData, setJournalFormData] = useState({
+        financeSettlementJournal: '',
+        financePaidDate: '',
+        financePaidAmount: '' as string | number,
+        financeOutstandingAmount: '' as string | number,
+        call: ''
+    });
 
     useEffect(() => {
-        // Get invoice data from URL parameters
-        const data = searchParams.get('data');
-        if (data) {
+        // Try to get invoice data from sessionStorage first (cleaner approach)
+        const sessionData = sessionStorage.getItem('bordeauxInvoiceData');
+        if (sessionData) {
             try {
-                const parsedData = JSON.parse(decodeURIComponent(data));
+                const parsedData = JSON.parse(sessionData);
+                setInvoiceData(parsedData);
+                // Clear sessionStorage after reading to prevent stale data
+                sessionStorage.removeItem('bordeauxInvoiceData');
+                return;
+            } catch (error) {
+                console.error('Error parsing session storage data:', error);
+            }
+        }
+
+        // Fallback to URL parameters for backward compatibility
+        const urlData = searchParams.get('data');
+        if (urlData) {
+            try {
+                const parsedData = JSON.parse(decodeURIComponent(urlData));
                 setInvoiceData(parsedData);
             } catch (error) {
-                console.error('Error parsing invoice data:', error);
+                console.error('Error parsing URL data:', error);
             }
         }
     }, [searchParams]);
@@ -76,6 +114,57 @@ export default function BordeauxInvoiceDetailsComponent() {
 
     const handleBack = () => {
         router.back();
+    };
+
+    const handleOpenJournalDialog = (invoice: InvoiceItem) => {
+        setSelectedInvoice(invoice);
+        setJournalFormData({
+            financeSettlementJournal: '',
+            financePaidDate: invoice.invoiceDate,
+            financePaidAmount: invoice.invoiceTotal,
+            financeOutstandingAmount: '',
+            call: ''
+        });
+        setOpenJournalDialog(true);
+    };
+
+    const handleCloseJournalDialog = () => {
+        setOpenJournalDialog(false);
+        setSelectedInvoice(null);
+        setJournalFormData({
+            financeSettlementJournal: '',
+            financePaidDate: '',
+            financePaidAmount: '',
+            financeOutstandingAmount: '',
+            call: ''
+        });
+    };
+
+    const handleAddJournal = async () => {
+        if (!selectedInvoice) return;
+
+        setJournalLoading(true);
+        try {
+            const payload: BordeauxFinanceSettlementJournal = {
+                invoiceId: selectedInvoice.invoiceId,
+                financeSettlementJournal: journalFormData.financeSettlementJournal,
+                financePaidDate: journalFormData.financePaidDate,
+                financePaidAmount: Number(journalFormData.financePaidAmount) || 0,
+                financeOutstandingAmount: Number(journalFormData.financeOutstandingAmount) || 0,
+                call: journalFormData.call
+            };
+
+            await bordeauxService.pushToFinanceSettlementJournal(payload).toPromise();
+
+            // Show success toast
+            toast.success('Journal added successfully!');
+            handleCloseJournalDialog();
+        } catch (error: any) {
+            console.error('Error adding journal:', error);
+            toast.error(error?.response?.data?.message || error?.message || 'Failed to add journal');
+        } finally {
+            setJournalLoading(false);
+        }
     };
 
     if (!invoiceData) {
@@ -112,23 +201,6 @@ export default function BordeauxInvoiceDetailsComponent() {
                 <Typography variant="h4" sx={{ fontWeight: 700, color: '#1e293b', flex: 1 }}>
                     Invoice Details
                 </Typography>
-                {invoiceData.invoiceCreated && (
-                    <Chip
-                        icon={<CheckCircleIcon />}
-                        label="Invoice Created Successfully"
-                        sx={{
-                            backgroundColor: '#e91e63',
-                            color: '#fff',
-                            fontWeight: 600,
-                            fontSize: '13px',
-                            px: 2,
-                            py: 2.5,
-                            '& .MuiChip-icon': {
-                                color: '#fff'
-                            }
-                        }}
-                    />
-                )}
             </Box>
 
             {/* Invoice Summary Banner */}
@@ -144,14 +216,24 @@ export default function BordeauxInvoiceDetailsComponent() {
                                 {invoiceData.invoices.length} Invoice(s)
                             </Typography>
                         </Box>
-                        <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>
-                                Total Amount
-                            </Typography>
-                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#fff', mt: 0.5 }}>
-                                ₹ {formatValue(totalAmount)}
-                            </Typography>
-                        </Box>
+                        {invoiceData.invoiceCreated && invoiceData.isNewlyGenerated && (
+                            <Chip
+                                icon={<CheckCircleIcon />}
+                                label="Invoice Created Successfully"
+                                sx={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                                    color: '#fff',
+                                    fontWeight: 600,
+                                    fontSize: '12px',
+                                    px: 2,
+                                    py: 2,
+                                    border: '1px solid rgba(255, 255, 255, 0.5)',
+                                    '& .MuiChip-icon': {
+                                        color: '#fff'
+                                    }
+                                }}
+                            />
+                        )}
                     </Stack>
                 </CardContent>
             </Card>
@@ -204,23 +286,6 @@ export default function BordeauxInvoiceDetailsComponent() {
                                         </Stack>
                                     </Box>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                                            <Box sx={{ p: 1, backgroundColor: '#dbeafe', borderRadius: '8px' }}>
-                                                <NumbersIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>
-                                                    Consolidated IDs
-                                                </Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b', mt: 0.5 }}>
-                                                    {invoiceData.consolidatedIds.join(', ')}
-                                                </Typography>
-                                            </Box>
-                                        </Stack>
-                                    </Box>
-                                </Grid>
                             </Grid>
                         </CardContent>
                     </Card>
@@ -241,10 +306,11 @@ export default function BordeauxInvoiceDetailsComponent() {
                                         <TableRow sx={{ backgroundColor: '#f8fafc' }}>
                                             <TableCell sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Invoice Number</TableCell>
                                             <TableCell sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Fee Code</TableCell>
-                                            <TableCell sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Invoice ID</TableCell>
                                             <TableCell align="right" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Amount (₹)</TableCell>
-                                            <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Journal ID</TableCell>
                                             <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Row Count</TableCell>
+                                            {invoiceData.isNewlyGenerated && (
+                                                <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Action</TableCell>
+                                            )}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -265,29 +331,32 @@ export default function BordeauxInvoiceDetailsComponent() {
                                                         }}
                                                     />
                                                 </TableCell>
-                                                <TableCell sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
-                                                    {invoice.invoiceId}
-                                                </TableCell>
                                                 <TableCell align="right" sx={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', py: 2 }}>
                                                     {formatValue(invoice.invoiceTotal)}
                                                 </TableCell>
                                                 <TableCell align="center" sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
-                                                    {invoice.financeSettlementJournalId}
-                                                </TableCell>
-                                                <TableCell align="center" sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
                                                     {invoice.rowCount}
                                                 </TableCell>
+                                                {invoiceData.isNewlyGenerated && (
+                                                    <TableCell align="center" sx={{ py: 2 }}>
+                                                        <Tooltip title="Add Journal Entry">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleOpenJournalDialog(invoice)}
+                                                                sx={{
+                                                                    color: '#3b82f6',
+                                                                    '&:hover': {
+                                                                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <AddIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </TableCell>
+                                                )}
                                             </TableRow>
                                         ))}
-                                        <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-                                            <TableCell colSpan={3} sx={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', py: 2.5 }}>
-                                                TOTAL AMOUNT
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', py: 2.5 }}>
-                                                ₹ {formatValue(totalAmount)}
-                                            </TableCell>
-                                            <TableCell colSpan={2} />
-                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -356,6 +425,102 @@ export default function BordeauxInvoiceDetailsComponent() {
                     </Card>
                 </Grid>
             </Grid>
+
+            {/* Add Journal Dialog */}
+            <Dialog open={openJournalDialog} onClose={handleCloseJournalDialog} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ fontWeight: 600, color: '#1e293b' }}>
+                    Add Finance Settlement Journal
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ pt: 2 }}>
+                        <Typography variant="body2" sx={{ mb: 2, color: '#64748b' }}>
+                            Invoice: <strong>{selectedInvoice?.invoiceNumber}</strong>
+                        </Typography>
+
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Finance Settlement Journal"
+                                    value={journalFormData.financeSettlementJournal}
+                                    onChange={(e) => setJournalFormData({ ...journalFormData, financeSettlementJournal: e.target.value })}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Finance Paid Date"
+                                    type="date"
+                                    value={journalFormData.financePaidDate}
+                                    onChange={(e) => setJournalFormData({ ...journalFormData, financePaidDate: e.target.value })}
+                                    InputLabelProps={{ shrink: true }}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Finance Paid Amount"
+                                    type="number"
+                                    value={journalFormData.financePaidAmount}
+                                    onChange={(e) => setJournalFormData({ ...journalFormData, financePaidAmount: e.target.value })}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Finance Outstanding Amount"
+                                    type="number"
+                                    value={journalFormData.financeOutstandingAmount}
+                                    onChange={(e) => setJournalFormData({ ...journalFormData, financeOutstandingAmount: e.target.value })}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Call"
+                                    value={journalFormData.call}
+                                    onChange={(e) => setJournalFormData({ ...journalFormData, call: e.target.value })}
+                                    required
+                                />
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5 }}>
+                    <Button
+                        onClick={handleCloseJournalDialog}
+                        sx={{
+                            textTransform: 'none',
+                            color: '#64748b',
+                            '&:hover': {
+                                backgroundColor: '#f1f5f9'
+                            }
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleAddJournal}
+                        variant="contained"
+                        disabled={journalLoading}
+                        sx={{
+                            textTransform: 'none',
+                            backgroundColor: '#e91e63',
+                            '&:hover': { backgroundColor: '#c2185b' },
+                            '&:disabled': {
+                                backgroundColor: '#e0e0e0',
+                                color: '#9e9e9e'
+                            }
+                        }}
+                    >
+                        {journalLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : 'Add Journal'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
