@@ -257,10 +257,16 @@ export class BordeauxService {
 
     /**
      * Search ledger by date range and/or bordeaux statement number
-     * @param params - Search parameters (fromDate, toDate, bordeauxStatementNumber)
+     * @param params - Search parameters (fromDate, toDate, bordeauxStatementNumber, page, size)
      * @returns Observable<any>
      */
-    searchLedger(params: { fromDate?: string; toDate?: string; bordeauxStatementNumber?: string }): Observable<any> {
+    searchLedger(params: {
+        fromDate?: string;
+        toDate?: string;
+        bordeauxStatementNumber?: string;
+        page?: number;
+        size?: number;
+    }): Observable<any> {
         const queryParams: any = {};
 
         if (params.fromDate) {
@@ -271,6 +277,12 @@ export class BordeauxService {
         }
         if (params.bordeauxStatementNumber) {
             queryParams.bordeauxStatementNumber = params.bordeauxStatementNumber;
+        }
+        if (params.page !== undefined) {
+            queryParams.page = params.page;
+        }
+        if (params.size !== undefined) {
+            queryParams.size = params.size;
         }
 
         return http

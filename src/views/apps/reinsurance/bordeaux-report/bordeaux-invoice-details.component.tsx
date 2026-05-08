@@ -26,7 +26,11 @@ import {
     DialogContent,
     DialogActions,
     TextField,
-    CircularProgress
+    CircularProgress,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -37,8 +41,10 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AddIcon from '@mui/icons-material/Add';
 import { BordeauxService, type BordeauxFinanceSettlementJournal } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
+import { CommonMastersService, type CommonMaster } from '@/services/remote-api/api/master-services/common.masters.service';
 
 const bordeauxService = new BordeauxService();
+const commonMastersService = new CommonMastersService();
 
 interface InvoiceItem {
     invoiceTotal: number;
@@ -57,6 +63,10 @@ interface InvoiceDetails {
     consolidatedIds: number[];
     invoiceCreated: boolean;
     isNewlyGenerated?: boolean; // Flag to distinguish between new and existing invoices
+    reinsurerCode?: string;
+    bordeauxStatementNumber?: string;
+    brokerCode?: string;
+    treatyCode?: string;
 }
 
 export default function BordeauxInvoiceDetailsComponent() {
@@ -66,6 +76,8 @@ export default function BordeauxInvoiceDetailsComponent() {
     const [openJournalDialog, setOpenJournalDialog] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState<InvoiceItem | null>(null);
     const [journalLoading, setJournalLoading] = useState(false);
+    const [callOptions, setCallOptions] = useState<CommonMaster[]>([]);
+    const [callOptionsLoading, setCallOptionsLoading] = useState(false);
     const [journalFormData, setJournalFormData] = useState({
         financeSettlementJournal: '',
         financePaidDate: '',
@@ -116,7 +128,7 @@ export default function BordeauxInvoiceDetailsComponent() {
         router.back();
     };
 
-    const handleOpenJournalDialog = (invoice: InvoiceItem) => {
+    const handleOpenJournalDialog = async (invoice: InvoiceItem) => {
         setSelectedInvoice(invoice);
         setJournalFormData({
             financeSettlementJournal: '',
@@ -126,6 +138,22 @@ export default function BordeauxInvoiceDetailsComponent() {
             call: ''
         });
         setOpenJournalDialog(true);
+
+        // Fetch call options when dialog opens
+        if (callOptions.length === 0) {
+            setCallOptionsLoading(true);
+            try {
+                const result = await commonMastersService.getCallOptions({ page: 0, size: 20 }).toPromise();
+                if (result && result.content) {
+                    setCallOptions(result.content);
+                }
+            } catch (error) {
+                console.error('Error fetching call options:', error);
+                toast.error('Failed to load call options');
+            } finally {
+                setCallOptionsLoading(false);
+            }
+        }
     };
 
     const handleCloseJournalDialog = () => {
@@ -286,6 +314,46 @@ export default function BordeauxInvoiceDetailsComponent() {
                                         </Stack>
                                     </Box>
                                 </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
+                                            Reinsurer Code
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>
+                                            {invoiceData.reinsurerCode || '-'}
+                                        </Typography>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
+                                            Broker Code
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>
+                                            {invoiceData.brokerCode || '-'}
+                                        </Typography>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
+                                            Treaty Code
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>
+                                            {invoiceData.treatyCode || '-'}
+                                        </Typography>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
+                                            Bordeaux Statement Number
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>
+                                            {invoiceData.bordeauxStatementNumber || '-'}
+                                        </Typography>
+                                    </Box>
+                                </Grid>
                             </Grid>
                         </CardContent>
                     </Card>
@@ -308,9 +376,7 @@ export default function BordeauxInvoiceDetailsComponent() {
                                             <TableCell sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Fee Code</TableCell>
                                             <TableCell align="right" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Amount (₹)</TableCell>
                                             <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Row Count</TableCell>
-                                            {invoiceData.isNewlyGenerated && (
-                                                <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Action</TableCell>
-                                            )}
+                                            <TableCell align="center" sx={{ fontWeight: 700, fontSize: '12px', color: '#475569', py: 2 }}>Action</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -337,24 +403,27 @@ export default function BordeauxInvoiceDetailsComponent() {
                                                 <TableCell align="center" sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
                                                     {invoice.rowCount}
                                                 </TableCell>
-                                                {invoiceData.isNewlyGenerated && (
-                                                    <TableCell align="center" sx={{ py: 2 }}>
-                                                        <Tooltip title="Add Journal Entry">
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => handleOpenJournalDialog(invoice)}
-                                                                sx={{
-                                                                    color: '#3b82f6',
-                                                                    '&:hover': {
-                                                                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <AddIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </TableCell>
-                                                )}
+                                                <TableCell align="center" sx={{ py: 2 }}>
+                                                    <Tooltip title="Add Journal Entry">
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleOpenJournalDialog(invoice)}
+                                                            sx={{
+                                                                color: '#e91e63',
+                                                                backgroundColor: 'rgba(233, 30, 99, 0.12)',
+                                                                border: '1px solid rgba(233, 30, 99, 0.3)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(233, 30, 99, 0.2)',
+                                                                    color: '#c2185b',
+                                                                    transform: 'scale(1.05)'
+                                                                },
+                                                                transition: 'all 0.2s ease'
+                                                            }}
+                                                        >
+                                                            <AddIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -395,31 +464,6 @@ export default function BordeauxInvoiceDetailsComponent() {
                                         {invoiceData.financePostingDate}
                                     </Typography>
                                 </Box>
-
-                                <Divider />
-
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
-                                        Finance Settlement Journal IDs
-                                    </Typography>
-                                    <Stack spacing={0.5}>
-                                        {invoiceData.invoices.map((invoice, index) => (
-                                            <Chip
-                                                key={index}
-                                                label={`Fee ${invoice.feeCode}: Journal ${invoice.financeSettlementJournalId}`}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: '#fff',
-                                                    border: '1px solid #cbd5e1',
-                                                    color: '#475569',
-                                                    fontSize: '11px',
-                                                    fontWeight: 600,
-                                                    justifyContent: 'flex-start'
-                                                }}
-                                            />
-                                        ))}
-                                    </Stack>
-                                </Box>
                             </Stack>
                         </CardContent>
                     </Card>
@@ -433,10 +477,6 @@ export default function BordeauxInvoiceDetailsComponent() {
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 2 }}>
-                        <Typography variant="body2" sx={{ mb: 2, color: '#64748b' }}>
-                            Invoice: <strong>{selectedInvoice?.invoiceNumber}</strong>
-                        </Typography>
-
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
                                 <TextField
@@ -479,13 +519,28 @@ export default function BordeauxInvoiceDetailsComponent() {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Call"
-                                    value={journalFormData.call}
-                                    onChange={(e) => setJournalFormData({ ...journalFormData, call: e.target.value })}
-                                    required
-                                />
+                                <FormControl fullWidth required>
+                                    <InputLabel>Call</InputLabel>
+                                    <Select
+                                        value={journalFormData.call}
+                                        onChange={(e) => setJournalFormData({ ...journalFormData, call: e.target.value })}
+                                        label="Call"
+                                        disabled={callOptionsLoading}
+                                    >
+                                        {callOptionsLoading ? (
+                                            <MenuItem disabled>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                Loading...
+                                            </MenuItem>
+                                        ) : (
+                                            callOptions.map((option) => (
+                                                <MenuItem key={option.id} value={option.commonDesc}>
+                                                    {option.commonDesc}
+                                                </MenuItem>
+                                            ))
+                                        )}
+                                    </Select>
+                                </FormControl>
                             </Grid>
                         </Grid>
                     </Box>

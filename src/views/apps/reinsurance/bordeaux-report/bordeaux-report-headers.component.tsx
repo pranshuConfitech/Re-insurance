@@ -20,11 +20,16 @@ import {
     TableRow,
     Chip,
     IconButton,
-    Tooltip
+    Tooltip,
+    Collapse,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BordeauxService, type BordeauxReportHeader } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
 
 const bordeauxService = new BordeauxService();
@@ -48,6 +53,7 @@ export default function BordeauxReportHeadersComponent() {
     const [invoiceLoading, setInvoiceLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
     // No auto-search - users will manually search with their own dates
 
@@ -70,7 +76,7 @@ export default function BordeauxReportHeadersComponent() {
             }
 
             setReportHeaders(result);
-            setSuccessMessage(`Found ${result.length} report headers`);
+            setSuccessMessage(null); // Don't show success message
         } catch (err: any) {
             console.error('Search headers error:', err);
             setReportHeaders([]);
@@ -145,6 +151,10 @@ export default function BordeauxReportHeadersComponent() {
             return value ? 'Yes' : 'No';
         }
         return String(value);
+    };
+
+    const handleAccordionToggle = (headerId: number) => {
+        setExpandedRow(expandedRow === headerId ? null : headerId);
     };
 
     return (
@@ -258,90 +268,209 @@ export default function BordeauxReportHeadersComponent() {
                             />
                         </Box>
 
-                        <TableContainer component={Paper} elevation={0} sx={{ maxHeight: 600 }}>
-                            <Table size="small" stickyHeader>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 100 }}>Section LOB</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 200 }}>Bordeaux Statement Number</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 120 }}>Bordeaux Statement Date</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 120 }}>Statement Status</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#28a745', color: '#fff', minWidth: 100 }}>TREATY CODE</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#28a745', color: '#fff', minWidth: 100 }}>BROKER CODE</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#17a2b8', color: '#fff', minWidth: 120 }}>REINSURER CODE</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 150 }}>sum(participant RI amount) for 9001</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 150 }}>sum(participant RI amount) for 9002</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 150 }}>sum(participant RI amount) for 9003</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#f8f9fa', minWidth: 150 }}>sum(participant RI amount) for 1001</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '10px', backgroundColor: '#ffc107', color: '#000', minWidth: 150, position: 'sticky', right: 0, zIndex: 1 }}>Actions</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {reportHeaders.map((header) => (
-                                        <TableRow key={header.id} hover>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sectionLob)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.bordeauxStatementNumber)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.bordeauxStatementDate)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.statementStatus)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px', backgroundColor: '#d4edda' }}>{formatValue(header.treatyCode)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px', backgroundColor: '#d4edda' }}>{formatValue(header.brokerCode)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px', backgroundColor: '#d1ecf1' }}>{formatValue(header.reinsurerCode)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee9001)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee9002)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee9003)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px' }}>{formatValue(header.sumFee1001)}</TableCell>
-                                            <TableCell sx={{ fontSize: '11px', position: 'sticky', right: 0, backgroundColor: '#fff', zIndex: 1 }}>
-                                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                                    {/* View Invoice Icon - Always visible */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                            {reportHeaders.map((header) => (
+                                <Accordion
+                                    key={header.id}
+                                    expanded={expandedRow === header.id}
+                                    onChange={() => handleAccordionToggle(header.id)}
+                                    sx={{
+                                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                        '&:before': { display: 'none' },
+                                        borderRadius: '6px !important',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        sx={{
+                                            backgroundColor: '#f8f9fa',
+                                            minHeight: '56px',
+                                            '&:hover': { backgroundColor: '#e9ecef' },
+                                            '& .MuiAccordionSummary-content': {
+                                                margin: '12px 0',
+                                                alignItems: 'center'
+                                            }
+                                        }}
+                                    >
+                                        <Grid container spacing={2} alignItems="center">
+                                            <Grid item xs={12} sm={6} md={2}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Section LOB
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(header.sectionLob)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={3}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Bordeaux Statement Number
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(header.bordeauxStatementNumber)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={2}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Statement Date
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(header.bordeauxStatementDate)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Status
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(header.statementStatus)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={1}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Treaty
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(header.treatyCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px' }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={1}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Broker
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(header.brokerCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px' }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Reinsurer
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(header.reinsurerCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d1ecf1', color: '#0c5460', fontSize: '11px', height: '22px' }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ backgroundColor: '#fff', p: 3 }}>
+                                        <Grid container spacing={3}>
+                                            {/* Sum Fields */}
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#2c3e50' }}>
+                                                    Participant RI Amount Summary
+                                                </Typography>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} sm={6} md={3}>
+                                                        <Paper sx={{ p: 2, backgroundColor: '#f0f9ff', border: '1px solid #bae6fd' }}>
+                                                            <Typography variant="caption" sx={{ color: '#0369a1', fontSize: '11px', display: 'block', mb: 0.5 }}>
+                                                                Sum for 9001
+                                                            </Typography>
+                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#0c4a6e' }}>
+                                                                {formatValue(header.sumFee9001)}
+                                                            </Typography>
+                                                        </Paper>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6} md={3}>
+                                                        <Paper sx={{ p: 2, backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                                                            <Typography variant="caption" sx={{ color: '#15803d', fontSize: '11px', display: 'block', mb: 0.5 }}>
+                                                                Sum for 9002
+                                                            </Typography>
+                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#14532d' }}>
+                                                                {formatValue(header.sumFee9002)}
+                                                            </Typography>
+                                                        </Paper>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6} md={3}>
+                                                        <Paper sx={{ p: 2, backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
+                                                            <Typography variant="caption" sx={{ color: '#92400e', fontSize: '11px', display: 'block', mb: 0.5 }}>
+                                                                Sum for 9003
+                                                            </Typography>
+                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#78350f' }}>
+                                                                {formatValue(header.sumFee9003)}
+                                                            </Typography>
+                                                        </Paper>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6} md={3}>
+                                                        <Paper sx={{ p: 2, backgroundColor: '#fce7f3', border: '1px solid #fbcfe8' }}>
+                                                            <Typography variant="caption" sx={{ color: '#9f1239', fontSize: '11px', display: 'block', mb: 0.5 }}>
+                                                                Sum for 1001
+                                                            </Typography>
+                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#881337' }}>
+                                                                {formatValue(header.sumFee1001)}
+                                                            </Typography>
+                                                        </Paper>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+
+                                            {/* Actions */}
+                                            <Grid item xs={12}>
+                                                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', pt: 2, borderTop: '1px solid #e9ecef' }}>
                                                     <Tooltip title={header.postedToFinance === 'Yes' ? 'View Invoice' : 'No invoice generated yet'}>
                                                         <span>
-                                                            <IconButton
+                                                            <Button
+                                                                variant="outlined"
                                                                 size="small"
+                                                                startIcon={<VisibilityIcon />}
                                                                 onClick={() => handleViewInvoiceForRow(header.id)}
                                                                 disabled={header.postedToFinance !== 'Yes' || invoiceLoading}
                                                                 sx={{
                                                                     color: header.postedToFinance === 'Yes' ? '#17a2b8' : '#ccc',
+                                                                    borderColor: header.postedToFinance === 'Yes' ? '#17a2b8' : '#ccc',
+                                                                    textTransform: 'none',
                                                                     '&:hover': {
-                                                                        backgroundColor: header.postedToFinance === 'Yes' ? 'rgba(23, 162, 184, 0.1)' : 'transparent'
+                                                                        backgroundColor: header.postedToFinance === 'Yes' ? 'rgba(23, 162, 184, 0.1)' : 'transparent',
+                                                                        borderColor: header.postedToFinance === 'Yes' ? '#17a2b8' : '#ccc'
                                                                     },
                                                                     '&.Mui-disabled': {
-                                                                        color: '#ccc'
+                                                                        color: '#ccc',
+                                                                        borderColor: '#ccc'
                                                                     }
                                                                 }}
                                                             >
-                                                                <VisibilityIcon fontSize="small" />
-                                                            </IconButton>
+                                                                View Invoice
+                                                            </Button>
                                                         </span>
                                                     </Tooltip>
 
-                                                    {/* Generate Invoice Icon - Always visible */}
                                                     <Tooltip title={header.postedToFinance === 'Yes' ? 'Invoice already generated' : 'Generate Invoice'}>
                                                         <span>
-                                                            <IconButton
+                                                            <Button
+                                                                variant="contained"
                                                                 size="small"
+                                                                startIcon={<ReceiptIcon />}
                                                                 onClick={() => handleGenerateInvoiceForRow(header.id)}
                                                                 disabled={header.postedToFinance === 'Yes' || invoiceLoading}
                                                                 sx={{
-                                                                    color: header.postedToFinance === 'No' ? '#28a745' : '#ccc',
+                                                                    backgroundColor: header.postedToFinance !== 'Yes' ? '#e91e63' : '#d0d0d0',
+                                                                    color: '#fff',
+                                                                    textTransform: 'none',
                                                                     '&:hover': {
-                                                                        backgroundColor: header.postedToFinance === 'No' ? 'rgba(40, 167, 69, 0.1)' : 'transparent'
+                                                                        backgroundColor: header.postedToFinance !== 'Yes' ? '#c2185b' : '#d0d0d0'
                                                                     },
                                                                     '&.Mui-disabled': {
-                                                                        color: '#ccc'
+                                                                        backgroundColor: '#d0d0d0',
+                                                                        color: '#fff'
                                                                     }
                                                                 }}
                                                             >
-                                                                <ReceiptIcon fontSize="small" />
-                                                            </IconButton>
+                                                                Generate Invoice
+                                                            </Button>
                                                         </span>
                                                     </Tooltip>
                                                 </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                                            </Grid>
+                                        </Grid>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Box>
                     </CardContent>
                 </Card>
             )}
