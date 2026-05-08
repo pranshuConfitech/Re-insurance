@@ -280,53 +280,25 @@ export default function BordeauxLedgerDisplayComponent() {
                                         }}
                                     >
                                         <Grid container spacing={1.5} alignItems="center">
-                                            <Grid item xs={6} sm={4} md={2.5}>
+                                            <Grid item xs={6} sm={4} md={2}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Reference No
+                                                    Fee Code
                                                 </Typography>
-                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {formatValue(row.referenceNo)}
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(row.feeCode)}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={6} sm={4} md={1.5}>
+                                            <Grid item xs={6} sm={4} md={2}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Posting Date
+                                                    Finance Posting Date
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
                                                     {formatValue(row.postingDate)}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={12} sm={4} md={3}>
+                                            <Grid item xs={6} sm={4} md={2}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Bordeaux Statement Number
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {formatValue(row.bordeauxStatementNumber)}
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} sm={4} md={1.5}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Treaty
-                                                </Typography>
-                                                <Chip
-                                                    label={formatValue(row.treatyCode)}
-                                                    size="small"
-                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px', minWidth: '50px' }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={4} sm={4} md={1.5}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Broker
-                                                </Typography>
-                                                <Chip
-                                                    label={formatValue(row.brokerCode)}
-                                                    size="small"
-                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px', minWidth: '50px' }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={4} sm={4} md={2}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Reinsurer
+                                                    Reinsurer Code
                                                 </Typography>
                                                 <Chip
                                                     label={formatValue(row.reinsurerCode)}
@@ -334,63 +306,91 @@ export default function BordeauxLedgerDisplayComponent() {
                                                     sx={{ backgroundColor: '#d1ecf1', color: '#0c5460', fontSize: '11px', height: '22px', minWidth: '50px' }}
                                                 />
                                             </Grid>
+                                            <Grid item xs={12} sm={6} md={3}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Accounting Code Desc
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {formatValue(row.accountingCodeDesc)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={6} sm={3} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Debit Amount
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(row.debitAmount)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={6} sm={3} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Credit Amount
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(row.creditAmount)}
+                                                </Typography>
+                                            </Grid>
                                         </Grid>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ backgroundColor: '#fff', p: 2.5 }}>
                                         <Grid container spacing={3}>
-                                            {/* Fee and Accounting Information */}
+                                            {/* Reference and Statement Information */}
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#2c3e50', fontSize: '13px' }}>
-                                                    Fee & Accounting Details
+                                                    Reference & Statement Details
                                                 </Typography>
                                                 <Grid container spacing={2}>
-                                                    <Grid item xs={12} sm={3}>
+                                                    <Grid item xs={12} sm={4}>
                                                         <Box>
                                                             <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
-                                                                Fee Code
+                                                                Reference No
                                                             </Typography>
                                                             <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
-                                                                {formatValue(row.feeCode)}
+                                                                {formatValue(row.referenceNo)}
                                                             </Typography>
                                                         </Box>
                                                     </Grid>
-                                                    <Grid item xs={12} sm={9}>
+                                                    <Grid item xs={12} sm={8}>
                                                         <Box>
                                                             <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
-                                                                Accounting Code Description
+                                                                Bordeaux Statement Number
                                                             </Typography>
                                                             <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
-                                                                {formatValue(row.accountingCodeDesc)}
+                                                                {formatValue(row.bordeauxStatementNumber)}
                                                             </Typography>
                                                         </Box>
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
 
-                                            {/* Debit and Credit Amounts */}
+                                            {/* Treaty and Broker Information */}
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#2c3e50', fontSize: '13px' }}>
-                                                    Amount Details
+                                                    Treaty & Broker Details
                                                 </Typography>
                                                 <Grid container spacing={2}>
                                                     <Grid item xs={12} sm={6}>
                                                         <Box>
                                                             <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
-                                                                Debit Amount
+                                                                Treaty Code
                                                             </Typography>
-                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
-                                                                {formatValue(row.debitAmount)}
-                                                            </Typography>
+                                                            <Chip
+                                                                label={formatValue(row.treatyCode)}
+                                                                size="small"
+                                                                sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '12px', height: '24px' }}
+                                                            />
                                                         </Box>
                                                     </Grid>
                                                     <Grid item xs={12} sm={6}>
                                                         <Box>
                                                             <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
-                                                                Credit Amount
+                                                                Broker Code
                                                             </Typography>
-                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
-                                                                {formatValue(row.creditAmount)}
-                                                            </Typography>
+                                                            <Chip
+                                                                label={formatValue(row.brokerCode)}
+                                                                size="small"
+                                                                sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '12px', height: '24px' }}
+                                                            />
                                                         </Box>
                                                     </Grid>
                                                 </Grid>
