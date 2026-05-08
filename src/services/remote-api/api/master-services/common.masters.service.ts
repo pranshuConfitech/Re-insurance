@@ -251,6 +251,15 @@ export class CommonMastersService {
     }
 
     /**
+     * Get call options from common masters
+     * @param pageRequest - Optional page request parameters
+     * @returns Observable<Page<CommonMaster>>
+     */
+    getCallOptions(pageRequest: CommonMasterQueryParams = {}): Observable<Page<CommonMaster>> {
+        return this.getCommonMasters({ commonTypeDesc: 'CALL', parent: false, ...pageRequest });
+    }
+
+    /**
      * Save a new common master
      * @param payload - Common master data to save
      * @returns Observable<CommonMaster>

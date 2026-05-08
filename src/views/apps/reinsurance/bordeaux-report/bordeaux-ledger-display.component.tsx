@@ -11,16 +11,16 @@ import {
     CircularProgress,
     Alert,
     Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
+    Pagination,
+    Stack,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
     Chip
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BordeauxService } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
 
 const bordeauxService = new BordeauxService();
@@ -40,7 +40,16 @@ export default function BordeauxLedgerDisplayComponent() {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const handleSearchLedger = async () => {
+    // Pagination state
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [hasNext, setHasNext] = useState(false);
+    const [hasPrevious, setHasPrevious] = useState(false);
+    const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+    const handleSearchLedger = async (pageNumber: number = 0) => {
         // Validate that at least one search criteria is provided
         if (!fromDate && !toDate && !bordeauxStatementNumber.trim()) {
             setError('Please provide at least one search criteria: Date range or Bordeaux Statement Number');
@@ -52,7 +61,10 @@ export default function BordeauxLedgerDisplayComponent() {
         setSuccessMessage(null);
 
         try {
-            const params: any = {};
+            const params: any = {
+                page: pageNumber,
+                size: pageSize
+            };
 
             if (fromDate) params.fromDate = fromDate;
             if (toDate) params.toDate = toDate;
@@ -63,27 +75,50 @@ export default function BordeauxLedgerDisplayComponent() {
             if (!result) {
                 setError('No ledger records found for the selected criteria.');
                 setLedgerData([]);
+                setTotalPages(0);
+                setTotalElements(0);
+                setHasNext(false);
+                setHasPrevious(false);
                 return;
             }
 
-            // Extract rows array from response
+            // Extract rows array and pagination info from response
             const rows = result.rows || [];
+            const pageInfo = result.pageInfo || {};
 
             if (rows.length === 0) {
                 setError('No ledger records found for the selected criteria.');
                 setLedgerData([]);
+                setTotalPages(0);
+                setTotalElements(0);
+                setHasNext(false);
+                setHasPrevious(false);
                 return;
             }
 
             setLedgerData(rows);
-            setSuccessMessage(`Found ${rows.length} ledger record(s)`);
+            setPage(pageInfo.page || 0);
+            setTotalPages(pageInfo.totalPages || 0);
+            setTotalElements(pageInfo.totalElements || 0);
+            setHasNext(pageInfo.hasNext || false);
+            setHasPrevious(pageInfo.hasPrevious || false);
+            setSuccessMessage(null); // Don't show success message
         } catch (err: any) {
             console.error('Search ledger error:', err);
             setLedgerData([]);
+            setTotalPages(0);
+            setTotalElements(0);
+            setHasNext(false);
+            setHasPrevious(false);
             setError(err?.response?.data?.message || err?.message || 'Failed to search ledger. Please try again.');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        // MUI Pagination is 1-indexed, but API is 0-indexed
+        handleSearchLedger(value - 1);
     };
 
     const formatValue = (value: any) => {
@@ -106,52 +141,8 @@ export default function BordeauxLedgerDisplayComponent() {
             .trim();
     };
 
-    // Extract column headers from the first data item, excluding ID fields and reordering for better display
-    const getTableHeaders = () => {
-        if (ledgerData.length === 0) return [];
-
-        // Get all keys and filter out ID-related and technical fields
-        const allKeys = Object.keys(ledgerData[0]);
-        const excludedFields = [
-            'id',
-            'key',
-            'referenceId',
-            'rowCreatedDate',
-            'rowLastUpdatedDate',
-            'rowVersionNbr',
-            'active',
-            'rowCreatedBy',
-            'rowLastUpdatedBy',
-            'rowLastModProcName',
-            'createdAt'
-        ];
-
-        // Define the preferred order for important columns
-        const priorityColumns = [
-            'referenceType',
-            'referenceNo',
-            'postingDate',
-            'bordeauxStatementNumber',
-            'treatyCode',
-            'brokerCode',
-            'reinsurerCode',
-            'feeCode',
-            'accountingCodeDesc',
-            'debitAmount',
-            'creditAmount',
-            'stage'
-        ];
-
-        // Filter out excluded fields
-        const availableKeys = allKeys.filter(key => !excludedFields.includes(key));
-
-        // Sort keys: priority columns first (in order), then remaining columns
-        const sortedKeys = [
-            ...priorityColumns.filter(col => availableKeys.includes(col)),
-            ...availableKeys.filter(col => !priorityColumns.includes(col))
-        ];
-
-        return sortedKeys;
+    const handleAccordionToggle = (rowKey: number) => {
+        setExpandedRow(expandedRow === rowKey ? null : rowKey);
     };
 
     return (
@@ -223,7 +214,7 @@ export default function BordeauxLedgerDisplayComponent() {
                             <Button
                                 fullWidth
                                 variant="contained"
-                                onClick={handleSearchLedger}
+                                onClick={() => handleSearchLedger(0)}
                                 disabled={loading}
                                 startIcon={loading ? null : <SearchIcon />}
                                 sx={{
@@ -255,71 +246,186 @@ export default function BordeauxLedgerDisplayComponent() {
                 </CardContent>
             </Card>
 
-            {/* Ledger Data Table */}
+            {/* Ledger Data Accordion */}
             {ledgerData.length > 0 && (
                 <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
                     <CardContent sx={{ p: 3 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50' }}>
-                                Ledger Records
-                            </Typography>
-                            <Chip
-                                label={`${ledgerData.length} record(s) found`}
-                                sx={{ backgroundColor: '#fce4ec', color: '#e91e63', fontWeight: 600 }}
-                            />
+                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50', mb: 2 }}>
+                            Ledger Records
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                            {ledgerData.map((row, rowIndex) => (
+                                <Accordion
+                                    key={row.key || rowIndex}
+                                    expanded={expandedRow === (row.key || rowIndex)}
+                                    onChange={() => handleAccordionToggle(row.key || rowIndex)}
+                                    sx={{
+                                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                        '&:before': { display: 'none' },
+                                        borderRadius: '6px !important',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        sx={{
+                                            backgroundColor: '#f8f9fa',
+                                            minHeight: '56px',
+                                            '&:hover': { backgroundColor: '#e9ecef' },
+                                            '& .MuiAccordionSummary-content': {
+                                                margin: '12px 0',
+                                                alignItems: 'center'
+                                            }
+                                        }}
+                                    >
+                                        <Grid container spacing={1.5} alignItems="center">
+                                            <Grid item xs={6} sm={4} md={2.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Reference No
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {formatValue(row.referenceNo)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={6} sm={4} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Posting Date
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                    {formatValue(row.postingDate)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={4} md={3}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Bordeaux Statement Number
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {formatValue(row.bordeauxStatementNumber)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={4} sm={4} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Treaty
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(row.treatyCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px', minWidth: '50px' }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={4} sm={4} md={1.5}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Broker
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(row.brokerCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d4edda', color: '#155724', fontSize: '11px', height: '22px', minWidth: '50px' }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={4} sm={4} md={2}>
+                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                    Reinsurer
+                                                </Typography>
+                                                <Chip
+                                                    label={formatValue(row.reinsurerCode)}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#d1ecf1', color: '#0c5460', fontSize: '11px', height: '22px', minWidth: '50px' }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ backgroundColor: '#fff', p: 2.5 }}>
+                                        <Grid container spacing={3}>
+                                            {/* Fee and Accounting Information */}
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#2c3e50', fontSize: '13px' }}>
+                                                    Fee & Accounting Details
+                                                </Typography>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} sm={3}>
+                                                        <Box>
+                                                            <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
+                                                                Fee Code
+                                                            </Typography>
+                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
+                                                                {formatValue(row.feeCode)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={9}>
+                                                        <Box>
+                                                            <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
+                                                                Accounting Code Description
+                                                            </Typography>
+                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
+                                                                {formatValue(row.accountingCodeDesc)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+
+                                            {/* Debit and Credit Amounts */}
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#2c3e50', fontSize: '13px' }}>
+                                                    Amount Details
+                                                </Typography>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <Box>
+                                                            <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
+                                                                Debit Amount
+                                                            </Typography>
+                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
+                                                                {formatValue(row.debitAmount)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <Box>
+                                                            <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block', mb: 0.5 }}>
+                                                                Credit Amount
+                                                            </Typography>
+                                                            <Typography variant="body1" sx={{ fontSize: '14px', fontWeight: 500, color: '#2c3e50' }}>
+                                                                {formatValue(row.creditAmount)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
                         </Box>
 
-                        <TableContainer component={Paper} elevation={0} sx={{ maxHeight: 600 }}>
-                            <Table size="small" stickyHeader>
-                                <TableHead>
-                                    <TableRow>
-                                        {getTableHeaders().map((header, index) => (
-                                            <TableCell
-                                                key={index}
-                                                sx={{
-                                                    fontWeight: 600,
-                                                    fontSize: '11px',
-                                                    backgroundColor: '#f8f9fa',
-                                                    minWidth: 120,
-                                                    whiteSpace: 'nowrap'
-                                                }}
-                                            >
-                                                {formatColumnHeader(header)}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {ledgerData.map((row, rowIndex) => (
-                                        <TableRow key={rowIndex} hover>
-                                            {getTableHeaders().map((header, colIndex) => {
-                                                const value = row[header];
-                                                const isDebitAmount = header === 'debitAmount';
-                                                const isCreditAmount = header === 'creditAmount';
+                        {/* Pagination Controls */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, flexWrap: 'wrap', gap: 2 }}>
+                            <Typography variant="body2" sx={{ color: '#64748b', fontSize: '13px' }}>
+                                Showing {page * pageSize + 1} - {Math.min((page + 1) * pageSize, totalElements)} of {totalElements}
+                            </Typography>
 
-                                                return (
-                                                    <TableCell
-                                                        key={colIndex}
-                                                        sx={{
-                                                            fontSize: '12px',
-                                                            fontWeight: (isDebitAmount || isCreditAmount) && value > 0 ? 600 : 400,
-                                                            color: isDebitAmount && value > 0 ? '#d32f2f' :
-                                                                isCreditAmount && value > 0 ? '#2e7d32' :
-                                                                    'inherit',
-                                                            backgroundColor: isDebitAmount && value > 0 ? '#ffebee' :
-                                                                isCreditAmount && value > 0 ? '#e8f5e9' :
-                                                                    'inherit'
-                                                        }}
-                                                    >
-                                                        {formatValue(value)}
-                                                    </TableCell>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                            {totalPages > 1 && (
+                                <Stack spacing={2}>
+                                    <Pagination
+                                        count={totalPages}
+                                        page={page + 1}
+                                        onChange={handlePageChange}
+                                        color="primary"
+                                        disabled={loading}
+                                        showFirstButton
+                                        showLastButton
+                                        sx={{
+                                            '& .MuiPaginationItem-root': {
+                                                fontSize: '13px'
+                                            }
+                                        }}
+                                    />
+                                </Stack>
+                            )}
+                        </Box>
                     </CardContent>
                 </Card>
             )}
