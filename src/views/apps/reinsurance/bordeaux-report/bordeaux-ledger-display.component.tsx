@@ -280,23 +280,15 @@ export default function BordeauxLedgerDisplayComponent() {
                                         }}
                                     >
                                         <Grid container spacing={1.5} alignItems="center">
-                                            <Grid item xs={6} sm={4} md={2}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Fee Code
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
-                                                    {formatValue(row.feeCode)}
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6} sm={4} md={2}>
+                                            <Grid item xs={6} sm={3} md={1.5}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
                                                     Finance Posting Date
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
-                                                    {formatValue(row.postingDate)}
+                                                    {formatValue(row.financePostingDate)}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={6} sm={4} md={2}>
+                                            <Grid item xs={6} sm={3} md={1.5}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
                                                     Reinsurer Code
                                                 </Typography>
@@ -314,22 +306,47 @@ export default function BordeauxLedgerDisplayComponent() {
                                                     {formatValue(row.accountingCodeDesc)}
                                                 </Typography>
                                             </Grid>
-                                            <Grid item xs={6} sm={3} md={1.5}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Debit Amount
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
-                                                    {formatValue(row.debitAmount)}
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6} sm={3} md={1.5}>
-                                                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Credit Amount
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
-                                                    {formatValue(row.creditAmount)}
-                                                </Typography>
-                                            </Grid>
+
+                                            {/* Dynamic Fee Codes Display */}
+                                            {row.fees && Array.isArray(row.fees) && row.fees.length > 0 ? (
+                                                row.fees.map((fee: any, feeIndex: number) => (
+                                                    <Grid item xs={6} sm={3} md={2} key={feeIndex}>
+                                                        <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                            Fee {fee.feeCode}
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                            {formatValue(fee.feeAmount)}
+                                                        </Typography>
+                                                    </Grid>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <Grid item xs={6} sm={3} md={2}>
+                                                        <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                            Fee Code
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                            {formatValue(row.feeCode)}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6} sm={3} md={1.5}>
+                                                        <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                            Debit Amount
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                            {formatValue(row.debitAmount)}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6} sm={3} md={1.5}>
+                                                        <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
+                                                            Credit Amount
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 500 }}>
+                                                            {formatValue(row.creditAmount)}
+                                                        </Typography>
+                                                    </Grid>
+                                                </>
+                                            )}
                                         </Grid>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ backgroundColor: '#fff', p: 2.5 }}>
