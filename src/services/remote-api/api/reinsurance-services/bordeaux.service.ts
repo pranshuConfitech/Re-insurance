@@ -291,4 +291,61 @@ export class BordeauxService {
             })
             .pipe(map((response) => response.data));
     }
+
+    /**
+     * Search treaties in staging table by date range
+     * @param fromDate - From date
+     * @param toDate - To date
+     * @returns Observable<any>
+     */
+    searchTreatiesInStaging(fromDate: string, toDate: string): Observable<any> {
+        return http
+            .get<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/treaties`, {
+                params: {
+                    fromDate,
+                    toDate
+                }
+            })
+            .pipe(map((response) => response.data));
+    }
+
+    /**
+     * Generate monthly statement for a single treaty
+     * @param params - Statement generation parameters
+     * @returns Observable<any>
+     */
+    generateMonthlyStatement(params: {
+        treatyCode: string;
+        fromDate: string;
+        toDate: string;
+    }): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/generate-monthly-statement`, null, {
+                params: {
+                    treatyCode: params.treatyCode,
+                    fromDate: params.fromDate,
+                    toDate: params.toDate
+                }
+            })
+            .pipe(map((response) => response.data));
+    }
+
+    /**
+     * Generate monthly statements in bulk for multiple treaties
+     * @param params - Bulk statement generation parameters
+     * @returns Observable<any>
+     */
+    generateMonthlyStatementsBulk(params: {
+        treatyCodes: string[];
+        fromDate: string;
+        toDate: string;
+    }): Observable<any> {
+        return http
+            .post<any>(`${this.BASE_CONTEXT}/premium-stagging-bordeaux/generate-monthly-statements-bulk`, {
+                treatyCodes: params.treatyCodes,
+                fromDate: params.fromDate,
+                toDate: params.toDate
+            })
+            .pipe(map((response) => response.data));
+    }
 }
