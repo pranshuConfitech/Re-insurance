@@ -103,6 +103,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href="/reinsurance/bordeaux-report">Bordeaux Report</MenuItem>
           <MenuItem href="/reinsurance/bordeaux-invoice-generation">Bordeaux Invoice Generation</MenuItem>
           <MenuItem href="/reinsurance/ledger-display">Ledger Display</MenuItem>
+          <MenuItem href="/reinsurance/monthly-statement-generation">Monthly Statement Generation</MenuItem>
           <MenuItem href="/reinsurance/reports">Reports</MenuItem>
         </SubMenu>
       </Menu>
