@@ -290,8 +290,8 @@ export default function MonthlyStatementGenerationComponent() {
                 Monthly Statement Generation
             </Typography>
 
-            {/* Mode Selection */}
-            <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
+            {/* Mode Selection - Hidden for now */}
+            {/* <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
                 <CardContent sx={{ p: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                         <AssessmentIcon sx={{ color: '#e91e63', fontSize: 22 }} />
@@ -304,7 +304,7 @@ export default function MonthlyStatementGenerationComponent() {
                         value={mode}
                         exclusive
                         onChange={handleModeChange}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, display: 'none' }}
                     >
                         <ToggleButton value="single" sx={{ px: 3, textTransform: 'none' }}>
                             Single Treaty
@@ -315,26 +315,24 @@ export default function MonthlyStatementGenerationComponent() {
                     </ToggleButtonGroup>
 
                     <Typography variant="caption" sx={{ display: 'block', color: '#64748b', fontSize: '12px' }}>
-                        {mode === 'single'
-                            ? '* Generate statement for a specific treaty or all treaties in date range'
-                            : '* Search and select multiple treaties to generate statements in bulk'}
+                        * Generate statement for a specific treaty or all treaties in date range
                     </Typography>
                 </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Single Mode */}
             {mode === 'single' && (
                 <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
                     <CardContent sx={{ p: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50', mb: 3 }}>
-                            Generate Statement for Single Treaty
+                            Generate Monthly Statement
                         </Typography>
 
                         <Grid container spacing={2.5} alignItems="flex-end">
                             <Grid item xs={12} sm={6} md={3}>
                                 <TextField
                                     fullWidth
-                                    label="Treaty Code (Optional)"
+                                    label="Treaty Code"
                                     value={singleTreatyCode}
                                     onChange={(e) => setSingleTreatyCode(e.target.value)}
                                     placeholder="Leave empty for all treaties"
@@ -399,9 +397,9 @@ export default function MonthlyStatementGenerationComponent() {
                             </Grid>
                         </Grid>
 
-                        <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontSize: '12px' }}>
+                        {/* <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontSize: '12px' }}>
                             * Treaty Code is optional. Leave empty to generate for all treaties in the date range.
-                        </Typography>
+                        </Typography> */}
 
                         {singleError && (
                             <Alert severity="error" sx={{ mt: 2, fontSize: '13px' }}>
@@ -556,175 +554,176 @@ export default function MonthlyStatementGenerationComponent() {
                 </Card>
             )}
 
-            {/* Bulk Mode */}
-            {mode === 'bulk' && (
+            {/* Bulk Mode - Commented out for now */}
+            {/* {mode === 'bulk' && (
                 <>
-                    {/* Search Section */}
-                    <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50', mb: 3 }}>
-                                Search Treaties in Staging Table
-                            </Typography>
+                    // Search Section
+            <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
+                <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50', mb: 3 }}>
+                        Search Treaties in Staging Table
+                    </Typography>
 
-                            <Grid container spacing={2.5} alignItems="flex-end">
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="From Date"
-                                        type="date"
-                                        value={bulkFromDate}
-                                        onChange={(e) => setBulkFromDate(e.target.value)}
-                                        InputLabelProps={{ shrink: true }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                fontSize: '14px',
-                                                height: '42px'
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        label="To Date"
-                                        type="date"
-                                        value={bulkToDate}
-                                        onChange={(e) => setBulkToDate(e.target.value)}
-                                        InputLabelProps={{ shrink: true }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                fontSize: '14px',
-                                                height: '42px'
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <Button
-                                        fullWidth
-                                        variant="contained"
-                                        onClick={handleBulkSearch}
-                                        disabled={bulkSearchLoading}
-                                        startIcon={bulkSearchLoading ? null : <SearchIcon />}
-                                        sx={{
-                                            backgroundColor: '#2196f3',
-                                            height: '42px',
-                                            textTransform: 'none',
-                                            '&:hover': { backgroundColor: '#1976d2' }
-                                        }}
-                                    >
-                                        {bulkSearchLoading ? <CircularProgress size={18} sx={{ color: 'white' }} /> : 'Search Treaties'}
-                                    </Button>
-                                </Grid>
-                            </Grid>
+                    <Grid container spacing={2.5} alignItems="flex-end">
+                        <Grid item xs={12} sm={6} md={4}>
+                            <TextField
+                                fullWidth
+                                label="From Date"
+                                type="date"
+                                value={bulkFromDate}
+                                onChange={(e) => setBulkFromDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        fontSize: '14px',
+                                        height: '42px'
+                                    }
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <TextField
+                                fullWidth
+                                label="To Date"
+                                type="date"
+                                value={bulkToDate}
+                                onChange={(e) => setBulkToDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        fontSize: '14px',
+                                        height: '42px'
+                                    }
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={handleBulkSearch}
+                                disabled={bulkSearchLoading}
+                                startIcon={bulkSearchLoading ? null : <SearchIcon />}
+                                sx={{
+                                    backgroundColor: '#2196f3',
+                                    height: '42px',
+                                    textTransform: 'none',
+                                    '&:hover': { backgroundColor: '#1976d2' }
+                                }}
+                            >
+                                {bulkSearchLoading ? <CircularProgress size={18} sx={{ color: 'white' }} /> : 'Search Treaties'}
+                            </Button>
+                        </Grid>
+                    </Grid>
 
-                            {bulkError && (
-                                <Alert severity="error" sx={{ mt: 2, fontSize: '13px' }}>
-                                    {bulkError}
-                                </Alert>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Treaties Table */}
-                    {bulkTreaties.length > 0 && (
-                        <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
-                            <CardContent sx={{ p: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50' }}>
-                                        Available Treaties ({bulkTreaties.length})
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Typography variant="body2" sx={{ color: '#64748b', fontSize: '13px' }}>
-                                            Selected: {selectedTreaties.size}
-                                        </Typography>
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            onClick={handleToggleAll}
-                                            sx={{ textTransform: 'none', fontSize: '12px' }}
-                                        >
-                                            {selectedTreaties.size === bulkTreaties.length ? 'Deselect All' : 'Select All'}
-                                        </Button>
-                                    </Box>
-                                </Box>
-
-                                <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0' }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        checked={selectedTreaties.size === bulkTreaties.length && bulkTreaties.length > 0}
-                                                        indeterminate={selectedTreaties.size > 0 && selectedTreaties.size < bulkTreaties.length}
-                                                        onChange={handleToggleAll}
-                                                    />
-                                                </TableCell>
-                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Treaty Code</TableCell>
-                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Reinsurer Code</TableCell>
-                                                <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Record Count</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {bulkTreaties.map((treaty) => (
-                                                <TableRow
-                                                    key={treaty.treatyCode}
-                                                    hover
-                                                    onClick={() => handleToggleTreaty(treaty.treatyCode)}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    <TableCell padding="checkbox">
-                                                        <Checkbox
-                                                            checked={selectedTreaties.has(treaty.treatyCode)}
-                                                            onChange={() => handleToggleTreaty(treaty.treatyCode)}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell sx={{ fontSize: '13px' }}>
-                                                        <Chip
-                                                            label={treaty.treatyCode}
-                                                            size="small"
-                                                            sx={{ backgroundColor: '#e3f2fd', color: '#1976d2', fontSize: '12px' }}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell sx={{ fontSize: '13px' }}>{treaty.reinsurerCode}</TableCell>
-                                                    <TableCell sx={{ fontSize: '13px' }}>{treaty.count}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-
-                                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleBulkGenerate}
-                                        disabled={bulkGenerateLoading || selectedTreaties.size === 0}
-                                        startIcon={bulkGenerateLoading ? null : <PlayArrowIcon />}
-                                        sx={{
-                                            backgroundColor: '#e91e63',
-                                            px: 4,
-                                            textTransform: 'none',
-                                            '&:hover': { backgroundColor: '#c2185b' }
-                                        }}
-                                    >
-                                        {bulkGenerateLoading ? (
-                                            <CircularProgress size={18} sx={{ color: 'white' }} />
-                                        ) : (
-                                            `Run Statements (${selectedTreaties.size})`
-                                        )}
-                                    </Button>
-                                </Box>
-
-                                {bulkSuccess && (
-                                    <Alert severity="success" sx={{ mt: 2, fontSize: '13px' }}>
-                                        {bulkSuccess}
-                                    </Alert>
-                                )}
-                            </CardContent>
-                        </Card>
+                    {bulkError && (
+                        <Alert severity="error" sx={{ mt: 2, fontSize: '13px' }}>
+                            {bulkError}
+                        </Alert>
                     )}
-                </>
+                </CardContent>
+            </Card>
+
+            // Treaties Table
+            {bulkTreaties.length > 0 && (
+                <Card sx={{ mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '8px' }}>
+                    <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '15px', color: '#2c3e50' }}>
+                                Available Treaties ({bulkTreaties.length})
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Typography variant="body2" sx={{ color: '#64748b', fontSize: '13px' }}>
+                                    Selected: {selectedTreaties.size}
+                                </Typography>
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={handleToggleAll}
+                                    sx={{ textTransform: 'none', fontSize: '12px' }}
+                                >
+                                    {selectedTreaties.size === bulkTreaties.length ? 'Deselect All' : 'Select All'}
+                                </Button>
+                            </Box>
+                        </Box>
+
+                        <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0' }}>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                checked={selectedTreaties.size === bulkTreaties.length && bulkTreaties.length > 0}
+                                                indeterminate={selectedTreaties.size > 0 && selectedTreaties.size < bulkTreaties.length}
+                                                onChange={handleToggleAll}
+                                            />
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Treaty Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Reinsurer Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Record Count</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {bulkTreaties.map((treaty) => (
+                                        <TableRow
+                                            key={treaty.treatyCode}
+                                            hover
+                                            onClick={() => handleToggleTreaty(treaty.treatyCode)}
+                                            sx={{ cursor: 'pointer' }}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    checked={selectedTreaties.has(treaty.treatyCode)}
+                                                    onChange={() => handleToggleTreaty(treaty.treatyCode)}
+                                                />
+                                            </TableCell>
+                                            <TableCell sx={{ fontSize: '13px' }}>
+                                                <Chip
+                                                    label={treaty.treatyCode}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#e3f2fd', color: '#1976d2', fontSize: '12px' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell sx={{ fontSize: '13px' }}>{treaty.reinsurerCode}</TableCell>
+                                            <TableCell sx={{ fontSize: '13px' }}>{treaty.count}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                                variant="contained"
+                                onClick={handleBulkGenerate}
+                                disabled={bulkGenerateLoading || selectedTreaties.size === 0}
+                                startIcon={bulkGenerateLoading ? null : <PlayArrowIcon />}
+                                sx={{
+                                    backgroundColor: '#e91e63',
+                                    px: 4,
+                                    textTransform: 'none',
+                                    '&:hover': { backgroundColor: '#c2185b' }
+                                }}
+                            >
+                                {bulkGenerateLoading ? (
+                                    <CircularProgress size={18} sx={{ color: 'white' }} />
+                                ) : (
+                                    `Run Statements (${selectedTreaties.size})`
+                                )}
+                            </Button>
+                        </Box>
+
+                        {bulkSuccess && (
+                            <Alert severity="success" sx={{ mt: 2, fontSize: '13px' }}>
+                                {bulkSuccess}
+                            </Alert>
+                        )}
+                    </CardContent>
+                </Card>
             )}
-        </Box>
+        </>
+    )
+} */}
+        </Box >
     );
 }

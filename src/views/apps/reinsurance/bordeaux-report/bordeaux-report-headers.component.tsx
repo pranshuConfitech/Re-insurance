@@ -360,52 +360,45 @@ export default function BordeauxReportHeadersComponent() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ backgroundColor: '#fff', p: 3 }}>
                                         <Grid container spacing={3}>
-                                            {/* Sum Fields */}
+                                            {/* Sum Fields - Dynamic Fees */}
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#2c3e50' }}>
                                                     Participant RI Amount Summary
                                                 </Typography>
                                                 <Grid container spacing={2}>
-                                                    <Grid item xs={12} sm={6} md={3}>
-                                                        <Paper sx={{ p: 2, backgroundColor: '#f0f9ff', border: '1px solid #bae6fd' }}>
-                                                            <Typography variant="caption" sx={{ color: '#0369a1', fontSize: '11px', display: 'block', mb: 0.5 }}>
-                                                                Sum for 9001
+                                                    {header.fees && Array.isArray(header.fees) && header.fees.length > 0 ? (
+                                                        header.fees.map((fee: any, index: number) => {
+                                                            // Define color schemes for different fee types
+                                                            const colorSchemes = [
+                                                                { bg: '#f0f9ff', border: '#bae6fd', textLight: '#0369a1', textDark: '#0c4a6e' },
+                                                                { bg: '#f0fdf4', border: '#bbf7d0', textLight: '#15803d', textDark: '#14532d' },
+                                                                { bg: '#fef3c7', border: '#fde68a', textLight: '#92400e', textDark: '#78350f' },
+                                                                { bg: '#fce7f3', border: '#fbcfe8', textLight: '#9f1239', textDark: '#881337' },
+                                                                { bg: '#ede9fe', border: '#ddd6fe', textLight: '#6b21a8', textDark: '#581c87' },
+                                                                { bg: '#fef2f2', border: '#fecaca', textLight: '#b91c1c', textDark: '#7f1d1d' }
+                                                            ];
+                                                            const colorScheme = colorSchemes[index % colorSchemes.length];
+
+                                                            return (
+                                                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                                                    <Paper sx={{ p: 2, backgroundColor: colorScheme.bg, border: `1px solid ${colorScheme.border}` }}>
+                                                                        <Typography variant="caption" sx={{ color: colorScheme.textLight, fontSize: '11px', display: 'block', mb: 0.5 }}>
+                                                                            Sum for {fee.feeCode}
+                                                                        </Typography>
+                                                                        <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: colorScheme.textDark }}>
+                                                                            {formatValue(fee.feeAmount)}
+                                                                        </Typography>
+                                                                    </Paper>
+                                                                </Grid>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <Grid item xs={12}>
+                                                            <Typography variant="body2" sx={{ color: '#9e9e9e', fontSize: '13px', fontStyle: 'italic' }}>
+                                                                No fee data available
                                                             </Typography>
-                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#0c4a6e' }}>
-                                                                {formatValue(header.sumFee9001)}
-                                                            </Typography>
-                                                        </Paper>
-                                                    </Grid>
-                                                    <Grid item xs={12} sm={6} md={3}>
-                                                        <Paper sx={{ p: 2, backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-                                                            <Typography variant="caption" sx={{ color: '#15803d', fontSize: '11px', display: 'block', mb: 0.5 }}>
-                                                                Sum for 9002
-                                                            </Typography>
-                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#14532d' }}>
-                                                                {formatValue(header.sumFee9002)}
-                                                            </Typography>
-                                                        </Paper>
-                                                    </Grid>
-                                                    <Grid item xs={12} sm={6} md={3}>
-                                                        <Paper sx={{ p: 2, backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
-                                                            <Typography variant="caption" sx={{ color: '#92400e', fontSize: '11px', display: 'block', mb: 0.5 }}>
-                                                                Sum for 9003
-                                                            </Typography>
-                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#78350f' }}>
-                                                                {formatValue(header.sumFee9003)}
-                                                            </Typography>
-                                                        </Paper>
-                                                    </Grid>
-                                                    <Grid item xs={12} sm={6} md={3}>
-                                                        <Paper sx={{ p: 2, backgroundColor: '#fce7f3', border: '1px solid #fbcfe8' }}>
-                                                            <Typography variant="caption" sx={{ color: '#9f1239', fontSize: '11px', display: 'block', mb: 0.5 }}>
-                                                                Sum for 1001
-                                                            </Typography>
-                                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 600, color: '#881337' }}>
-                                                                {formatValue(header.sumFee1001)}
-                                                            </Typography>
-                                                        </Paper>
-                                                    </Grid>
+                                                        </Grid>
+                                                    )}
                                                 </Grid>
                                             </Grid>
 
