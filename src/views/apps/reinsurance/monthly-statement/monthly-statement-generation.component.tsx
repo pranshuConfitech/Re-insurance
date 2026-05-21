@@ -443,7 +443,7 @@ export default function MonthlyStatementGenerationComponent() {
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Statement Number</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Treaty</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Reinsurer</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Insurer / Reinsurer</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Broker</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Section/LOB</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '12px', backgroundColor: '#f8f9fa', whiteSpace: 'nowrap' }}>Status</TableCell>
@@ -659,7 +659,7 @@ export default function MonthlyStatementGenerationComponent() {
                                             />
                                         </TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Treaty Code</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Reinsurer Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Insurer / Reinsurer</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '13px' }}>Record Count</TableCell>
                                     </TableRow>
                                 </TableHead>

@@ -317,7 +317,7 @@ export default function BordeauxInvoiceDetailsComponent() {
                                 <Grid item xs={12} sm={6}>
                                     <Box sx={{ p: 2.5, backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                         <Typography variant="caption" sx={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, display: 'block', mb: 1 }}>
-                                            Reinsurer Code
+                                            Insurer / Reinsurer
                                         </Typography>
                                         <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>
                                             {invoiceData.reinsurerCode || '-'}

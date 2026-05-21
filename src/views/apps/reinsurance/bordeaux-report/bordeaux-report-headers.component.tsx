@@ -348,7 +348,7 @@ export default function BordeauxReportHeadersComponent() {
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={1.5}>
                                                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '10px', display: 'block' }}>
-                                                    Reinsurer
+                                                    Insurer / Reinsurer
                                                 </Typography>
                                                 <Chip
                                                     label={formatValue(header.reinsurerCode)}
