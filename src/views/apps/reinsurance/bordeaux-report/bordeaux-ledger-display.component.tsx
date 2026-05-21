@@ -270,7 +270,7 @@ export default function BordeauxLedgerDisplayComponent() {
                                 </Grid>
                                 <Grid item xs={6} sm={2} md={1.5}>
                                     <Typography variant="caption" sx={{ color: '#6c757d', fontSize: '11px', fontWeight: 600 }}>
-                                        Reinsurer Code
+                                        Insurer / Reinsurer
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={4} md={2.5}>

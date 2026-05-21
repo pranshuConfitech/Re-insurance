@@ -196,7 +196,7 @@ export default function BordeauxReportComponent() {
         uniqueInternalId: 'Unique INTERNAL ID',
         treatyCode: 'TREATY CODE',
         brokerCode: 'BROKER CODE',
-        reinsurerCode: 'REINSURER CODE',
+        reinsurerCode: 'INSURER / REINSURER',
         feeCode: 'FEE CODE',
         riDate: 'RI DATE',
         cessionType: 'OUT/RETROO CESSION',
@@ -577,7 +577,7 @@ export default function BordeauxReportComponent() {
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Treaty Code</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Broker Code</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Reinsurer Code</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Insurer / Reinsurer</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Section LOB</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>Statement Number</TableCell>
                                         <TableCell sx={{ fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase' }}>From Date</TableCell>
@@ -677,7 +677,7 @@ export default function BordeauxReportComponent() {
                                             Broker Code
                                         </TableCell>
                                         <TableCell sx={{ width: '10%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
-                                            Reinsurer Code
+                                            Insurer / Reinsurer
                                         </TableCell>
                                         <TableCell sx={{ width: '8%', fontWeight: 600, fontSize: '11px', backgroundColor: '#f8f9fa', color: '#495057', textTransform: 'uppercase', py: 1.5, borderBottom: '1px solid #dee2e6' }}>
                                             Fee Code
