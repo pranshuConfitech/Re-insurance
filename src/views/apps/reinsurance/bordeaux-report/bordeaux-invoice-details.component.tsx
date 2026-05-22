@@ -46,14 +46,20 @@ import { CommonMastersService, type CommonMaster } from '@/services/remote-api/a
 const bordeauxService = new BordeauxService();
 const commonMastersService = new CommonMastersService();
 
+interface FeeItem {
+    feeCode: number | string;
+    feeAmount: number;
+}
+
 interface InvoiceItem {
-    invoiceTotal: number;
+    invoiceGrandTotal: number;
     financeSettlementJournalId: number;
     invoiceDate: string;
     invoiceId: number;
     rowCount: number;
-    feeCode: number;
+    fees: FeeItem[];
     invoiceNumber: string;
+    bordeauxStatementNumber?: string;
 }
 
 interface InvoiceDetails {
@@ -133,7 +139,7 @@ export default function BordeauxInvoiceDetailsComponent() {
         setJournalFormData({
             financeSettlementJournal: '',
             financePaidDate: invoice.invoiceDate,
-            financePaidAmount: invoice.invoiceTotal,
+            financePaidAmount: invoice.invoiceGrandTotal,
             financeOutstandingAmount: '',
             call: ''
         });
@@ -203,7 +209,7 @@ export default function BordeauxInvoiceDetailsComponent() {
         );
     }
 
-    const totalAmount = invoiceData.invoices.reduce((sum, invoice) => sum + invoice.invoiceTotal, 0);
+    const totalAmount = invoiceData.invoices.reduce((sum, invoice) => sum + invoice.invoiceGrandTotal, 0);
     const totalRowCount = invoiceData.invoices.reduce((sum, invoice) => sum + invoice.rowCount, 0);
 
     return (
@@ -380,52 +386,56 @@ export default function BordeauxInvoiceDetailsComponent() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {invoiceData.invoices.map((invoice, index) => (
-                                            <TableRow key={index} hover sx={{ '&:hover': { backgroundColor: '#f8fafc' } }}>
-                                                <TableCell sx={{ fontSize: '12px', fontWeight: 600, py: 2, color: '#1e293b' }}>
-                                                    {invoice.invoiceNumber}
-                                                </TableCell>
-                                                <TableCell sx={{ fontSize: '13px', py: 2 }}>
-                                                    <Chip
-                                                        label={invoice.feeCode}
-                                                        size="small"
-                                                        sx={{
-                                                            backgroundColor: '#dbeafe',
-                                                            color: '#1e40af',
-                                                            fontSize: '11px',
-                                                            fontWeight: 600
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="right" sx={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', py: 2 }}>
-                                                    {formatValue(invoice.invoiceTotal)}
-                                                </TableCell>
-                                                <TableCell align="center" sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
-                                                    {invoice.rowCount}
-                                                </TableCell>
-                                                <TableCell align="center" sx={{ py: 2 }}>
-                                                    <Tooltip title="Add Journal Entry">
-                                                        <IconButton
+                                        {invoiceData.invoices.flatMap((invoice, invoiceIndex) =>
+                                            invoice.fees.map((fee, feeIndex) => (
+                                                <TableRow key={`${invoiceIndex}-${feeIndex}`} hover sx={{ '&:hover': { backgroundColor: '#f8fafc' } }}>
+                                                    <TableCell sx={{ fontSize: '12px', fontWeight: 600, py: 2, color: '#1e293b' }}>
+                                                        {invoice.invoiceNumber}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '13px', py: 2 }}>
+                                                        <Chip
+                                                            label={formatValue(fee.feeCode)}
                                                             size="small"
-                                                            onClick={() => handleOpenJournalDialog(invoice)}
                                                             sx={{
-                                                                color: '#e91e63',
-                                                                backgroundColor: 'rgba(233, 30, 99, 0.12)',
-                                                                border: '1px solid rgba(233, 30, 99, 0.3)',
-                                                                '&:hover': {
-                                                                    backgroundColor: 'rgba(233, 30, 99, 0.2)',
-                                                                    color: '#c2185b',
-                                                                    transform: 'scale(1.05)'
-                                                                },
-                                                                transition: 'all 0.2s ease'
+                                                                backgroundColor: '#dbeafe',
+                                                                color: '#1e40af',
+                                                                fontSize: '11px',
+                                                                fontWeight: 600
                                                             }}
-                                                        >
-                                                            <AddIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell align="right" sx={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', py: 2 }}>
+                                                        {formatValue(fee.feeAmount)}
+                                                    </TableCell>
+                                                    <TableCell align="center" sx={{ fontSize: '13px', py: 2, color: '#475569' }}>
+                                                        {feeIndex === 0 ? invoice.rowCount : '-'}
+                                                    </TableCell>
+                                                    <TableCell align="center" sx={{ py: 2 }}>
+                                                        {feeIndex === 0 && (
+                                                            <Tooltip title="Add Journal Entry">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => handleOpenJournalDialog(invoice)}
+                                                                    sx={{
+                                                                        color: '#e91e63',
+                                                                        backgroundColor: 'rgba(233, 30, 99, 0.12)',
+                                                                        border: '1px solid rgba(233, 30, 99, 0.3)',
+                                                                        '&:hover': {
+                                                                            backgroundColor: 'rgba(233, 30, 99, 0.2)',
+                                                                            color: '#c2185b',
+                                                                            transform: 'scale(1.05)'
+                                                                        },
+                                                                        transition: 'all 0.2s ease'
+                                                                    }}
+                                                                >
+                                                                    <AddIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
