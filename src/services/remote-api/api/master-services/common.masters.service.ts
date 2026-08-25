@@ -38,7 +38,7 @@ export class CommonMastersService {
     getCommonMasters(params: CommonMasterParams): Observable<Page<CommonMaster>> {
         const pageRequest: any = {
             page: params.page || 0,
-            size: params.size || 20,
+            size: params.size || 50,
             summary: params.summary !== undefined ? params.summary : true,
             active: params.active !== undefined ? params.active : true,
             commonTypeDesc: params.commonTypeDesc,

@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+.auth-tokens/
 
 # production
 /dist

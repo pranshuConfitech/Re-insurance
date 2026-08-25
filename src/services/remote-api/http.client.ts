@@ -55,13 +55,6 @@ export class HttpClient {
 
           window.document.dispatchEvent(event);
 
-          // Handle 401 Unauthorized error
-          if (error.response?.status === 401) {
-            console.log('Unauthorized! Logging out...');
-            localStorage.clear();
-            window.location.href = '/api/auth/logout'
-          }
-
           return Promise.reject(error);
         }
       }

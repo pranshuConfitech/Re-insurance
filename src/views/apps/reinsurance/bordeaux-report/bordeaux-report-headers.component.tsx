@@ -1,6 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Box,
     Card,
@@ -33,18 +33,58 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BordeauxService, type BordeauxReportHeader } from '@/services/remote-api/api/reinsurance-services/bordeaux.service';
 
 const bordeauxService = new BordeauxService();
+const SEARCH_STATE_KEY = 'bordeauxInvoiceGenerationSearchState';
+
+interface PersistedSearchState {
+    fromDate: string;
+    toDate: string;
+    treatyCode: string;
+    reportHeaders: BordeauxReportHeader[];
+    expandedRow: number | null;
+    hasSearched: boolean;
+}
+
+const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+};
+
+const loadSearchState = (): PersistedSearchState | null => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+        const raw = sessionStorage.getItem(SEARCH_STATE_KEY);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        return {
+            fromDate: parsed.fromDate || getCurrentDate(),
+            toDate: parsed.toDate || getCurrentDate(),
+            treatyCode: parsed.treatyCode || '',
+            reportHeaders: Array.isArray(parsed.reportHeaders) ? parsed.reportHeaders : [],
+            expandedRow: typeof parsed.expandedRow === 'number' ? parsed.expandedRow : null,
+            hasSearched: Boolean(parsed.hasSearched)
+        };
+    } catch {
+        return null;
+    }
+};
+
+const saveSearchState = (state: PersistedSearchState) => {
+    if (typeof window === 'undefined') return;
+
+    try {
+        sessionStorage.setItem(SEARCH_STATE_KEY, JSON.stringify(state));
+    } catch (error) {
+        console.error('Failed to persist Bordeaux search state:', error);
+    }
+};
 
 export default function BordeauxReportHeadersComponent() {
-    const searchParams = useSearchParams();
     const router = useRouter();
+    const didRestoreRef = useRef(false);
+    const didRefreshRef = useRef(false);
 
-    // Get current date in YYYY-MM-DD format
-    const getCurrentDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    };
-
-    // Initialize state with current date as default
     const [fromDate, setFromDate] = useState(getCurrentDate());
     const [toDate, setToDate] = useState(getCurrentDate());
     const [treatyCode, setTreatyCode] = useState('');
@@ -54,37 +94,97 @@ export default function BordeauxReportHeadersComponent() {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
+    const [hasSearched, setHasSearched] = useState(false);
+    const [isReady, setIsReady] = useState(false);
 
-    // No auto-search - users will manually search with their own dates
+    useEffect(() => {
+        const saved = loadSearchState();
 
-    const handleSearchHeaders = async () => {
-        setLoading(true);
+        if (saved) {
+            setFromDate(saved.fromDate);
+            setToDate(saved.toDate);
+            setTreatyCode(saved.treatyCode);
+            setReportHeaders(saved.reportHeaders);
+            setExpandedRow(saved.expandedRow);
+            setHasSearched(saved.hasSearched);
+        }
+
+        didRestoreRef.current = true;
+        setIsReady(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isReady || !didRestoreRef.current) return;
+
+        saveSearchState({
+            fromDate,
+            toDate,
+            treatyCode,
+            reportHeaders,
+            expandedRow,
+            hasSearched
+        });
+    }, [fromDate, toDate, treatyCode, reportHeaders, expandedRow, hasSearched, isReady]);
+
+    const handleSearchHeaders = async (options?: { silent?: boolean; fromDate?: string; toDate?: string; treatyCode?: string }) => {
+        const searchFromDate = options?.fromDate ?? fromDate;
+        const searchToDate = options?.toDate ?? toDate;
+        const searchTreatyCode = options?.treatyCode ?? treatyCode;
+        const silent = options?.silent ?? false;
+
+        if (!silent) {
+            setLoading(true);
+        }
         setError(null);
         setSuccessMessage(null);
+        setHasSearched(true);
 
         try {
             const result = await bordeauxService.searchReportHeaders({
-                fromDate,
-                toDate,
-                treatyCode: treatyCode.trim() || undefined
+                fromDate: searchFromDate,
+                toDate: searchToDate,
+                treatyCode: searchTreatyCode.trim() || undefined
             }).toPromise();
 
             if (!result || result.length === 0) {
-                setError('No report headers found for the selected criteria. Please confirm generated headers first.');
-                setReportHeaders([]);
+                if (!silent) {
+                    setError('No report headers found for the selected criteria. Please confirm generated headers first.');
+                    setReportHeaders([]);
+                }
                 return;
             }
 
             setReportHeaders(result);
-            setSuccessMessage(null); // Don't show success message
+            setSuccessMessage(null);
         } catch (err: any) {
             console.error('Search headers error:', err);
-            setReportHeaders([]);
-            setError(err?.response?.data?.message || err?.message || 'Failed to search report headers. Please try again.');
+            if (!silent) {
+                setReportHeaders([]);
+                setError(err?.response?.data?.message || err?.message || 'Failed to search report headers. Please try again.');
+            }
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
+
+    useEffect(() => {
+        if (!isReady || !hasSearched || didRefreshRef.current) return;
+
+        const saved = loadSearchState();
+        if (!saved?.hasSearched) return;
+
+        didRefreshRef.current = true;
+        void handleSearchHeaders({
+            silent: true,
+            fromDate: saved.fromDate,
+            toDate: saved.toDate,
+            treatyCode: saved.treatyCode
+        });
+        // Refresh once after restoring a previous search so invoice status stays current.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isReady, hasSearched]);
 
     const handleGenerateInvoiceForRow = async (headerId: number) => {
         setInvoiceLoading(true);
@@ -100,6 +200,15 @@ export default function BordeauxReportHeadersComponent() {
                 setError('Invoice generation completed but no response received');
                 return;
             }
+
+            saveSearchState({
+                fromDate,
+                toDate,
+                treatyCode,
+                reportHeaders,
+                expandedRow,
+                hasSearched: true
+            });
 
             // Store invoice data in sessionStorage for cleaner URL
             const invoiceDataWithFlag = { ...result, isNewlyGenerated: true };
@@ -127,6 +236,15 @@ export default function BordeauxReportHeadersComponent() {
                 setError('No invoice data found');
                 return;
             }
+
+            saveSearchState({
+                fromDate,
+                toDate,
+                treatyCode,
+                reportHeaders,
+                expandedRow,
+                hasSearched: true
+            });
 
             // Store invoice data in sessionStorage for cleaner URL
             const invoiceDataWithFlag = { ...result, isNewlyGenerated: false };
@@ -226,7 +344,7 @@ export default function BordeauxReportHeadersComponent() {
                             <Button
                                 fullWidth
                                 variant="contained"
-                                onClick={handleSearchHeaders}
+                                onClick={() => handleSearchHeaders()}
                                 disabled={loading}
                                 startIcon={loading ? null : <SearchIcon />}
                                 sx={{
