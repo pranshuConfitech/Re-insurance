@@ -4,9 +4,9 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS=--max-http-header-size=131072 next dev",
     "build": "cross-env NEXTJS_IGNORE_ESLINT=true NODE_OPTIONS=--max-old-space-size=4096 next build",
-    "start": "next start -p 80",
+    "start": "cross-env NODE_OPTIONS=--max-http-header-size=131072 next start -p 80",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",

@@ -7,8 +7,7 @@ import type { ChildrenType } from '@core/types'
 import { auth } from '../libs/auth'
 
 export default async function AuthGuard({ children }: ChildrenType) {
-  const session = await auth()
+  const session: any = await auth()
 
-  
-return <>{session ? children : <AuthRedirect  />}</>
+  return <>{session && !session.error ? children : <AuthRedirect />}</>
 }

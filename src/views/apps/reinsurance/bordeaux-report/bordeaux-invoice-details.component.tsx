@@ -149,7 +149,7 @@ export default function BordeauxInvoiceDetailsComponent() {
         if (callOptions.length === 0) {
             setCallOptionsLoading(true);
             try {
-                const result = await commonMastersService.getCallOptions({ page: 0, size: 20 }).toPromise();
+                const result = await commonMastersService.getCallOptions({ page: 0, size: 40 }).toPromise();
                 if (result && result.content) {
                     setCallOptions(result.content);
                 }
