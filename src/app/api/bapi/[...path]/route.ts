@@ -1,13 +1,38 @@
+// import type { NextRequest } from 'next/server';
+// import { NextResponse } from 'next/server'
+
+// import { auth } from '../../../../libs/auth'
+
+// export const config = {
+//   api: {
+//     bodyParser: false // Disable bodyParser for raw data handling
+//   }
+// }
+
+// export async function GET(req: NextRequest) {
+//   return proxyHandler(req)
+// }
+
+// export async function POST(req: NextRequest) {
+//   return proxyHandler(req)
+// }
+
+// export async function PUT(req: NextRequest) {
+//   return proxyHandler(req)
+// }
+// export async function PATCH(req: NextRequest) {
+//   return proxyHandler(req)
+// }
+// export async function DELETE(req: NextRequest) {
+//   return proxyHandler(req)
+// }
+
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server'
 
 import { auth } from '../../../../libs/auth'
 
-export const config = {
-  api: {
-    bodyParser: false // Disable bodyParser for raw data handling
-  }
-}
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   return proxyHandler(req)
