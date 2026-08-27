@@ -19,7 +19,8 @@ if (!globalForTokens.__authTokenCache) {
 }
 
 const cache = globalForTokens.__authTokenCache
-const STORE_DIR = path.join(process.cwd(), '.auth-tokens')
+// const STORE_DIR = path.join(process.cwd(), '.auth-tokens')
+const STORE_DIR = '/tmp/.auth-tokens'
 
 async function ensureDir() {
   if (!existsSync(STORE_DIR)) {
